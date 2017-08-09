@@ -19,6 +19,7 @@ SPArrayList* spArrayListCreate(int maxSize)
 	return array;
 }
 
+
 /**
  *	Creates an exact copy of the src array list. Elements in the new copy will
  *	be in the same order as they appeared in the source list.
