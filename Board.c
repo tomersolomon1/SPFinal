@@ -31,5 +31,5 @@ bool is_valid_move(Board *board, Move move) {
 }
 
 int **get_all_moves(Board *board, int colur) {
-
+	return NULL;
 }
