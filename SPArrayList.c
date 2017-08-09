@@ -7,13 +7,7 @@
 
 #include "SPArrayList.h"
 
-/**
- *  Creates an empty array list with the specified maximum capacity.
- *  @param maxSize - the maximum capacity of the target array list.
- *  @return
- *  NULL, if an allocation error occurred or maxSize  <= 0.
- *  An instant of an array list otherwise.
- */
+
 SPArrayList* spArrayListCreate(int maxSize)
 {
 	SPArrayList* array = (SPArrayList*) malloc(sizeof(SPArrayList));
