@@ -19,7 +19,73 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat, c
 	newPiece->is_moved = false;
 	newPiece->type = type;
 	newPiece->sign = sign;
-	return Piece;
+	newPiece->amount_steps = 0;
+	newPiece->steps = NULL;
+	Vector_step* vectors;
+	if(type == Pawn && colur == white){
+		Vector_step[0] = create_vector(1, 0, 2);
+		newPiece->amount_vectors = 1;
+	}
+	if(type == Pawn && colur == black){
+		Vector_step[0] = create_vector(-1, 0, 2);
+		newPiece->amount_vectors = 1;
+	}
+	if(type == Knight){
+		Vector_step[0] = create_vector(1, 2, 1);
+		Vector_step[1] = create_vector(1, -2, 1);
+		Vector_step[2] = create_vector(-1, 2, 1);
+		Vector_step[3] = create_vector(-1, -2, 1);
+		Vector_step[4] = create_vector(2, 1, 1);
+		Vector_step[5] = create_vector(2, -1, 1);
+		Vector_step[6] = create_vector(-2, 1, 1);
+		Vector_step[7] = create_vector(-2, -1, 1);
+		newPiece->amount_vectors = 8;
+	}
+	if(type == Bishop){
+		Vector_step[0] = create_vector(1, -1, 8);
+		Vector_step[1] = create_vector(-1, 1, 8);
+		Vector_step[2] = create_vector(1, 1, 8);
+		Vector_step[3] = create_vector(-1, -1, 8);
+		newPiece->amount_vectors = 4;
+	}
+	if(type == Rock){
+		Vector_step[0] = create_vector(1, 0, 8);
+		Vector_step[1] = create_vector(-1, 0, 8);
+		Vector_step[2] = create_vector(0, 1, 8);
+		Vector_step[3] = create_vector(0, -1, 8);
+		newPiece->amount_vectors = 4;
+	}
+	if(type == Queen){
+		Vector_step[0] = create_vector(1, 0, 8);
+		Vector_step[1] = create_vector(-1, 0, 8);
+		Vector_step[2] = create_vector(0, 1, 8);
+		Vector_step[3] = create_vector(0, -1, 8);
+		Vector_step[4] = create_vector(1, -1, 8);
+		Vector_step[5] = create_vector(-1, 1, 8);
+		Vector_step[6] = create_vector(1, 1, 8);
+		Vector_step[7] = create_vector(-1, -1, 8);
+		newPiece->amount_vectors = 8;
+	}
+	if(type == King){
+		Vector_step[0] = create_vector(1, 0, 1);
+		Vector_step[1] = create_vector(-1, 0, 1);
+		Vector_step[2] = create_vector(0, 1, 1);
+		Vector_step[3] = create_vector(0, -1, 1);
+		Vector_step[4] = create_vector(1, -1, 1);
+		Vector_step[5] = create_vector(-1, 1, 1);
+		Vector_step[6] = create_vector(1, 1, 1);
+		Vector_step[7] = create_vector(-1, -1, 1);
+		newPiece->amount_vectors = 8;
+	}
+	return newPiece;
+}
+
+Vector_step create_vector(int delta_row, int delta_col, int vector_size){
+	Vector_step v;
+	v.delta_row = delta_row;
+	v.delta_col = delta_col;
+	v.vector_size = vector_size;
+	return v;
 }
 
 void destroy_piece(Piece piece) {
@@ -47,3 +113,4 @@ Piece *copy_piece(Piece old){
 	return newPiece;
 }
 
+int *

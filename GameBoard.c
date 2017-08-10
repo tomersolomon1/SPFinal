@@ -7,8 +7,7 @@
 
 #include "GameBoard.h"
 
-#define black 0
-#define white 1
+
 
 Gameboard *create_board() {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
@@ -59,6 +58,7 @@ Gameboard *create_board() {
 	newBoard->all_pieces = all_pieces;
 	newBoard->turn = white;
 	newBoard->history = history;
+	newBoard->empty = Empty_piece;
 	return newBoard;
 }
 
@@ -68,17 +68,17 @@ void add_piece(Piece* board, Piece* all_pieces, Piece_type type, int colur, int 
 	all_pieces[colur][indexat] = piece;
 }
 
-void destroy_board(Gameboard *board) {
-	if(board == NULL){
+void destroy_board(Gameboard *gameboard) {
+	if(gameboard == NULL){
 		return;
 	}
-	ArrayListDestroy(board->history);
+	ArrayListDestroy(gameboard->history);
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
-			destroy_piece(board->board[i][j]);
+			destroy_piece(gameboard->board[i][j]);
 		}
 	}
-	free(board);
+	free(gameboard);
 }
 
 Gameboard *copy_board(Gameboard* old) {
@@ -107,6 +107,7 @@ Gameboard *copy_board(Gameboard* old) {
 	newBoard->board = board;
 	newBoard->history = history;
 	newBoard->turn = old->turn;
+	newBoard->empty = Empty_piece;
 	return newBoard;
 }
 
@@ -120,21 +121,83 @@ Step create_step(int srow, int scol, int drow, int dcol, Piece *prev){
 	return Step;
 }
 
-CHESS_BOARD_MESSAGE set_Step(Gameboard *board, Step step) {
+CHESS_BOARD_MESSAGE set_Step(Gameboard *gameboard, Step step) {
 	return CHESS_BOARD_SUCCESS;
 }
 
-bool is_valid_Step(Gameboard *board, Step step) {
+bool is_valid_Step(Gameboard *gameboard, Step step) {
 	return true;
 }
 
-bool is_check_curr_player(Gameboard *board) {
+bool is_check_curr_player(Gameboard *gameboard) {
+	for(int i = 0; i < 16; i++){
+		Piece piece = gameboard->all_pieces[gameboard->turn][i];
+		if(piece->alive){
+			if(piece->type == Pawn){
+
+			}
+		}
+	}
 	return false;
 }
 
-Step *get_Steps(Gameboard *board, Piece *piece) {
-	return NULL;
+bool is_check_by_vector(Gameboard *gameboard, Piece *piece, int delta_row, int delta_col, int amount_going){
+	int row = piece->row;
+	int col = piece->col;
+	while(amount_going > 0){
+		amount_going --;
+		row = row + delta_row;
+		col = col + delta_col;
+		if(row < 0 || row > 7 || col < 0 || col > 7){ //out of board
+			return false;
+		}
+		else if(gameboard->board[row][col]->type == Empty){ // can go, empty
+			continue;
+		}
+		else if(gameboard->board[row][col]->type == King &&
+				gameboard->board[row][col]->colur != piece->colur){ //eating opponent's king
+			return true;
+		}
+		else{ // seeing your color piece
+			return false;
+		}
+	}
+	return false;
 }
+void set_Steps(Gameboard *gameboard, Piece *piece) {
+	int amount_steps = 0;
+
+
+}
+
+void add_Steps_by_vector(Gameboard *gameboard, Piece *piece, int delta_row, int delta_col, int amount_going, int *amount_steps){
+	int row = piece->row;
+	int col = piece->col;
+	while(amount_going > 0){
+		amount_going --;
+		row = row + delta_row;
+		col = col + delta_col;
+		if(row < 0 || row > 7 || col < 0 || col > 7){ //out of board
+			break;
+		}
+		if(gameboard->board[row][col]->type == Empty){ // can go, empty
+			Step s = create_step(piece->row, piece->col, row, col, gameboard.empty);
+			piece->steps[amount_steps] = s;
+			amount_steps++;
+		}
+		else if(gameboard->board[row][col]->colur != piece->colur){ //eating opponent's piece
+			Step s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col]);
+			piece->steps[amount_steps] = s;
+			amount_steps++;
+			break;
+		}
+		else{ // seeing your color piece
+			break;
+		}
+	}
+
+}
+
 
 Step *get_all_Steps(Gameboard *board, int colur) {
 	return NULL;

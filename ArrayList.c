@@ -14,7 +14,6 @@ ArrayList* ArrayListCreate(int maxSize)
 
 	array->maxSize = maxSize;
 	array->elements = (Step*) malloc(sizeof(Step) * maxSize);
-
 	array->actualSize = 0;
 	return array;
 }

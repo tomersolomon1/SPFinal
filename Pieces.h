@@ -14,6 +14,9 @@
 #include <stddef.h>
 #include <string.h>
 
+#define black 0
+#define white 1
+
 typedef enum {
 	Pawn, /* "Hayal" */
 	Knight, /* "Parash */
@@ -25,6 +28,13 @@ typedef enum {
 } Piece_type;
 //Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '');
 
+typedef struct step_t {
+	int srow;
+	int scol;
+	int drow;
+	int dcol;
+	Piece *prevPiece;
+} Step;
 
 typedef struct piece_t {
 	Piece_type type;
@@ -35,6 +45,15 @@ typedef struct piece_t {
 	int indext; /*index in array of tools*/
 	bool is_moved;
 	char sign;
+	Step* steps;
+	int amount_steps;
+	Vector_step* vectors;
+	int amount_vectors;
 } Piece;
 
+typedef struct vector_step_t{
+	int delta_row;
+	int delta_col;
+	int vector_size;
+} Vector_step;
 #endif /* PIECES_H_ */

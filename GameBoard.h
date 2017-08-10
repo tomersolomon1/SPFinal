@@ -19,15 +19,10 @@ typedef struct gameboard_t {
 	int turn;
 	Piece *all_pieces[2][16];
 	ArrayList history;
+	Piece *empty;
 } Gameboard;
 
-typedef struct step_t {
-	int srow;
-	int scol;
-	int drow;
-	int dcol;
-	Piece *prevPiece;
-} Step;
+
 
 typedef enum chess_board_message_t {
 	CHESS_BOARD_INVALID_MOVE,
