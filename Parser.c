@@ -6,19 +6,36 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 #include "Parser.h"
 
-const char comms_s[] = { "game_mode", "difficulty", "user_color", "load", "default", "print_setting", "start", \
-		"move", "save", "undo", "reset", \
-		"quit"
-};
+bool valid_tail(Command *comm, const char *line, int offset) {
+	while (offset < SP_MAX_LINE_LENGTH) {
+		if (!isspace(line(offset))) { /* what about the null-char? ask moav */
+			comm->comm_e = Ivalid_command; /* more chars than should be, therefore illegal */
+			return false;
+		}
+	}
+	return true;
+}
 
-const SP_commands comms_e[] = { Set_GameMode, Set_Difficulty, Set_UserColor, Load, Restore_Default, Print_Settings, Start, \
-								Make_Move, Save, Undo_Move, Reset, \
-								Quit, \
-								Ivalid_command
-};
-
+/* make sure this is the right command */
+bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len,
+		bool need_param) {
+	int actual_len = 0;
+	for (; (actual_len < comm_len && offset < SP_MAX_LINE_LENGTH); actual_len++, offset++) {
+		if (comm_s[offset] != line[offset]) {
+			comm->comm_e = Ivalid_command; /* it's not the command we thought it was */
+			return false;
+		}
+	}
+	if ((actual_len != comm_len - 1) || (offset == SP_MAX_LINE_LENGTH && need_param) ||
+			(need_param && !isspace(line[offset]))) {
+		comm->comm_e = Ivalid_command;
+		return false;
+	}
+	return true;
+}
 
 int get_non_whitespace_offset(const char *str) {
 	int i = 0;
@@ -29,6 +46,34 @@ int get_non_whitespace_offset(const char *str) {
 	}
 	if (i < practical_max_legnth) { return i; }
 	else { return -1; }
+}
+
+/* should transform it into a macro */
+void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s) {
+	int len = strlen(comm_s);
+	verify_command(comm, line, offset, comm_s, len, false);
+	valid_tail(comm, line, offset+len);
+}
+
+void get_file_name(Command *comm, const char *line, int offset, const char *comm_s) {
+	int len = strlen(comm_s);
+	if (verify_command(comm, line, offset, comm_s, len, true)) {
+		int file_name_offset = get_non_whitespace_offset(line + offset + len) + offset + len;
+		comm->file_name = (char *) malloc(sizeof(char) * MAX_FILE_NAME);
+		int j = 0;
+		while ((file_name_offset < SP_MAX_LINE_LENGTH) && (j < MAX_FILE_NAME - 1)
+				&& (!isspace(line(file_name_offset)))) {
+			comm->file_name[j] = line[file_name_offset];
+			file_name_offset++;
+			j++;
+		}
+		comm->file_name[j] = '\0'; /* terminating the file-name */
+		valid_tail(comm, line, file_name_offset);
+	}
+}
+
+get_user_color(comm, line, offset) {
+
 }
 
 Command *parser(const char *line) {
@@ -43,14 +88,14 @@ Command *parser(const char *line) {
 	switch (line[offset]) {
 		case 'g': /* 'game_mode' */
 			comm->comm_e = Set_GameMode;
-			get_game_mode(comm, line, offset);
+			get_game_mode(comm, line, offset); /* !!!!! */
 			break;
 
 		case 'd': /* either 'difficulty' or 'default' */
 			switch (line[offset+1]) {
 				case 'i': /* 'difficulty' */
 					comm->comm_e = Set_Difficulty;
-					get_difficulty(comm, line, offset);
+					get_difficulty(comm, line, offset); /* !!!!! */
 					break;
 				case 'e': /* 'default' */
 					comm->comm_e = Restore_Default;
@@ -63,7 +108,7 @@ Command *parser(const char *line) {
 			switch (line[offset+1]) {
 				case 's': /* 'user_color */
 					comm->comm_e = Set_UserColor;
-					get_user_colur(comm, line, offset);
+					get_user_color(comm, line, offset); /* !!!!! */
 					break;
 				case 'n': /* 'undo' */
 					comm->comm_e = Undo_Move;
@@ -78,7 +123,7 @@ Command *parser(const char *line) {
 
 		case 'p': /* 'print_settings */
 			comm->comm_e = Print_Settings;
-			get_non_arg_command(comm, line, "print_setting");
+			get_non_arg_command(comm, line, offset, "print_setting");
 			break;
 
 		case 's': /* either 'save' or 'start' */
@@ -89,28 +134,28 @@ Command *parser(const char *line) {
 					break;
 				case 't': /* 'start */
 					comm->comm_e = Start;
-					get_non_arg_command(comm, line, "start");
+					get_non_arg_command(comm, line, offset, "start");
 					break;
 			};
 			break;
 
 		case 'm': /* 'move' */
 			comm->comm_e = Make_Move;
-			get_move_arg(comm, line, offset);
+			get_move_arg(comm, line, offset); /* !!!!! */
 			break;
 
 		case 'r': /* 'reset' */
 			comm->comm_e = Reset;
-			get_non_arg_command(comm, line, "reset");
+			get_non_arg_command(comm, line, offset, "reset");
 			break;
 
 		case 'q': /* 'quit' */
 			comm->comm_e = Quit;
-			get_non_arg_command(comm, line, "quit");
+			get_non_arg_command(comm, line, offset, "quit");
 			break;
 
 		default: /* unrecognized command */
-			comm->comm_e = Ivalid_command;
+			return comm;
 	}
 	return comm;
 }

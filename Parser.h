@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #define SP_MAX_LINE_LENGTH 1024
+#define MAX_FILE_NAME 1024
 
 typedef enum {
 	/* Settings-Mode commands */
@@ -38,5 +39,7 @@ typedef struct command_t {
 	int arg1, arg2, arg3, arg4;
 	char *file_name; /* useful for load & save commands */
 } Command;
+
+void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s);
 
 #endif /* PARSER_H_ */
