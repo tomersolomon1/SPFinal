@@ -12,9 +12,10 @@
 bool valid_tail(Command *comm, const char *line, int offset) {
 	while (offset < SP_MAX_LINE_LENGTH) {
 		if (!isspace(line(offset))) { /* what about the null-char? ask moav */
-			comm->comm_e = Ivalid_command; /* more chars than should be, therefore illegal */
+			comm->comm_e = Ivalid_command; /* more non-whitespace chars than should be, therefore illegal command */
 			return false;
 		}
+		offset++;
 	}
 	return true;
 }
@@ -68,12 +69,64 @@ void get_file_name(Command *comm, const char *line, int offset, const char *comm
 			j++;
 		}
 		comm->file_name[j] = '\0'; /* terminating the file-name */
+		comm->valid_arg = true;
 		valid_tail(comm, line, file_name_offset);
 	}
 }
 
-get_user_color(comm, line, offset) {
+void get_int_arg(Command *comm, char *line, int offset, const char *comm_s, int lower_bound, int upper_bound) {
+	int len = strlen(comm_s);
+	if (verify_command(comm, line, offset, comm_s, len, true)) {
+		int arg_offset = get_non_whitespace_offset(line + offset + len) + offset + len;
+		int arg = line[arg_offset] - '0';
+		if (arg >= lower_bound && arg <= upper_bound) {
+			comm->arg1 = arg;
+			comm->valid_arg = true;
+		} else {
+			comm->valid_arg = false;
+		}
+		valid_tail(comm, line, arg_offset + 1); /* should check the 1 constant */
+	}
+}
 
+bool get_number(const char *line, int offset, int *coordinate, char range_offset) {
+	*coordinate = line[offset] - range_offset;
+	if ((*coordinate < 0) || (*coordinate > 7)) {
+		return false;
+	}
+	return true;
+}
+
+void getXY(Command *comm, const char *line, int offset, int *row, int *col) {
+	if (offset >= SP_MAX_LINE_LENGTH - 6) { /* should check at home if it's 5 or 6 */
+		comm->comm_e = Ivalid_command; /* no room for parameters, treat the command as illegal */
+	} else {
+		if (line[offset] == '<') {
+			comm->valid_arg = get_number(line, offset+1, row, '0');
+			comm->valid_arg = get_number(line, offset+3, col, 'A') && comm->valid_arg;
+			comm->comm_e = (line[offset+2] == ',') && (line[offset+4] == '>') ? Make_Move : Ivalid_command;
+		}
+	}
+}
+
+void get_move_arg(Command *comm, const char *line, int offset) {
+	int len = strlen("move");
+	if (verify_command(comm, line, offset, "move", len, true)) {
+		int barcket_offset = get_non_whitespace_offset(line + len + offset);
+	}
+	offset = get_non_whitespace_offset(line+offset) + offset + len;
+	getXY(comm, line, offset, &(comm->arg1), &(comm->arg2)); /* getting the first coordinate */
+	if (!comm->valid_arg || comm->comm_e == Ivalid_command) { return; } /* no need for further parsing */
+
+	offset += 5;
+
+	offset += get_non_whitespace_offset(line + offset);
+	if ((offset < SP_MAX_LINE_LENGTH - 2) && (line[offset] == 't') && (line[offset+1] == 'o')) { /* first check there is enough space for 'to' */
+		offset += 2 + get_non_whitespace_offset(line + offset + 2);
+		getXY(comm, line, offset, &(comm->arg3), &(comm->arg4)); /* getting the second coordinate */
+		offset += 6; /* should it be 6? or 5? */
+		valid_tail(comm, line, offset);
+	}
 }
 
 Command *parser(const char *line) {
@@ -88,14 +141,14 @@ Command *parser(const char *line) {
 	switch (line[offset]) {
 		case 'g': /* 'game_mode' */
 			comm->comm_e = Set_GameMode;
-			get_game_mode(comm, line, offset); /* !!!!! */
+			get_int_arg(comm, line, offset, 'game_mode', 1, 2);
 			break;
 
 		case 'd': /* either 'difficulty' or 'default' */
 			switch (line[offset+1]) {
 				case 'i': /* 'difficulty' */
 					comm->comm_e = Set_Difficulty;
-					get_difficulty(comm, line, offset); /* !!!!! */
+					get_int_arg(comm, line, offset, 'difficulty', 1, 5);
 					break;
 				case 'e': /* 'default' */
 					comm->comm_e = Restore_Default;
@@ -108,7 +161,7 @@ Command *parser(const char *line) {
 			switch (line[offset+1]) {
 				case 's': /* 'user_color */
 					comm->comm_e = Set_UserColor;
-					get_user_color(comm, line, offset); /* !!!!! */
+					get_int_arg(comm, line, offset, 'user_color', 0, 1);
 					break;
 				case 'n': /* 'undo' */
 					comm->comm_e = Undo_Move;
