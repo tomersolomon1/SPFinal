@@ -13,7 +13,7 @@ ArrayList* ArrayListCreate(int maxSize)
 	ArrayList* array = (ArrayList*) malloc(sizeof(ArrayList));
 
 	array->maxSize = maxSize;
-	array->elements = (Move*) malloc(sizeof(Move) * maxSize);
+	array->elements = (Step*) malloc(sizeof(Step) * maxSize);
 
 	array->actualSize = 0;
 	return array;
@@ -26,10 +26,10 @@ ArrayList* ArrayListCopy(ArrayList* src)
 
 	dst->actualSize = src->actualSize;
 	dst->maxSize = src->maxSize;
-	Move *dst_elements = (Move*) malloc(sizeof(Move) * src->maxSize);
+	Step *dst_elements = (Step*) malloc(sizeof(Step) * src->maxSize);
 
 	if(dst_elements == NULL){ return NULL;}
-	memcpy(dst_elements, src->elements, (sizeof(Move) * src->maxSize));
+	memcpy(dst_elements, src->elements, (sizeof(Step) * src->maxSize));
 	dst->elements = dst_elements;
 	return dst;
 }
@@ -51,7 +51,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src){
 	return SP_ARRAY_LIST_SUCCESS;
 }
 
-SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Move elem, int index){
+SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index){
 	if(src == NULL){
 		return SP_ARRAY_LIST_INVALID_ARGUMENT;
 	}
@@ -62,9 +62,9 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Move elem, int index){
 		return SP_ARRAY_LIST_INVALID_ARGUMENT;
 	}
 
-	Move one_before = *((src->elements) + index);
+	Step one_before = *((src->elements) + index);
 	*((src->elements) + index) = elem;
-	Move temp = 0;
+	Step temp = 0;
 
 	for (int i = index + 1; i < (src->maxSize); i++){
 		temp = *((src->elements) + i);
@@ -75,15 +75,15 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Move elem, int index){
 	return SP_ARRAY_LIST_SUCCESS;
 }
 
- SP_ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Move elem){
+ SP_ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Step elem){
 	 return ArrayListAddAt(src, elem, 0);
  }
 
-SP_ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Move elem){
+SP_ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step elem){
 	return ArrayListAddAt(src, elem, src->actualSize);
 }
 
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index){
+SP_ARRAY_LIST_MESSAGE ArrayListReStepAt(ArrayList* src, int index){
 	if(src == NULL){
 		return SP_ARRAY_LIST_INVALID_ARGUMENT;
 	}
@@ -102,31 +102,31 @@ SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index){
 
 }
 
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src){
-	return ArrayListRemoveAt(src, 0);
+SP_ARRAY_LIST_MESSAGE ArrayListReStepFirst(ArrayList* src){
+	return ArrayListReStepAt(src, 0);
 }
 
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src){
-	return ArrayListRemoveAt(src, (src->actualSize) - 1);
+SP_ARRAY_LIST_MESSAGE ArrayListReStepLast(ArrayList* src){
+	return ArrayListReStepAt(src, (src->actualSize) - 1);
 }
 
-Move ArrayListGetAt(ArrayList* src, int index){
+Step ArrayListGetAt(ArrayList* src, int index){
 	return *(src->elements + index);
 }
 
-Move ArrayListGetFirst(ArrayList* src){
+Step ArrayListGetFirst(ArrayList* src){
 	return ArrayListGetAt(src, 0);
 }
 
-Move ArrayListGetLast(ArrayList* src){
+Step ArrayListGetLast(ArrayList* src){
 	return ArrayListGetAt(src, (src->actualSize) - 1);
 }
 
-Move ArrayListMaxCapacity(ArrayList* src){
+int ArrayListMaxCapacity(ArrayList* src){
 	return src->maxSize;
 }
 
-Move ArrayListSize(ArrayList* src){
+int ArrayListSize(ArrayList* src){
 	return src->actualSize;
 }
 
@@ -150,9 +150,9 @@ bool ArrayListIsEmpty(ArrayList* src){
 	return false;
 }
 
-SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Move elem){
+SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem){
 	if(ArrayListIsFull(src)){
-		SP_ARRAY_LIST_MESSAGE status = ArrayListRemoveLast(src);
+		SP_ARRAY_LIST_MESSAGE status = ArrayListReStepLast(src);
 		if(status != SP_ARRAY_LIST_SUCCESS){
 			return status;
 		}
@@ -164,7 +164,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Move elem){
 	}
 }
 
-void ArrayListPrMove(ArrayList* src){
+void ArrayListPrint(ArrayList* src){
 	for(int i=0; i<src->actualSize; i++){
 		if(i<src->actualSize-1){
 			printf("%d, ", *((src->elements) + i));

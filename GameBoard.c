@@ -5,13 +5,13 @@
  *      Author: User
  */
 
-
 #include "GameBoard.h"
+
 #define black 0
 #define white 1
 
-GameBoard *create_board() {
-	GameBoard *newBoard = (GameBoard*) malloc(sizeof(GameBoard));
+Gameboard *create_board() {
+	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
 	Piece *board[8][8];
 	Piece *all_pieces[2][16]; //[0] = black, [1] = white
 	ArrayList* history = ArrayListCreate(3);
@@ -68,7 +68,7 @@ void add_piece(Piece* board, Piece* all_pieces, Piece_type type, int colur, int 
 	all_pieces[colur][indexat] = piece;
 }
 
-void destroy_board(GameBoard *board) {
+void destroy_board(Gameboard *board) {
 	if(board == NULL){
 		return;
 	}
@@ -81,11 +81,11 @@ void destroy_board(GameBoard *board) {
 	free(board);
 }
 
-GameBoard *copy_board(GameBoard* old) {
+Gameboard *copy_board(Gameboard* old) {
 	if(old == NULL){
 		return NULL;
 	}
-	GameBoard *newBoard = (GameBoard*) malloc(sizeof(GameBoard));
+	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
 	Piece *board[8][8];
 	Piece *all_pieces[2][16];
 	Piece *curr;
@@ -110,47 +110,57 @@ GameBoard *copy_board(GameBoard* old) {
 	return newBoard;
 }
 
-CHESS_BOARD_MESSAGE set_move(GameBoard *board, Move move) {
+Step create_step(int srow, int scol, int drow, int dcol, Piece *prev){
+	Step newStep;
+	newStep.srow = srow;
+	newStep.dcol = dcol;
+	newStep.drow = drow;
+	newStep.scol = scol;
+	newStep.prevPiece = prev;
+	return Step;
+}
+
+CHESS_BOARD_MESSAGE set_Step(Gameboard *board, Step step) {
 	return CHESS_BOARD_SUCCESS;
 }
 
-bool is_valid_move(GameBoard *board, Move move) {
+bool is_valid_Step(Gameboard *board, Step step) {
 	return true;
 }
 
-bool is_check_curr_player(GameBoard *board) {
+bool is_check_curr_player(Gameboard *board) {
 	return false;
 }
 
-Move *get_moves(GameBoard *board, Piece *piece) {
+Step *get_Steps(Gameboard *board, Piece *piece) {
 	return NULL;
 }
 
-Move *get_all_moves(GameBoard *board, int colur) {
+Step *get_all_Steps(Gameboard *board, int colur) {
 	return NULL;
 }
 
-Piece *get_piece_in_place(GameBoard *board, int row, int col) {
+Piece *get_piece_in_place(Gameboard *board, int row, int col) {
 	return NULL;
 }
 
-bool is_undo_valid(GameBoard *board) {
+bool is_undo_valid(Gameboard *board) {
 	return true;
 }
 
-CHESS_BOARD_MESSAGE undo_move(GameBoard *board) {
+CHESS_BOARD_MESSAGE undo_Step(Gameboard *board) {
 	return CHESS_BOARD_SUCCESS;
 }
 
-char is_game_over(GameBoard *board) {
+char is_game_over(Gameboard *board) {
 	return 'a';
 }
 
-bool is_check_mate(GameBoard *board) {
+bool is_check_mate(Gameboard *board) {
 	return true;
 }
 
-void print_board(GameBoard *board) {
+void print_board(Gameboard *board) {
 }
 
 

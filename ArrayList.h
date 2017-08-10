@@ -29,11 +29,11 @@
  * ArrayListAddFirst     - Inserts an element at the beginning of the array
  *                           list, elements will be shifted to make place.
  * ArrayListAddLast      - Inserts an element at the end of the array list.
- * ArrayListRemoveAt     - Removes an element at the specified index, elements
+ * ArrayListReStepAt     - ReSteps an element at the specified index, elements
  *                           elements will be shifted as a result.
- * ArrayListRemoveFirst  - Removes an element from the beginning of the array
+ * ArrayListReStepFirst  - ReSteps an element from the beginning of the array
  *                           list, elements will be shifted as a result.
- * ArrayListRemoveLast   - Removes an element from the end of the array list
+ * ArrayListReStepLast   - ReSteps an element from the end of the array list
  * ArrayListGetAt        - Accesses the element at the specified index.
  * ArrayListGetFirst     - Accesses the first element of the array list.
  * ArrayListGetLast      - Accesses the last element of the array list.
@@ -43,9 +43,9 @@
  * ArrayListIsEmpty      - Returns true if the array list contains no elements.
  */
 typedef struct sp_array_list_t {
-	Move* elements;
-	Move actualSize;
-	Move maxSize;
+	Step* elements;
+	int actualSize;
+	int maxSize;
 } ArrayList;
 
 /**
@@ -66,7 +66,7 @@ typedef enum sp_array_list_message_t {
  *  NULL, if an allocation error occurred or maxSize  <= 0.
  *  An instant of an array list otherwise.
  */
-ArrayList* ArrayListCreate(Move maxSize);
+ArrayList* ArrayListCreate(int maxSize);
 
 /**
  *	Creates an exact copy of the src array list. Elements in the new copy will
@@ -110,7 +110,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src);
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Move elem, Move index);
+SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
 
 /**
  * Inserts element at a the beginning of the source element. The elements
@@ -124,7 +124,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Move elem, Move index);
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
- SP_ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Move elem);
+ SP_ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Step elem);
 
 /**
  * Inserts element at a the end of the source element. If the array list
@@ -137,26 +137,26 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Move elem, Move index);
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Move elem);
+SP_ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step elem);
 
 /**
- * Removes an element from a specified index. The elements residing after the
+ * ReSteps an element from a specified index. The elements residing after the
  * specified index will be shifted to make to keep the list continuous. If the
  * array list is empty then an error message is returned and the source list
  * is not affected
  * @param src   - The source array list
  * @param elem  - The new element to be inserted
- * @param index - The index from where the new element will be removed.
+ * @param index - The index from where the new element will be reStepd.
  *                The index is 0-based.
  * @return
  * SP_ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, Move index);
+SP_ARRAY_LIST_MESSAGE ArrayListReStepAt(ArrayList* src, int index);
 
 /**
- * Removes an element from a the beginning of the list.
+ * ReSteps an element from a the beginning of the list.
  * The elements will be shifted to make to keep the list continuous. If the
  * array list is empty then an error message is returned and the source list
  * is not affected
@@ -167,10 +167,10 @@ SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, Move index);
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
+SP_ARRAY_LIST_MESSAGE ArrayListReStepFirst(ArrayList* src);
 
 /**
- * Removes an element from a the end of the list.
+ * ReSteps an element from a the end of the list.
  * The elements will be shifted to make to keep the list continuous. If the
  * array list is empty then an error message is returned and the source list
  * is not affected
@@ -181,7 +181,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise.
  */
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
+SP_ARRAY_LIST_MESSAGE ArrayListReStepLast(ArrayList* src);
 
 /**
  * Returns the element at the specified index. The function is called
@@ -193,7 +193,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
  * Undefined value if either src == NULL or index out of bound.
  * Otherwise, the element at the specified index is returned.
  */
-Move ArrayListGetAt(ArrayList* src, Move index);
+Step ArrayListGetAt(ArrayList* src, int index);
 
 /**
  * Returns the element at the beginning of the list. The function is called
@@ -204,7 +204,7 @@ Move ArrayListGetAt(ArrayList* src, Move index);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the beginning of the list is returned.
  */
-Move ArrayListGetFirst(ArrayList* src);
+Step ArrayListGetFirst(ArrayList* src);
 
 /**
  * Returns the element at the end of the list. The function is called
@@ -215,7 +215,7 @@ Move ArrayListGetFirst(ArrayList* src);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the end of the list is returned.
  */
-Move ArrayListGetLast(ArrayList* src);
+Step ArrayListGetLast(ArrayList* src);
 
 /**
  * Returns the maximum capacity of the list. The function is called
@@ -226,7 +226,7 @@ Move ArrayListGetLast(ArrayList* src);
  * Undefined value if either src == NULL
  * Otherwise, the maximum capacity of the list is returned.
  */
-Move ArrayListMaxCapacity(ArrayList* src);
+int ArrayListMaxCapacity(ArrayList* src);
 
 /**
  * Returns the number of elements in the list. The function is called
@@ -237,7 +237,7 @@ Move ArrayListMaxCapacity(ArrayList* src);
  * Undefined value if either src == NULL
  * Otherwise, the number of the elements in the list is returned.
  */
-Move ArrayListSize(ArrayList* src);
+int ArrayListSize(ArrayList* src);
 
 /**
  * Returns true if the list is full, that is the number of elements in the list
@@ -262,9 +262,9 @@ bool ArrayListIsEmpty(ArrayList* src);
 
 /*
  * push element at first, if the src is full:
- * remove the last element and then add at first
+ * reStep the last element and then add at first
  * **/
-SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Move elem);
+SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem);
 
 /**
  * print the list

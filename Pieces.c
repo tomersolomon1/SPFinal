@@ -47,5 +47,12 @@ Piece *copy_piece(Piece old){
 	return newPiece;
 }
 
-
-
+Step create_step(int srow, int scol, int drow, int dcol, Piece *prev){
+	Step newStep;
+	newStep.srow = srow;
+	newStep.dcol = dcol;
+	newStep.drow = drow;
+	newStep.scol = scol;
+	newStep.prevPiece = prev;
+	return Step;
+}
