@@ -111,27 +111,70 @@ Gameboard *copy_board(Gameboard* old) {
 	return newBoard;
 }
 
-Step create_step(int srow, int scol, int drow, int dcol, Piece *prev){
+Step create_step(int srow, int scol, int drow, int dcol, Piece *prev, bool is_srcPiece_was_moved){
 	Step newStep;
 	newStep.srow = srow;
 	newStep.dcol = dcol;
 	newStep.drow = drow;
 	newStep.scol = scol;
 	newStep.prevPiece = prev;
+	newStep.is_srcPiece_was_moved = is_srcPiece_was_moved;
 	return Step;
 }
 
-CHESS_BOARD_MESSAGE set_Step(Gameboard *gameboard, Step step) {
+CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
+	if(!is_valid_step(gameboard, srow, scol, drow, dcol)){
+		return CHESS_BOARD_INVALID_MOVE;
+	}
+	Piece *source_p = gameboard->board[srow][scol];
+	Piece *dest_p = gameboard->board[drow][dcol];
+
+	Step step = create_step(srow, scol, drow, dcol, dest_p, source_p->is_moved);
+	ArrayListPushFirst(gameboard->history, step);
+
+	gameboard->board[drow][dcol] = source_p;
+	gameboard->board[srow][scol] = gameboard->empty;
+	dest_p->alive = false;
+	source_p->is_moved = true;
+	source_p->row = drow;
+	source_p->col = dcol;
+	gameboard->turn = abs(1 - gameboard->turn);
+	if(source_p->type == Pawn){
+		source_p->vectors[0].vector_size = 1;
+	}
+	set_all_valid_steps(gameboard);
 	return CHESS_BOARD_SUCCESS;
 }
 
-bool is_valid_Step(Gameboard *gameboard, Step step) {
-	return true;
+bool is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol){
+	Piece *p = gameboard->board[srow][scol];
+	if(p->colur != gameboard->turn){
+		return false;
+	}
+	if(!p->alive){
+		return false;
+	}
+	if(p->type == Empty){
+		return false;
+	}
+	Step s;
+	for(int i = 0; i < p->amount_steps; i++){
+		 s = p->steps[i];
+		 if(s.dcol == dcol && s.drow == drow){
+			 return true;
+		 }
+	}
+	return false;
 }
 
-bool is_check_curr_player(Gameboard *gameboard) {
+bool is_check_curr_player(Gameboard *gameboard){
+	return is_check(gameboard, gameboard->turn);
+}
+
+//is the player with color colur threating the other player?
+bool is_check(Gameboard *gameboard, int colur) {
 	for(int i = 0; i < 16; i++){
-		Piece piece = gameboard->all_pieces[gameboard->turn][i];
+		Piece *piece = gameboard->all_pieces[colur][i];
 		if(piece->alive){
 			int amount_v = piece->amount_vectors; //check all vectors
 			while(amount_v > 0){
@@ -145,7 +188,7 @@ bool is_check_curr_player(Gameboard *gameboard) {
 	return false;
 }
 
-bool is_check_by_vector(Gameboard *gameboard, Piece *piece, Vector_step v){
+bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector_step v){
 	int delta_row = v.delta_row;
 	int delta_col = v.delta_col;
 	int amount_going = v.vector_size;
@@ -171,12 +214,26 @@ bool is_check_by_vector(Gameboard *gameboard, Piece *piece, Vector_step v){
 	}
 	return false;
 }
+//---
 
-void set_Steps(Gameboard *gameboard, Piece *piece) {
-	int amount_steps = 0;
+void set_all_valid_steps(Gameboard *gameboard){
+	for(int i = 0; i < 16; i++){
+		Piece *piece = gameboard->all_pieces[gameboard->turn][i];
+		if(piece.alive){
+			set_all_valid_steps_per_piece(gameboard, piece);
+		}
+	}
 }
 
-void add_Steps_by_vector(Gameboard *gameboard, Piece *piece, Vector_step v, int *amount_steps){
+void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece) {
+	int amount_steps = 0;
+	for(int i = 0; i < piece->amount_vectors; i++){
+		add_steps_by_vector(gameboard, piece, piece->vectors[i], &amount_steps);
+	}
+	piece->amount_steps = amount_steps;
+}
+
+void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector_step v, int *amount_steps){
 	int delta_row = v.delta_row;
 	int delta_col = v.delta_col;
 	int amount_going = v.vector_size;
@@ -190,17 +247,17 @@ void add_Steps_by_vector(Gameboard *gameboard, Piece *piece, Vector_step v, int 
 			break;
 		}
 		if(gameboard->board[row][col]->type == Empty){ // can go, empty
-			Step s = create_step(piece->row, piece->col, row, col, gameboard.empty);
+			Step s = create_step(piece->row, piece->col, row, col, gameboard.empty, piece->is_moved);
 			if(!is_step_causes_check(gameboard, s, piece)){
-				piece->steps[amount_steps] = s;
-				amount_steps++;
+				piece->steps[*amount_steps] = s;
+				(*amount_steps)++;
 			}
 		}
 		else if(gameboard->board[row][col]->colur != piece->colur){ //eating opponent's piece
-			Step s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col]);
+			Step s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->is_moved);
 			if(!is_step_causes_check(gameboard, s, piece)){
-				piece->steps[amount_steps] = s;
-				amount_steps++;
+				piece->steps[*amount_steps] = s;
+				(*amount_steps)++;
 			}
 			break;
 		}
@@ -224,32 +281,81 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step step){
 	gameboard->board[piece->row][piece->col] = piece;
 	return answer;
 }
+//---
 
-Step *get_all_Steps(Gameboard *board, int colur) {
+Step *get_all_Steps(Gameboard *gameboard, int colur) {
 	return NULL;
 }
 
-Piece *get_piece_in_place(Gameboard *board, int row, int col) {
-	return NULL;
+Piece *get_piece_in_place(Gameboard *gameboard, int row, int col) {
+	if(row < 0 || row > 7 || col < 0 || col > 7){
+		return NULL;
+	}
+	return gameboard[row][col];
 }
 
-bool is_undo_valid(Gameboard *board) {
-	return true;
-}
 
-CHESS_BOARD_MESSAGE undo_Step(Gameboard *board) {
+CHESS_BOARD_MESSAGE undo_Step(Gameboard *gameboard) {
+	if(gameboard == NULL){
+		return CHESS_BOARD_INVALID_ARGUMENT;
+	}
+	if(ArrayListSize(gameboard->history) == 0){
+		return CHESS_BOARD_NO_HISTORY;
+	}
+	Step step = ArrayListGetFirst(gameboard->history);
+	ArrayListRemoveFirst(gameboard->history);
+
+	Piece *source_p = gameboard->board[step.drow][step.dcol];
+	Piece *dest_p = step.prevPiece;
+
+	gameboard->board[step.drow][step.dcol] = dest_p;
+	gameboard->board[step.srow][step.scol] = source_p;
+	dest_p->alive = true;
+	if(!step.is_srcPiece_was_moved){
+		source_p->is_moved = false;
+	}
+	source_p->row = step.srow;
+	source_p->col = step.scol;
+	dest_p->row = step.drow;
+	dest_p->col = step.dcol;
+	gameboard->turn = abs(1 - gameboard->turn);
+	if(source_p->type == Pawn && !source_p->is_moved){
+		source_p->vectors[0].vector_size = 2;
+	}
+	set_all_valid_steps(gameboard);
 	return CHESS_BOARD_SUCCESS;
 }
 
-char is_game_over(Gameboard *board) {
-	return 'a';
+// return the winner's color
+// if tie return 2
+// if not game over return -1
+int is_game_over(Gameboard *gameboard) {
+	for(int i = 0; i < 16; i++){ //is there any piece that has legal move?
+		Piece *p = gameboard->all_pieces[gameboard->turn][i];
+		if(p->amount_steps > 0 && p->alive){
+			return -1;
+		}
+	}
+	if(is_check(gameboard, abs(1 - gameboard->turn))){ //is the other player threating me with check?
+		return abs(1 - gameboard->turn);
+	}
+	return 2;
 }
 
-bool is_check_mate(Gameboard *board) {
-	return true;
-}
-
-void print_board(Gameboard *board) {
+void print_board(Gameboard *gameboard) {
+	for(int i = 7; i >= 0; i--){
+		printf("%d| ", i + 1);
+		fflush(stdout);
+		for(int j = 0; j < 8; j++){
+			printf("%c ", gameboard->board[i][j]->sign);
+			fflush(stdout);
+		}
+		printf("|\n", i + 1);
+		fflush(stdout);
+	}
+	printf("  -----------------\n");
+	printf("   A B C D E F G H");
+	fflush(stdout);
 }
 
 

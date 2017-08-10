@@ -34,6 +34,7 @@ typedef struct step_t {
 	int drow;
 	int dcol;
 	Piece *prevPiece;
+	bool is_srcPiece_was_moved;
 } Step;
 
 typedef struct piece_t {

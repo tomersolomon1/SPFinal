@@ -80,14 +80,6 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat, c
 	return newPiece;
 }
 
-Vector_step create_vector(int delta_row, int delta_col, int vector_size){
-	Vector_step v;
-	v.delta_row = delta_row;
-	v.delta_col = delta_col;
-	v.vector_size = vector_size;
-	return v;
-}
-
 void destroy_piece(Piece piece) {
 	if(piece != NULL){
 		free(piece);
@@ -113,4 +105,10 @@ Piece *copy_piece(Piece old){
 	return newPiece;
 }
 
-int *
+Vector_step create_vector(int delta_row, int delta_col, int vector_size){
+	Vector_step v;
+	v.delta_row = delta_row;
+	v.delta_col = delta_col;
+	v.vector_size = vector_size;
+	return v;
+}
