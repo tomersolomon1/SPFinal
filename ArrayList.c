@@ -63,7 +63,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index){
 
 	Step one_before = *((src->elements) + index);
 	*((src->elements) + index) = elem;
-	Step temp = 0;
+	int temp = 0;
 
 	for (int i = index + 1; i < (src->maxSize); i++){
 		temp = *((src->elements) + i);
@@ -82,7 +82,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step elem){
 	return ArrayListAddAt(src, elem, src->actualSize);
 }
 
-SP_ARRAY_LIST_MESSAGE ArrayListReStepAt(ArrayList* src, int index){
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index){
 	if(src == NULL){
 		return SP_ARRAY_LIST_INVALID_ARGUMENT;
 	}
@@ -95,18 +95,18 @@ SP_ARRAY_LIST_MESSAGE ArrayListReStepAt(ArrayList* src, int index){
 	for(int i = index; i <= (src->actualSize) - 2; i++){
 		*((src->elements) + i) = *((src->elements) + i + 1);
 	}
-	*((src->elements) + src->actualSize - 1) = 0;
+	*(&(src->elements) + src->actualSize - 1) = 0;
 	(src->actualSize)--;
 	return SP_ARRAY_LIST_SUCCESS;
 
 }
 
-SP_ARRAY_LIST_MESSAGE ArrayListReStepFirst(ArrayList* src){
-	return ArrayListReStepAt(src, 0);
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src){
+	return ArrayListRemoveAt(src, 0);
 }
 
-SP_ARRAY_LIST_MESSAGE ArrayListReStepLast(ArrayList* src){
-	return ArrayListReStepAt(src, (src->actualSize) - 1);
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src){
+	return ArrayListRemoveAt(src, (src->actualSize) - 1);
 }
 
 Step ArrayListGetAt(ArrayList* src, int index){
@@ -151,7 +151,7 @@ bool ArrayListIsEmpty(ArrayList* src){
 
 SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem){
 	if(ArrayListIsFull(src)){
-		SP_ARRAY_LIST_MESSAGE status = ArrayListReStepLast(src);
+		SP_ARRAY_LIST_MESSAGE status = ArrayListRemoveLast(src);
 		if(status != SP_ARRAY_LIST_SUCCESS){
 			return status;
 		}

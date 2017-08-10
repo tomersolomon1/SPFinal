@@ -9,63 +9,58 @@
 
 Gameboard *create_board() {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
-	assert(newBoard!=NULL);
-	Piece *board[8][8];
-	Piece *all_pieces[2][16]; //[0] = black, [1] = white
-	ArrayList* history = ArrayListCreate(3);
+	assert(newBoard != NULL);
+	newBoard->history = ArrayListCreate(3 * 2);
 	int i = 0;
-	add_piece(board, all_pieces, Pawn, black, 6, 0, i++, 'M');
-	add_piece(board, all_pieces, Pawn, black, 6, 1, i++, 'M');
-	add_piece(board, all_pieces, Pawn, black, 6, 2, i++, 'M');
-	add_piece(board, all_pieces, Pawn, black, 6, 3, i++, 'M');
-	add_piece(board, all_pieces, Pawn, black, 6, 4, i++, 'M');
-	add_piece(board, all_pieces, Pawn, black, 6, 5, i++, 'M');
-	add_piece(board, all_pieces, Pawn, black, 6, 6, i++, 'M');
-	add_piece(board, all_pieces, Pawn, black, 6, 7, i++, 'M');
-	add_piece(board, all_pieces, Bishop, black, 7, 2, i++, 'B');
-	add_piece(board, all_pieces, Bishop, black, 7, 5, i++, 'B');
-	add_piece(board, all_pieces, Knight, black, 7, 1, i++, 'N');
-	add_piece(board, all_pieces, Knight, black, 7, 6, i++, 'N');
-	add_piece(board, all_pieces, Rock, black, 7, 0, i++, 'R');
-	add_piece(board, all_pieces, Rock, black, 7, 7, i++, 'R');
-	add_piece(board, all_pieces, Queen, black, 7, 3, i++, 'Q');
-	add_piece(board, all_pieces, King, black, 7, 4, i++, 'K');
+	add_piece(newBoard, Pawn, black, 6, 0, i++, 'M');
+	add_piece(newBoard, Pawn, black, 6, 1, i++, 'M');
+	add_piece(newBoard, Pawn, black, 6, 2, i++, 'M');
+	add_piece(newBoard, Pawn, black, 6, 3, i++, 'M');
+	add_piece(newBoard, Pawn, black, 6, 4, i++, 'M');
+	add_piece(newBoard, Pawn, black, 6, 5, i++, 'M');
+	add_piece(newBoard, Pawn, black, 6, 6, i++, 'M');
+	add_piece(newBoard, Pawn, black, 6, 7, i++, 'M');
+	add_piece(newBoard, Bishop, black, 7, 2, i++, 'B');
+	add_piece(newBoard, Bishop, black, 7, 5, i++, 'B');
+	add_piece(newBoard, Knight, black, 7, 1, i++, 'N');
+	add_piece(newBoard, Knight, black, 7, 6, i++, 'N');
+	add_piece(newBoard, Rock, black, 7, 0, i++, 'R');
+	add_piece(newBoard, Rock, black, 7, 7, i++, 'R');
+	add_piece(newBoard, Queen, black, 7, 3, i++, 'Q');
+	add_piece(newBoard, King, black, 7, 4, i++, 'K');
 	i = 0;
-	add_piece(board, all_pieces, Pawn, white, 1, 0, i++, 'm');
-	add_piece(board, all_pieces, Pawn, white, 1, 1, i++, 'm');
-	add_piece(board, all_pieces, Pawn, white, 1, 2, i++, 'm');
-	add_piece(board, all_pieces, Pawn, white, 1, 3, i++, 'm');
-	add_piece(board, all_pieces, Pawn, white, 1, 4, i++, 'm');
-	add_piece(board, all_pieces, Pawn, white, 1, 5, i++, 'm');
-	add_piece(board, all_pieces, Pawn, white, 1, 6, i++, 'm');
-	add_piece(board, all_pieces, Pawn, white, 1, 7, i++, 'm');
-	add_piece(board, all_pieces, Bishop, white, 0, 2, i++, 'b');
-	add_piece(board, all_pieces, Bishop, white, 0, 5, i++, 'b');
-	add_piece(board, all_pieces, Knight, white, 0, 1, i++, 'n');
-	add_piece(board, all_pieces, Knight, white, 0, 6, i++, 'n');
-	add_piece(board, all_pieces, Rock, white, 0, 0, i++, 'r');
-	add_piece(board, all_pieces, Rock, white, 0, 7, i++, 'r');
-	add_piece(board, all_pieces, Queen, white, 0, 3, i++, 'q');
-	add_piece(board, all_pieces, King, white, 0, 4, i++, 'k');
-	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '_');
+	add_piece(newBoard, Pawn, white, 1, 0, i++, 'm');
+	add_piece(newBoard, Pawn, white, 1, 1, i++, 'm');
+	add_piece(newBoard, Pawn, white, 1, 2, i++, 'm');
+	add_piece(newBoard, Pawn, white, 1, 3, i++, 'm');
+	add_piece(newBoard, Pawn, white, 1, 4, i++, 'm');
+	add_piece(newBoard, Pawn, white, 1, 5, i++, 'm');
+	add_piece(newBoard, Pawn, white, 1, 6, i++, 'm');
+	add_piece(newBoard, Pawn, white, 1, 7, i++, 'm');
+	add_piece(newBoard, Bishop, white, 0, 2, i++, 'b');
+	add_piece(newBoard, Bishop, white, 0, 5, i++, 'b');
+	add_piece(newBoard, Knight, white, 0, 1, i++, 'n');
+	add_piece(newBoard, Knight, white, 0, 6, i++, 'n');
+	add_piece(newBoard, Rock, white, 0, 0, i++, 'r');
+	add_piece(newBoard, Rock, white, 0, 7, i++, 'r');
+	add_piece(newBoard, Queen, white, 0, 3, i++, 'q');
+	add_piece(newBoard, King, white, 0, 4, i++, 'k');
+	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, '_');
 	for(int i = 2; i < 6; i++){
 		for(int j = 0; j < 8; j++){
 			board[i][j] = Empty_piece;
 		}
 	}
-	newBoard->board = board;
-	newBoard->all_pieces = all_pieces;
 	newBoard->turn = white;
-	newBoard->history = history;
 	newBoard->empty = Empty_piece;
 	set_all_valid_steps(newBoard);
 	return newBoard;
 }
 
-void add_piece(Piece* board, Piece* all_pieces, Piece_type type, int colur, int row, int col, int indexat, char sign){
+void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat, char sign){
 	Piece* piece = create_piece(type, colur, row, col, sign);
-	board[row][col] = piece;
-	all_pieces[colur][indexat] = piece;
+	gameboard->board[row][col] = piece;
+	gameboard->all_pieces[colur][indexat] = piece;
 }
 
 void destroy_board(Gameboard *gameboard) {
@@ -86,26 +81,21 @@ Gameboard *copy_board(Gameboard* old) {
 		return NULL;
 	}
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
-	Piece *board[8][8];
-	Piece *all_pieces[2][16];
 	Piece *curr;
-	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '_');
+	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, '_');
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
-			board[i][j] = Empty_piece;
+			newBoard->board[i][j] = Empty_piece;
 		}
 	}
 	for(int i = 0; i < 2; i++){
 		for(int j = 0; j < 16; j++){
 			curr = copy_piece(old->all_pieces[i][j]);
-			board[curr->row][curr->col] = curr;
-			all_pieces[i][j] = curr;
+			newBoard->board[curr->row][curr->col] = curr;
+			newBoard->all_pieces[i][j] = curr;
 		}
 	}
-	ArrayList* history = ArrayListCopy(old->history);
-	newBoard->all_pieces = all_pieces;
-	newBoard->board = board;
-	newBoard->history = history;
+	newBoard->history = ArrayListCopy(old->history);
 	newBoard->turn = old->turn;
 	newBoard->empty = Empty_piece;
 	return newBoard;

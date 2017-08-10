@@ -29,11 +29,11 @@
  * ArrayListAddFirst     - Inserts an element at the beginning of the array
  *                           list, elements will be shifted to make place.
  * ArrayListAddLast      - Inserts an element at the end of the array list.
- * ArrayListReStepAt     - ReSteps an element at the specified index, elements
+ * ArrayListRemoveAt     - Removes an element at the specified index, elements
  *                           elements will be shifted as a result.
- * ArrayListReStepFirst  - ReSteps an element from the beginning of the array
+ * ArrayListRemoveFirst  - Removes an element from the beginning of the array
  *                           list, elements will be shifted as a result.
- * ArrayListReStepLast   - ReSteps an element from the end of the array list
+ * ArrayListRemoveLast   - Removes an element from the end of the array list
  * ArrayListGetAt        - Accesses the element at the specified index.
  * ArrayListGetFirst     - Accesses the first element of the array list.
  * ArrayListGetLast      - Accesses the last element of the array list.
@@ -140,23 +140,23 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
 SP_ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step elem);
 
 /**
- * ReSteps an element from a specified index. The elements residing after the
+ * Removes an element from a specified index. The elements residing after the
  * specified index will be shifted to make to keep the list continuous. If the
  * array list is empty then an error message is returned and the source list
  * is not affected
  * @param src   - The source array list
  * @param elem  - The new element to be inserted
- * @param index - The index from where the new element will be reStepd.
+ * @param index - The index from where the new element will be Removed.
  *                The index is 0-based.
  * @return
  * SP_ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListReStepAt(ArrayList* src, int index);
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index);
 
 /**
- * ReSteps an element from a the beginning of the list.
+ * Removes an element from a the beginning of the list.
  * The elements will be shifted to make to keep the list continuous. If the
  * array list is empty then an error message is returned and the source list
  * is not affected
@@ -167,10 +167,10 @@ SP_ARRAY_LIST_MESSAGE ArrayListReStepAt(ArrayList* src, int index);
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListReStepFirst(ArrayList* src);
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
 
 /**
- * ReSteps an element from a the end of the list.
+ * Removes an element from a the end of the list.
  * The elements will be shifted to make to keep the list continuous. If the
  * array list is empty then an error message is returned and the source list
  * is not affected
@@ -181,7 +181,7 @@ SP_ARRAY_LIST_MESSAGE ArrayListReStepFirst(ArrayList* src);
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise.
  */
-SP_ARRAY_LIST_MESSAGE ArrayListReStepLast(ArrayList* src);
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
 
 /**
  * Returns the element at the specified index. The function is called
@@ -262,7 +262,7 @@ bool ArrayListIsEmpty(ArrayList* src);
 
 /*
  * push element at first, if the src is full:
- * reStep the last element and then add at first
+ * Remove the last element and then add at first
  * **/
 SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem);
 
