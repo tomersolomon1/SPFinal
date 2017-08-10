@@ -5,9 +5,9 @@
  *      Author: User
  */
 
-#include <string.h>
+
 #include <Board.h>
-#include <stdbool.h>
+
 
 Board *create_board() {
 	return NULL;

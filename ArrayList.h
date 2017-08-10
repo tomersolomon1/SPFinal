@@ -1,10 +1,12 @@
-#ifndef SPARRAYLIST_H_
-#define SPARRAYLIST_H_
+#ifndef ARRAYLIST_H_
+#define ARRAYLIST_H_
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "Pieces.h"
 
 /**
  * SPArrayList summary:
@@ -41,9 +43,9 @@
  * spArrayListIsEmpty      - Returns true if the array list contains no elements.
  */
 typedef struct sp_array_list_t {
-	int* elements;
-	int actualSize;
-	int maxSize;
+	Piece* elements;
+	Piece actualSize;
+	Piece maxSize;
 } SPArrayList;
 
 /**
@@ -64,7 +66,7 @@ typedef enum sp_array_list_message_t {
  *  NULL, if an allocation error occurred or maxSize  <= 0.
  *  An instant of an array list otherwise.
  */
-SPArrayList* spArrayListCreate(int maxSize);
+SPArrayList* spArrayListCreate(Piece maxSize);
 
 /**
  *	Creates an exact copy of the src array list. Elements in the new copy will
@@ -108,7 +110,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListClear(SPArrayList* src);
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, int elem, int index);
+SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, Piece elem, Piece index);
 
 /**
  * Inserts element at a the beginning of the source element. The elements
@@ -122,7 +124,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, int elem, int index);
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
- SP_ARRAY_LIST_MESSAGE spArrayListAddFirst(SPArrayList* src, int elem);
+ SP_ARRAY_LIST_MESSAGE spArrayListAddFirst(SPArrayList* src, Piece elem);
 
 /**
  * Inserts element at a the end of the source element. If the array list
@@ -135,7 +137,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, int elem, int index);
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE spArrayListAddLast(SPArrayList* src, int elem);
+SP_ARRAY_LIST_MESSAGE spArrayListAddLast(SPArrayList* src, Piece elem);
 
 /**
  * Removes an element from a specified index. The elements residing after the
@@ -151,7 +153,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListAddLast(SPArrayList* src, int elem);
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE spArrayListRemoveAt(SPArrayList* src, int index);
+SP_ARRAY_LIST_MESSAGE spArrayListRemoveAt(SPArrayList* src, Piece index);
 
 /**
  * Removes an element from a the beginning of the list.
@@ -191,7 +193,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListRemoveLast(SPArrayList* src);
  * Undefined value if either src == NULL or index out of bound.
  * Otherwise, the element at the specified index is returned.
  */
-int spArrayListGetAt(SPArrayList* src, int index);
+Piece spArrayListGetAt(SPArrayList* src, Piece index);
 
 /**
  * Returns the element at the beginning of the list. The function is called
@@ -202,7 +204,7 @@ int spArrayListGetAt(SPArrayList* src, int index);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the beginning of the list is returned.
  */
-int spArrayListGetFirst(SPArrayList* src);
+Piece spArrayListGetFirst(SPArrayList* src);
 
 /**
  * Returns the element at the end of the list. The function is called
@@ -213,7 +215,7 @@ int spArrayListGetFirst(SPArrayList* src);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the end of the list is returned.
  */
-int spArrayListGetLast(SPArrayList* src);
+Piece spArrayListGetLast(SPArrayList* src);
 
 /**
  * Returns the maximum capacity of the list. The function is called
@@ -224,7 +226,7 @@ int spArrayListGetLast(SPArrayList* src);
  * Undefined value if either src == NULL
  * Otherwise, the maximum capacity of the list is returned.
  */
-int spArrayListMaxCapacity(SPArrayList* src);
+Piece spArrayListMaxCapacity(SPArrayList* src);
 
 /**
  * Returns the number of elements in the list. The function is called
@@ -235,7 +237,7 @@ int spArrayListMaxCapacity(SPArrayList* src);
  * Undefined value if either src == NULL
  * Otherwise, the number of the elements in the list is returned.
  */
-int spArrayListSize(SPArrayList* src);
+Piece spArrayListSize(SPArrayList* src);
 
 /**
  * Returns true if the list is full, that is the number of elements in the list
@@ -262,11 +264,11 @@ bool spArrayListIsEmpty(SPArrayList* src);
  * push element at first, if the src is full:
  * remove the last element and then add at first
  * **/
-SP_ARRAY_LIST_MESSAGE spArrayListPushFirst(SPArrayList* src, int elem);
+SP_ARRAY_LIST_MESSAGE spArrayListPushFirst(SPArrayList* src, Piece elem);
 
 /**
- * print the list
+ * prPiece the list
  * */
-void spArrayListPrint(SPArrayList* src);
+void spArrayListPrPiece(SPArrayList* src);
 
 #endif

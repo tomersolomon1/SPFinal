@@ -7,6 +7,9 @@
 
 #ifndef BOARD_H_
 #define BOARD_H_
+#include <string.h>
+#include <stdbool.h>
+
 
 typedef struct board_t {
 	Piece *board[8][8];

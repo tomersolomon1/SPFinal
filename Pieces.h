@@ -24,6 +24,7 @@ typedef struct piece_t {
 	int col; /* column coordinate */
 	bool alive;
 	int piece_indext;
+	bool is_moved;
 } Piece;
 
 #endif /* PIECES_H_ */
