@@ -16,7 +16,7 @@ typedef enum {
 	/* Settings-Mode commands */
 	Set_GameMode,
 	Set_Difficulty,
-	Set_UserColur,
+	Set_UserColor,
 	Load,
 	Restore_Default,
 	Print_Settings,
@@ -29,7 +29,7 @@ typedef enum {
 	Reset,
 
 	Quit, /* this command is for both modes */
-	Ivalid_command /* for in_valid commands */
+	Ivalid_command /* for invalid commands */
 } SP_commands;
 
 typedef struct command_t {
