@@ -8,26 +8,27 @@
 
 Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat, char sign) {
 	Piece* newPiece = (Piece*) malloc(sizeof(Piece));
-	if(newPiece == NULL){
-		return NULL;
-	}
+	assert(newPiece != NULL);
 	newPiece->alive = true;
 	newPiece->col = col;
 	newPiece->row = row;
 	newPiece->colur = colur;
-	newPiece->indext = indexat;
-	newPiece->is_moved = false;
+	newPiece->indexat = indexat;
+	newPiece->has_moved = false;
 	newPiece->type = type;
 	newPiece->sign = sign;
 	newPiece->amount_steps = 0;
 	newPiece->steps = NULL;
+
 	Vector_step* vectors;
 	if(type == Pawn && colur == white){
-		Vector_step[0] = create_vector(1, 0, 2);
+		vectors = (Vector_step*) malloc(sizeof(Vector_step) * 1);
+		assert();
+		vectors[0] = create_vector(1, 0, 2);
 		newPiece->amount_vectors = 1;
 	}
 	if(type == Pawn && colur == black){
-		Vector_step[0] = create_vector(-1, 0, 2);
+		vectors[0] = create_vector(-1, 0, 2);
 		newPiece->amount_vectors = 1;
 	}
 	if(type == Knight){

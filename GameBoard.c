@@ -7,8 +7,6 @@
 
 #include "GameBoard.h"
 
-
-
 Gameboard *create_board() {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
 	Piece *board[8][8];
@@ -59,6 +57,7 @@ Gameboard *create_board() {
 	newBoard->turn = white;
 	newBoard->history = history;
 	newBoard->empty = Empty_piece;
+	set_all_valid_steps(newBoard);
 	return newBoard;
 }
 
@@ -95,7 +94,7 @@ Gameboard *copy_board(Gameboard* old) {
 			curr = copy_piece(old->board[i][j]);
 			if(curr->type != Empty){
 				board[i][j] = curr;
-				all_pieces[curr->colur][curr->indext] = curr;
+				all_pieces[curr->colur][curr->indexat] = curr;
 			}
 			else{
 				board[i][j] = Empty_piece;
@@ -129,13 +128,13 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 	Piece *source_p = gameboard->board[srow][scol];
 	Piece *dest_p = gameboard->board[drow][dcol];
 
-	Step step = create_step(srow, scol, drow, dcol, dest_p, source_p->is_moved);
+	Step step = create_step(srow, scol, drow, dcol, dest_p, source_p->has_moved);
 	ArrayListPushFirst(gameboard->history, step);
 
 	gameboard->board[drow][dcol] = source_p;
 	gameboard->board[srow][scol] = gameboard->empty;
 	dest_p->alive = false;
-	source_p->is_moved = true;
+	source_p->has_moved = true;
 	source_p->row = drow;
 	source_p->col = dcol;
 	gameboard->turn = abs(1 - gameboard->turn);
@@ -247,14 +246,14 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector_step v, int
 			break;
 		}
 		if(gameboard->board[row][col]->type == Empty){ // can go, empty
-			Step s = create_step(piece->row, piece->col, row, col, gameboard.empty, piece->is_moved);
+			Step s = create_step(piece->row, piece->col, row, col, gameboard.empty, piece->has_moved);
 			if(!is_step_causes_check(gameboard, s, piece)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
 			}
 		}
 		else if(gameboard->board[row][col]->colur != piece->colur){ //eating opponent's piece
-			Step s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->is_moved);
+			Step s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved);
 			if(!is_step_causes_check(gameboard, s, piece)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
@@ -283,17 +282,12 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step step){
 }
 //---
 
-Step *get_all_Steps(Gameboard *gameboard, int colur) {
-	return NULL;
-}
-
 Piece *get_piece_in_place(Gameboard *gameboard, int row, int col) {
 	if(row < 0 || row > 7 || col < 0 || col > 7){
 		return NULL;
 	}
 	return gameboard[row][col];
 }
-
 
 CHESS_BOARD_MESSAGE undo_Step(Gameboard *gameboard) {
 	if(gameboard == NULL){
@@ -312,14 +306,14 @@ CHESS_BOARD_MESSAGE undo_Step(Gameboard *gameboard) {
 	gameboard->board[step.srow][step.scol] = source_p;
 	dest_p->alive = true;
 	if(!step.is_srcPiece_was_moved){
-		source_p->is_moved = false;
+		source_p->has_moved = false;
 	}
 	source_p->row = step.srow;
 	source_p->col = step.scol;
 	dest_p->row = step.drow;
 	dest_p->col = step.dcol;
 	gameboard->turn = abs(1 - gameboard->turn);
-	if(source_p->type == Pawn && !source_p->is_moved){
+	if(source_p->type == Pawn && !source_p->has_moved){
 		source_p->vectors[0].vector_size = 2;
 	}
 	set_all_valid_steps(gameboard);
@@ -357,5 +351,3 @@ void print_board(Gameboard *gameboard) {
 	printf("   A B C D E F G H");
 	fflush(stdout);
 }
-
-

@@ -29,11 +29,11 @@ typedef enum {
 //Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '');
 
 typedef struct step_t {
-	int srow;
-	int scol;
-	int drow;
-	int dcol;
-	Piece *prevPiece;
+	int srow; //source row
+	int scol; //source col
+	int drow; //dest row
+	int dcol; //dest col
+	Piece *prevPiece; //i ate it
 	bool is_srcPiece_was_moved;
 } Step;
 
@@ -43,11 +43,13 @@ typedef struct piece_t {
 	int row; //row coordinate
 	int col; //column coordinate
 	bool alive;
-	int indext; //index in array of tools
-	bool is_moved;
+	int indexat; //index in array of tools
+	bool has_moved;
 	char sign;
+
 	Step* steps; //all possible steps in a current game
 	int amount_steps; //how many possible steps in a current game
+
 	Vector_step* vectors; //all possible vector movements
 	int amount_vectors; //how many different vectors
 } Piece;
