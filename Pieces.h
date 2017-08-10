@@ -18,10 +18,10 @@
 #define white 1
 
 typedef enum {
-	Pawn, /* "Hayal" */
-	Knight, /* "Parash */
-	Bishop, /* Ratz */
-	Rock, /* "Tzarih" */
+	Pawn, // Hayal
+	Knight, // Parash
+	Bishop, // Ratz
+	Rock, // Tzarih
 	Queen,
 	King,
 	Empty
@@ -39,16 +39,16 @@ typedef struct step_t {
 typedef struct piece_t {
 	Piece_type type;
 	int colur;
-	int row; /* row coordinate */
-	int col; /* column coordinate */
+	int row; //row coordinate
+	int col; //column coordinate
 	bool alive;
-	int indext; /*index in array of tools*/
+	int indext; //index in array of tools
 	bool is_moved;
 	char sign;
-	Step* steps;
-	int amount_steps;
-	Vector_step* vectors;
-	int amount_vectors;
+	Step* steps; //all possible steps in a current game
+	int amount_steps; //how many possible steps in a current game
+	Vector_step* vectors; //all possible vector movements
+	int amount_vectors; //how many different vectors
 } Piece;
 
 typedef struct vector_step_t{

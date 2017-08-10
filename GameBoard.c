@@ -133,15 +133,22 @@ bool is_check_curr_player(Gameboard *gameboard) {
 	for(int i = 0; i < 16; i++){
 		Piece piece = gameboard->all_pieces[gameboard->turn][i];
 		if(piece->alive){
-			if(piece->type == Pawn){
-
+			int amount_v = piece->amount_vectors; //check all vectors
+			while(amount_v > 0){
+				amount_v --;
+				if(is_check_by_vector(gameboard, piece, piece->vectors[amount_v])){
+					return true;
+				}
 			}
 		}
 	}
 	return false;
 }
 
-bool is_check_by_vector(Gameboard *gameboard, Piece *piece, int delta_row, int delta_col, int amount_going){
+bool is_check_by_vector(Gameboard *gameboard, Piece *piece, Vector_step v){
+	int delta_row = v.delta_row;
+	int delta_col = v.delta_col;
+	int amount_going = v.vector_size;
 	int row = piece->row;
 	int col = piece->col;
 	while(amount_going > 0){
@@ -158,19 +165,21 @@ bool is_check_by_vector(Gameboard *gameboard, Piece *piece, int delta_row, int d
 				gameboard->board[row][col]->colur != piece->colur){ //eating opponent's king
 			return true;
 		}
-		else{ // seeing your color piece
+		else{ // seeing another piece
 			return false;
 		}
 	}
 	return false;
 }
+
 void set_Steps(Gameboard *gameboard, Piece *piece) {
 	int amount_steps = 0;
-
-
 }
 
-void add_Steps_by_vector(Gameboard *gameboard, Piece *piece, int delta_row, int delta_col, int amount_going, int *amount_steps){
+void add_Steps_by_vector(Gameboard *gameboard, Piece *piece, Vector_step v, int *amount_steps){
+	int delta_row = v.delta_row;
+	int delta_col = v.delta_col;
+	int amount_going = v.vector_size;
 	int row = piece->row;
 	int col = piece->col;
 	while(amount_going > 0){
@@ -182,13 +191,17 @@ void add_Steps_by_vector(Gameboard *gameboard, Piece *piece, int delta_row, int 
 		}
 		if(gameboard->board[row][col]->type == Empty){ // can go, empty
 			Step s = create_step(piece->row, piece->col, row, col, gameboard.empty);
-			piece->steps[amount_steps] = s;
-			amount_steps++;
+			if(!is_step_causes_check(gameboard, s, piece)){
+				piece->steps[amount_steps] = s;
+				amount_steps++;
+			}
 		}
 		else if(gameboard->board[row][col]->colur != piece->colur){ //eating opponent's piece
 			Step s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col]);
-			piece->steps[amount_steps] = s;
-			amount_steps++;
+			if(!is_step_causes_check(gameboard, s, piece)){
+				piece->steps[amount_steps] = s;
+				amount_steps++;
+			}
 			break;
 		}
 		else{ // seeing your color piece
@@ -198,6 +211,19 @@ void add_Steps_by_vector(Gameboard *gameboard, Piece *piece, int delta_row, int 
 
 }
 
+bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step step){
+	bool answer = false;
+	gameboard->board[step->drow][step->dcol] = piece;
+	gameboard->board[piece->row][piece->col] = gameboard->empty;
+	gameboard->turn = abs(1-gameboard->turn);
+	if(is_check_curr_player(gameboard)){
+		answer = true;
+	}
+	gameboard->turn = abs(1-gameboard->turn);
+	gameboard->board[step->drow][step->dcol] = step.prevPiece;
+	gameboard->board[piece->row][piece->col] = piece;
+	return answer;
+}
 
 Step *get_all_Steps(Gameboard *board, int colur) {
 	return NULL;
