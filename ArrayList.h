@@ -6,10 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "Pieces.h"
+#include "GameBoard.h"
 
 /**
- * SPArrayList summary:
+ * ArrayList summary:
  *
  * A container that represents a fixed size linked list. The capcity of the list
  * is specified at the creation. The container supports typical list
@@ -18,35 +18,35 @@
  * returned and the list is not affected. A summary of the supported functions
  * is given below:
  *
- * spArrayListCreate       - Creates an empty array list with a specified
+ * ArrayListCreate       - Creates an empty array list with a specified
  *                           max capacity.
- * spArrayListCopy         - Creates an exact copy of a specified array list.
- * spArrayListDestroy      - Frees all memory resources associated with an array
+ * ArrayListCopy         - Creates an exact copy of a specified array list.
+ * ArrayListDestroy      - Frees all memory resources associated with an array
  *                           list.
- * spArrayListClear        - Clears all elements from a specified array list.
- * spArrayListAddAt        - Inserts an element at a specified index, elements
+ * ArrayListClear        - Clears all elements from a specified array list.
+ * ArrayListAddAt        - Inserts an element at a specified index, elements
  *                           will be shifted to make place.
- * spArrayListAddFirst     - Inserts an element at the beginning of the array
+ * ArrayListAddFirst     - Inserts an element at the beginning of the array
  *                           list, elements will be shifted to make place.
- * spArrayListAddLast      - Inserts an element at the end of the array list.
- * spArrayListRemoveAt     - Removes an element at the specified index, elements
+ * ArrayListAddLast      - Inserts an element at the end of the array list.
+ * ArrayListRemoveAt     - Removes an element at the specified index, elements
  *                           elements will be shifted as a result.
- * spArrayListRemoveFirst  - Removes an element from the beginning of the array
+ * ArrayListRemoveFirst  - Removes an element from the beginning of the array
  *                           list, elements will be shifted as a result.
- * spArrayListRemoveLast   - Removes an element from the end of the array list
- * spArrayListGetAt        - Accesses the element at the specified index.
- * spArrayListGetFirst     - Accesses the first element of the array list.
- * spArrayListGetLast      - Accesses the last element of the array list.
- * spArrayListMaxCapcity   - Returns the maximum capcity of the array list.
- * spArrayListSize         - Returns the number of elements in that array list.
- * spArrayListIsFull       - Returns if the array list reached its max capacity.
- * spArrayListIsEmpty      - Returns true if the array list contains no elements.
+ * ArrayListRemoveLast   - Removes an element from the end of the array list
+ * ArrayListGetAt        - Accesses the element at the specified index.
+ * ArrayListGetFirst     - Accesses the first element of the array list.
+ * ArrayListGetLast      - Accesses the last element of the array list.
+ * ArrayListMaxCapcity   - Returns the maximum capcity of the array list.
+ * ArrayListSize         - Returns the number of elements in that array list.
+ * ArrayListIsFull       - Returns if the array list reached its max capacity.
+ * ArrayListIsEmpty      - Returns true if the array list contains no elements.
  */
 typedef struct sp_array_list_t {
-	Piece* elements;
-	Piece actualSize;
-	Piece maxSize;
-} SPArrayList;
+	Move* elements;
+	Move actualSize;
+	Move maxSize;
+} ArrayList;
 
 /**
  *
@@ -66,7 +66,7 @@ typedef enum sp_array_list_message_t {
  *  NULL, if an allocation error occurred or maxSize  <= 0.
  *  An instant of an array list otherwise.
  */
-SPArrayList* spArrayListCreate(Piece maxSize);
+ArrayList* ArrayListCreate(Move maxSize);
 
 /**
  *	Creates an exact copy of the src array list. Elements in the new copy will
@@ -76,14 +76,14 @@ SPArrayList* spArrayListCreate(Piece maxSize);
  *	NULL if either an allocation error occurs or src == NULL.
  *	A new copy of the source array list, otherwise.
  */
-SPArrayList* spArrayListCopy(SPArrayList* src);
+ArrayList* ArrayListCopy(ArrayList* src);
 
 /**
  * Frees all memory resources associated with the source array list. If the
  * source array is NULL, then the function does nothing.
  * @param src - the source array list
  */
-void spArrayListDestroy(SPArrayList* src);
+void ArrayListDestroy(ArrayList* src);
 
 /**
  * Clears all elements from the source array list. After invoking this function,
@@ -94,7 +94,7 @@ void spArrayListDestroy(SPArrayList* src);
  * SP_ARRAY_LIST_INVALID_ARGUMENT if src == NULL
  * SP_ARRAY_LIST_SUCCESS otherwise
  */
-SP_ARRAY_LIST_MESSAGE spArrayListClear(SPArrayList* src);
+SP_ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src);
 
 /**
  * Inserts element at a specified index. The elements residing at and after the
@@ -110,7 +110,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListClear(SPArrayList* src);
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, Piece elem, Piece index);
+SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Move elem, Move index);
 
 /**
  * Inserts element at a the beginning of the source element. The elements
@@ -124,7 +124,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, Piece elem, Piece index
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
- SP_ARRAY_LIST_MESSAGE spArrayListAddFirst(SPArrayList* src, Piece elem);
+ SP_ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Move elem);
 
 /**
  * Inserts element at a the end of the source element. If the array list
@@ -137,7 +137,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, Piece elem, Piece index
  * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE spArrayListAddLast(SPArrayList* src, Piece elem);
+SP_ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Move elem);
 
 /**
  * Removes an element from a specified index. The elements residing after the
@@ -153,7 +153,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListAddLast(SPArrayList* src, Piece elem);
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE spArrayListRemoveAt(SPArrayList* src, Piece index);
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, Move index);
 
 /**
  * Removes an element from a the beginning of the list.
@@ -167,7 +167,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListRemoveAt(SPArrayList* src, Piece index);
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE spArrayListRemoveFirst(SPArrayList* src);
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
 
 /**
  * Removes an element from a the end of the list.
@@ -181,7 +181,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListRemoveFirst(SPArrayList* src);
  * SP_ARRAY_LIST_EMPTY - if the source array list is empty
  * SP_ARRAY_LIST_SUCCESS - otherwise.
  */
-SP_ARRAY_LIST_MESSAGE spArrayListRemoveLast(SPArrayList* src);
+SP_ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
 
 /**
  * Returns the element at the specified index. The function is called
@@ -193,7 +193,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListRemoveLast(SPArrayList* src);
  * Undefined value if either src == NULL or index out of bound.
  * Otherwise, the element at the specified index is returned.
  */
-Piece spArrayListGetAt(SPArrayList* src, Piece index);
+Move ArrayListGetAt(ArrayList* src, Move index);
 
 /**
  * Returns the element at the beginning of the list. The function is called
@@ -204,7 +204,7 @@ Piece spArrayListGetAt(SPArrayList* src, Piece index);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the beginning of the list is returned.
  */
-Piece spArrayListGetFirst(SPArrayList* src);
+Move ArrayListGetFirst(ArrayList* src);
 
 /**
  * Returns the element at the end of the list. The function is called
@@ -215,7 +215,7 @@ Piece spArrayListGetFirst(SPArrayList* src);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the end of the list is returned.
  */
-Piece spArrayListGetLast(SPArrayList* src);
+Move ArrayListGetLast(ArrayList* src);
 
 /**
  * Returns the maximum capacity of the list. The function is called
@@ -226,7 +226,7 @@ Piece spArrayListGetLast(SPArrayList* src);
  * Undefined value if either src == NULL
  * Otherwise, the maximum capacity of the list is returned.
  */
-Piece spArrayListMaxCapacity(SPArrayList* src);
+Move ArrayListMaxCapacity(ArrayList* src);
 
 /**
  * Returns the number of elements in the list. The function is called
@@ -237,7 +237,7 @@ Piece spArrayListMaxCapacity(SPArrayList* src);
  * Undefined value if either src == NULL
  * Otherwise, the number of the elements in the list is returned.
  */
-Piece spArrayListSize(SPArrayList* src);
+Move ArrayListSize(ArrayList* src);
 
 /**
  * Returns true if the list is full, that is the number of elements in the list
@@ -248,7 +248,7 @@ Piece spArrayListSize(SPArrayList* src);
  * than its maximum capacity.
  * Otherwise, true is returned.
  */
-bool spArrayListIsFull(SPArrayList* src);
+bool ArrayListIsFull(ArrayList* src);
 
 /**
  * Returns true if the list is empty, that is the number of elements in the list
@@ -258,17 +258,17 @@ bool spArrayListIsFull(SPArrayList* src);
  * false if either src == NULL or the number of elements in the list is not zero.
  * Otherwise, true is returned.
  */
-bool spArrayListIsEmpty(SPArrayList* src);
+bool ArrayListIsEmpty(ArrayList* src);
 
 /*
  * push element at first, if the src is full:
  * remove the last element and then add at first
  * **/
-SP_ARRAY_LIST_MESSAGE spArrayListPushFirst(SPArrayList* src, Piece elem);
+SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Move elem);
 
 /**
- * prPiece the list
+ * print the list
  * */
-void spArrayListPrPiece(SPArrayList* src);
+void ArrayListprint(ArrayList* src);
 
 #endif
