@@ -22,7 +22,7 @@ typedef struct move_t {
 	int sc;
 	int dr;
 	int dc;
-	Piece *prepre;
+	Piece *prev_piece;
 } Move;
 
 typedef enum sp_chess_board_message_t {
