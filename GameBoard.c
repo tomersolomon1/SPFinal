@@ -9,6 +9,7 @@
 
 Gameboard *create_board() {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
+	assert(newBoard!=NULL);
 	Piece *board[8][8];
 	Piece *all_pieces[2][16]; //[0] = black, [1] = white
 	ArrayList* history = ArrayListCreate(3);
@@ -46,9 +47,9 @@ Gameboard *create_board() {
 	add_piece(board, all_pieces, Rock, white, 0, 7, i++, 'r');
 	add_piece(board, all_pieces, Queen, white, 0, 3, i++, 'q');
 	add_piece(board, all_pieces, King, white, 0, 4, i++, 'k');
-	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '');
+	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '_');
 	for(int i = 2; i < 6; i++){
-		for(int j = 0; j < 7; j++){
+		for(int j = 0; j < 8; j++){
 			board[i][j] = Empty_piece;
 		}
 	}
@@ -62,7 +63,7 @@ Gameboard *create_board() {
 }
 
 void add_piece(Piece* board, Piece* all_pieces, Piece_type type, int colur, int row, int col, int indexat, char sign){
-	Piece* piece = create_piece(type, colur, row, col, indexat, sign);
+	Piece* piece = create_piece(type, colur, row, col, sign);
 	board[row][col] = piece;
 	all_pieces[colur][indexat] = piece;
 }
@@ -88,17 +89,17 @@ Gameboard *copy_board(Gameboard* old) {
 	Piece *board[8][8];
 	Piece *all_pieces[2][16];
 	Piece *curr;
-	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '');
+	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '_');
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
-			curr = copy_piece(old->board[i][j]);
-			if(curr->type != Empty){
-				board[i][j] = curr;
-				all_pieces[curr->colur][curr->indexat] = curr;
-			}
-			else{
-				board[i][j] = Empty_piece;
-			}
+			board[i][j] = Empty_piece;
+		}
+	}
+	for(int i = 0; i < 2; i++){
+		for(int j = 0; j < 16; j++){
+			curr = copy_piece(old->all_pieces[i][j]);
+			board[curr->row][curr->col] = curr;
+			all_pieces[i][j] = curr;
 		}
 	}
 	ArrayList* history = ArrayListCopy(old->history);

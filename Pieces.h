@@ -43,7 +43,6 @@ typedef struct piece_t {
 	int row; //row coordinate
 	int col; //column coordinate
 	bool alive;
-	int indexat; //index in array of tools
 	bool has_moved;
 	char sign;
 
