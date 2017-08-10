@@ -14,7 +14,7 @@
 #define black 0
 #define white 1
 
-typedef struct gameboard_t {
+typedef struct gameboard_t  {
 	Piece *board[8][8];
 	int turn;
 	Piece *all_pieces[2][16];
