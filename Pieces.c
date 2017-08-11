@@ -6,7 +6,65 @@
  */
 #include "Pieces.h"
 
-Piece *create_piece(Piece_type type, int colur, int row, int col, char sign) {
+//Vector:
+
+Vector *create_vector(int delta_row, int delta_col, int vector_size){
+	Vector *v = (Vector*) malloc(sizeof(Vector));
+	v.delta_row = delta_row;
+	v.delta_col = delta_col;
+	v.vector_size = vector_size;
+	return v;
+}
+
+Vector *copy_vector(Vector *old){
+	Vector *v = (Vector *) malloc(sizeof(Vector));
+	v->delta_col = old->delta_col;
+	v->delta_row = old->delta_row;
+	v->vector_size = old->vector_size;
+	return v;
+}
+
+void destroy_vector(Vector *v){
+	if(v != NULL){
+		free(v);
+	}
+}
+
+//Step
+
+Step *create_step(int srow, int scol, int drow, int dcol, int prevPiece_colur, int prevPiece_index, bool is_srcPiece_was_moved){
+	Step newStep = (Step*) malloc(sizeof(Step));
+	newStep.srow = srow;
+	newStep.dcol = dcol;
+	newStep.drow = drow;
+	newStep.scol = scol;
+	newStep.prevPiece_colur = prevPiece_colur;
+	newStep.prevPiece_index = prevPiece_index;
+	newStep.is_srcPiece_was_moved = is_srcPiece_was_moved;
+	return newStep;
+}
+
+Step *copy_step(Step *old){
+	Step *new = (Step*) malloc(sizeof(Step));
+	new->srow = old->srow;
+	new->scol = old->scol;
+	new->drow = old->drow;
+	new->dcol = old->dcol;
+	new->prevPiece_colur = old->prevPiece_colur;
+	new->prevPiece_index = old->prevPiece_index;
+	new->is_srcPiece_was_moved = old->is_srcPiece_was_moved;
+	return new;
+}
+
+void destroy_Step(Step *step){
+	if(step != NULL){
+		free(step);
+	}
+}
+
+//Piece:
+
+Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int indexat) {
 	Piece* newPiece = (Piece*) malloc(sizeof(Piece));
 	assert(newPiece != NULL);
 	newPiece->alive = true;
@@ -16,7 +74,9 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, char sign) {
 	newPiece->has_moved = false;
 	newPiece->type = type;
 	newPiece->sign = sign;
+	newPiece->indexat = indexat;
 	newPiece->amount_steps = 0;
+
 	int amount_vectors = 0;
 	if(type == Pawn){
 		amount_vectors = 1;
@@ -27,36 +87,69 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, char sign) {
 	if(type == Bishop || type == Rock){
 		amount_vectors = 4;
 	}
-	Vector_step* vectors;
-	vectors = (Vector_step*) malloc(sizeof(Vector_step) * amount_vectors);
-	assert(vectors != NULL);
+	Vector **vectors = (Vector**)malloc(sizeof(Vector*) * amount_vectors);
 	set_vectors(type, colur, vectors);
 	newPiece->amount_vectors = amount_vectors;
 	newPiece->vectors = vectors;
 
-	int max_amount_steps = 0;
-	if(type == Pawn){
-		max_amount_steps = 2;
-	}
-	if(type == Knight || type == King){
-		max_amount_steps = 8;
-	}
-	if(type == Bishop || type == Rock){
-		max_amount_steps = 14;
-	}
-	if(type == Queen){
-		max_amount_steps = 28;
-	}
-	Step *steps = (Step*) malloc(sizeof(Step) * max_amount_steps);
+	Step **steps = (Step**) malloc(sizeof(Step*) * 28);
 	assert(steps != NULL);
-	for(int i = 0; i < max_amount_steps; i++){
-		Step[i] = NULL;
+	for(int i = 0; i < 28; i++){
+		steps[i] = NULL;
 	}
 	newPiece->steps = steps;
 	return newPiece;
 }
 
-void set_vectors(Piece_type type, int colur, Vector_step * vectors){
+//copy_piece but steps remain null
+Piece *copy_piece(Piece *old){
+	if(old == NULL){
+		return NULL;
+	}
+	Piece* newPiece = (Piece*) malloc(sizeof(Piece));
+	assert(newPiece != NULL);
+	newPiece->alive = old->alive;
+	newPiece->col = old->col;
+	newPiece->colur = old->colur;
+	newPiece->has_moved = old->has_moved;
+	newPiece->row = old->row;
+	newPiece->type = old->type;
+	newPiece->sign = old->sign;
+	newPiece->indexat = old->indexat;
+	newPiece->amount_steps = 0;
+	newPiece->amount_vectors = old->amount_vectors;
+
+	Vector **vectors = (Vector**) malloc(sizeof(Vector*) * newPiece->amount_vectors);
+	assert(vectors != NULL);
+	for(int i = 0; i < newPiece->amount_vectors; i++){
+		vectors[i] = copy_vector(old->vectors[i]);
+	}
+	newPiece->vectors = vectors;
+
+	Step **steps = (Step**) malloc(sizeof(Step*) * 28);
+	assert(steps != NULL);
+	for(int i = 0; i < 28; i++){
+		steps[i] = NULL;
+	}
+	newPiece->steps = steps;
+	return newPiece;
+}
+
+void destroy_piece(Piece *piece) {
+	if(piece != NULL){
+		for(int i = 0; i < 28; i++){
+			destroy_step(piece->steps[i]);
+		}
+		for(int i = 0; i < piece->amount_vectors; i++){
+			destroy_vector(piece->vectors[i]);
+		}
+		free(piece->vectors);
+		free(piece->steps);
+		free(piece);
+	}
+}
+
+void set_vectors(Piece_type type, int colur, Vector **vectors){
 	if(type == Pawn && colur == white){
 		vectors[0] = create_vector(1, 0, 2);
 	}
@@ -82,7 +175,7 @@ void set_vectors(Piece_type type, int colur, Vector_step * vectors){
 	if(type == Rock){
 		vectors[0] = create_vector(1, 0, 8);
 		vectors[1] = create_vector(-1, 0, 8);
-		vectors[2] = create_vector(0, 1, 8);
+		vectors[2] = reate_vector(0, 1, 8);
 		vectors[3] = create_vector(0, -1, 8);
 	}
 	if(type == Queen){
@@ -107,50 +200,3 @@ void set_vectors(Piece_type type, int colur, Vector_step * vectors){
 	}
 }
 
-void destroy_piece(Piece piece) {
-	if(piece != NULL){
-		free(piece->vectors);
-		free(piece->steps);
-		free(piece);
-	}
-}
-
-Piece *copy_piece(Piece old){
-	if(old == NULL){
-		return NULL;
-	}
-	Piece* newPiece = (Piece*) malloc(sizeof(Piece));
-	assert(newPiece != NULL);
-	newPiece->alive = old->alive;
-	newPiece->col = old->col;
-	newPiece->colur = old->colur;
-	newPiece->has_moved = old->has_moved;
-	newPiece->row = old->row;
-	newPiece->type = old->type;
-	newPiece->sign = old->sign;
-	newPiece->amount_steps = old->amount_steps;
-	newPiece->amount_vectors = old->amount_vectors;
-
-	Vector_step *vectors = (Vector_step*) malloc(sizeof(Vector_step) * newPiece->amount_vectors);
-	assert(vectors != NULL);
-	for(int i = 0; i < newPiece->amount_vectors; i++){
-		vectors[i] = old->vectors[i];
-	}
-	newPiece->vectors = vectors;
-
-	Step *steps = (Step*) malloc(sizeof(Step) * newPiece->amount_steps);
-	assert(steps != NULL);
-	for(int i = 0; i < newPiece->amount_steps; i++){
-		steps[i] = old->steps[i];
-	}
-	newPiece->steps = steps;
-	return newPiece;
-}
-
-Vector_step create_vector(int delta_row, int delta_col, int vector_size){
-	Vector_step v;
-	v.delta_row = delta_row;
-	v.delta_col = delta_col;
-	v.vector_size = vector_size;
-	return v;
-}

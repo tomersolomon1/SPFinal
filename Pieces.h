@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
+#include <assert.h>
 
 #define black 0
 #define white 1
@@ -28,46 +29,37 @@ typedef enum {
 } Piece_type;
 //Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '');
 
-typedef struct vector_step_t{
+typedef struct Vector_t{
 	int delta_row;
 	int delta_col;
 	int vector_size;
-} Vector_step;
-
-struct step_t;
-
-typedef struct piece_t {
-	Piece_type type;
-	int colur;
-	int row; //row coordinate
-	int col; //column coordinate
-	bool alive;
-	bool has_moved;
-	char sign;
-	struct step_t *steps; //all possible steps in a current game
-	int amount_steps; //how many possible steps in a current game
-	Vector_step *vectors; //all possible vector movements
-	int amount_vectors; //how many different vectors
-} Piece;
+} Vector;
 
 typedef struct step_t {
 	int srow; //source row
 	int scol; //source col
 	int drow; //dest row
 	int dcol; //dest col
-	Piece *prevPiece; //i ate it
+	int prevPiece_colur; //colur of prev piece
+	int prevPiece_index; //index in "all_pieces array" of prev piece
 	bool is_srcPiece_was_moved;
 } Step;
 
+typedef struct piece_t {
+	Piece_type type;
+	int colur;
+	int row; //row coordinate
+	int col; //column coordinate
+	int indexat; //index of piece in the array of pieces
+	bool alive;
+	bool has_moved;
+	char sign;
+	Step **steps; //all possible steps in a current game (size = 28)
+	int amount_steps; //how many possible steps in a current game
+	Vector **vectors; //all possible vector movements
+	int amount_vectors; //how many different vectors
+} Piece;
 
 
-Piece *create_piece(Piece_type type, int colur, int row, int col, char sign);
 
-void set_vectors(Piece_type type, int colur, Vector_step * vectors);
-
-void destroy_piece(Piece *piece);
-
-Piece *copy_piece(Piece *old);
-
-Vector_step create_vector(int delta_row, int delta_col, int vector_size);
 #endif /* PIECES_H_ */

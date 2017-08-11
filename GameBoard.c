@@ -45,20 +45,19 @@ Gameboard *create_board() {
 	add_piece(newBoard, Rock, white, 0, 7, i++, 'r');
 	add_piece(newBoard, Queen, white, 0, 3, i++, 'q');
 	add_piece(newBoard, King, white, 0, 4, i++, 'k');
-	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, '_');
+	newBoard->empty = create_piece(Empty, -1, -1, -1, '_', -1);
 	for(int i = 2; i < 6; i++){
 		for(int j = 0; j < 8; j++){
-			newBoard->board[i][j] = Empty_piece;
+			newBoard->board[i][j] = newBoard->empty;
 		}
 	}
 	newBoard->turn = white;
-	newBoard->empty = Empty_piece;
 	set_all_valid_steps(newBoard);
 	return newBoard;
 }
 
 void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat, char sign){
-	Piece* piece = create_piece(type, colur, row, col, sign);
+	Piece *piece = create_piece(type, colur, row, col, sign, indexat);
 	gameboard->board[row][col] = piece;
 	gameboard->all_pieces[colur][indexat] = piece;
 }
@@ -68,11 +67,12 @@ void destroy_board(Gameboard *gameboard) {
 		return;
 	}
 	ArrayListDestroy(gameboard->history);
-	for(int i = 0; i < 8; i++){
-		for(int j = 0; j < 8; j++){
-			destroy_piece(gameboard->board[i][j]);
+	for(int i = 0; i < 2; i++){
+		for(int j = 0; j < 16; j++){
+			destroy_piece(gameboard->all_pieces[i][j]);
 		}
 	}
+	destroy_piece(gameboard->empty);
 	free(gameboard);
 }
 
@@ -80,36 +80,27 @@ Gameboard *copy_board(Gameboard* old) {
 	if(old == NULL){
 		return NULL;
 	}
-	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
-	Piece *curr;
-	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, '_');
+	Gameboard *new = (Gameboard*) malloc(sizeof(Gameboard));
+	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 ,'_', -1);
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
-			newBoard->board[i][j] = Empty_piece;
+			new->board[i][j] = empty;
 		}
 	}
 	for(int i = 0; i < 2; i++){
 		for(int j = 0; j < 16; j++){
-			curr = copy_piece(old->all_pieces[i][j]);
-			newBoard->board[curr->row][curr->col] = curr;
-			newBoard->all_pieces[i][j] = curr;
+			new->all_pieces[i][j] = copy_piece(old->all_pieces[i][j]);
+			Piece *curr = new->all_pieces[i][j];
+			if(curr->alive){
+				new->board[curr->row][curr->col] = curr;
+			}
 		}
 	}
-	newBoard->history = ArrayListCopy(old->history);
-	newBoard->turn = old->turn;
-	newBoard->empty = Empty_piece;
-	return newBoard;
-}
-
-Step create_step(int srow, int scol, int drow, int dcol, Piece *prev, bool is_srcPiece_was_moved){
-	Step newStep;
-	newStep.srow = srow;
-	newStep.dcol = dcol;
-	newStep.drow = drow;
-	newStep.scol = scol;
-	newStep.prevPiece = prev;
-	newStep.is_srcPiece_was_moved = is_srcPiece_was_moved;
-	return newStep;
+	new->turn = old->turn;
+	new->empty = empty;
+	//new->history
+	set_all_valid_steps(new);
+	return new;
 }
 
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
@@ -178,7 +169,7 @@ bool is_check(Gameboard *gameboard, int colur) {
 	return false;
 }
 
-bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector_step v){
+bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector v){
 	int delta_row = v.delta_row;
 	int delta_col = v.delta_col;
 	int amount_going = v.vector_size;
@@ -223,7 +214,7 @@ void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece) {
 	piece->amount_steps = amount_steps;
 }
 
-void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector_step v, int *amount_steps){
+void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector v, int *amount_steps){
 	int delta_row = v.delta_row;
 	int delta_col = v.delta_col;
 	int amount_going = v.vector_size;

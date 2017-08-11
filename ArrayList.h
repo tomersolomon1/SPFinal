@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include "GameBoard.h"
+#include "Pieces.h"
 /**
  * ArrayList summary:
  *
@@ -41,7 +41,7 @@
  * ArrayListIsEmpty      - Returns true if the array list contains no elements.
  */
 typedef struct ARRAY_list_t {
-	Step* elements;
+	Step** elements;
 	int actualSize;
 	int maxSize;
 } ArrayList;
@@ -107,7 +107,7 @@ ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src);
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
-ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
+ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step *elem, int index);
 
 /**
  * Inserts element at a the beginning of the source element. The elements
@@ -121,7 +121,7 @@ ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
- ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Step elem);
+ ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Step *elem);
 
 /**
  * Inserts element at a the end of the source element. If the array list
@@ -134,7 +134,7 @@ ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
-ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step elem);
+ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step *elem);
 
 /**
  * Removes an element from a ecified index. The elements residing after the
@@ -190,7 +190,7 @@ ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
  * Undefined value if either src == NULL or index out of bound.
  * Otherwise, the element at the ecified index is returned.
  */
-Step ArrayListGetAt(ArrayList* src, int index);
+Step *ArrayListGetAt(ArrayList* src, int index);
 
 /**
  * Returns the element at the beginning of the list. The function is called
@@ -201,7 +201,7 @@ Step ArrayListGetAt(ArrayList* src, int index);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the beginning of the list is returned.
  */
-Step ArrayListGetFirst(ArrayList* src);
+Step *ArrayListGetFirst(ArrayList* src);
 
 /**
  * Returns the element at the end of the list. The function is called
@@ -212,7 +212,7 @@ Step ArrayListGetFirst(ArrayList* src);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the end of the list is returned.
  */
-Step ArrayListGetLast(ArrayList* src);
+Step *ArrayListGetLast(ArrayList* src);
 
 /**
  * Returns the maximum capacity of the list. The function is called
@@ -261,7 +261,7 @@ bool ArrayListIsEmpty(ArrayList* src);
  * push element at first, if the src is full:
  * remove the last element and then add at first
  * **/
-ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem);
+ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step *elem);
 
 /**
  * print the list

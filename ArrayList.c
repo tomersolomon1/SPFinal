@@ -19,7 +19,7 @@ ArrayList* ArrayListCreate(int maxSize)
 	ArrayList* array = (ArrayList*) malloc(sizeof(ArrayList));
 
 	array->maxSize = maxSize;
-	array->elements = (Step*) malloc(sizeof(Step) * maxSize);
+	array->elements = (Step**) malloc(sizeof(Step) * maxSize);
 	for(int i = 0; i < maxSize; i++){
 		array->elements[i] = create_step(0,0,0,0,NULL,0);
 	}
@@ -42,11 +42,9 @@ ArrayList* ArrayListCopy(ArrayList* src)
 
 	dst->actualSize = src->actualSize;
 	dst->maxSize = src->maxSize;
-	int *dst_elements = (Step*) malloc(sizeof(Step) * src->maxSize);
-
-	if(dst_elements == NULL){ return NULL;}
-	memcpy(dst_elements, src->elements, (sizeof(Step) * src->maxSize));
-	dst->elements = dst_elements;
+	for(int i = 0; i< dst->actualSize; i++){
+		dst->elements[i] = copy_step(src->elements[i]);
+	}
 	return dst;
 }
 
@@ -58,6 +56,9 @@ ArrayList* ArrayListCopy(ArrayList* src)
 void ArrayListDestroy(ArrayList* src)
 {
 	if(src != NULL){
+		for(int i = 0; i< src->actualSize; i++){
+			destroy_Step(src->elements[i]);
+		}
 		free(src->elements);
 		free(src);
 	}
@@ -76,7 +77,10 @@ ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src){
 	if(src == NULL){
 		return ARRAY_LIST_INVALID_ARGUMENT;
 	}
-	free(src->elements);
+	for(int i = 0; i< src->actualSize; i++){
+		destroy_Step(src->elements[i]);
+		src->elements[i] = NULL;
+	}
 	src->actualSize = 0;
 	return ARRAY_LIST_SUCCESS;
 }
@@ -95,7 +99,7 @@ ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src){
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
-ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index){
+ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step *elem, int index){
 	if(src == NULL){
 		return ARRAY_LIST_INVALID_ARGUMENT;
 	}
@@ -106,13 +110,13 @@ ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index){
 		return ARRAY_LIST_INVALID_ARGUMENT;
 	}
 
-	Step one_before = *((src->elements) + index);
-	*((src->elements) + index) = elem;
-	Step temp = create_step(0,0,0,0,NULL,0);
+	Step *one_before = src->elements[index];
+	src->elements[index] = elem;
+	Step *temp = NULL;
 
 	for (int i = index + 1; i < (src->maxSize); i++){
-		temp = *((src->elements) + i);
-		*((src->elements) + i) = one_before;
+		temp = src->elements[i];
+		src->elements[i] = one_before;
 		one_before = temp;
 	}
 	(src->actualSize)++;
@@ -131,7 +135,7 @@ ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index){
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
- ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Step elem){
+ ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Step *elem){
 	 return ArrayListAddAt(src, elem, 0);
  }
 
@@ -146,7 +150,7 @@ ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index){
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
-ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step elem){
+ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step *elem){
 	return ArrayListAddAt(src, elem, src->actualSize);
 }
 
@@ -174,10 +178,11 @@ ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index){
 	if(index + 1 > (src->actualSize)){
 		return ARRAY_LIST_INVALID_ARGUMENT;
 	}
+	destroy_Step(src->elements[index]);
 	for(int i = index; i <= (src->actualSize) - 2; i++){
-		*((src->elements) + i) = *((src->elements) + i + 1);
+		src->elements[i] = src->elements[i + 1];
 	}
-	*((src->elements) + src->actualSize - 1) = create_step(0,0,0,0,NULL,0);
+	src->elements[src->actualSize - 1] = NULL;
 	(src->actualSize)--;
 	return ARRAY_LIST_SUCCESS;
 
@@ -225,7 +230,7 @@ ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src){
  * Undefined value if either src == NULL or index out of bound.
  * Otherwise, the element at the ecified index is returned.
  */
-Step ArrayListGetAt(ArrayList* src, int index){
+Step *ArrayListGetAt(ArrayList* src, int index){
 	return *(src->elements + index);
 }
 
@@ -238,7 +243,7 @@ Step ArrayListGetAt(ArrayList* src, int index){
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the beginning of the list is returned.
  */
-Step ArrayListGetFirst(ArrayList* src){
+Step *ArrayListGetFirst(ArrayList* src){
 	return ArrayListGetAt(src, 0);
 }
 
@@ -251,7 +256,7 @@ Step ArrayListGetFirst(ArrayList* src){
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the end of the list is returned.
  */
-Step ArrayListGetLast(ArrayList* src){
+Step *ArrayListGetLast(ArrayList* src){
 	return ArrayListGetAt(src, (src->actualSize) - 1);
 }
 
@@ -323,7 +328,7 @@ bool ArrayListIsEmpty(ArrayList* src){
  * remove the last element and then add at first
  * **/
 
-ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem){
+ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step *elem){
 	if(ArrayListIsFull(src)){
 		ARRAY_LIST_MESSAGE status = ArrayListRemoveLast(src);
 		if(status != ARRAY_LIST_SUCCESS){
@@ -343,11 +348,11 @@ ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem){
 void ArrayListPrint(ArrayList* src){
 	for(int i=0; i<src->actualSize; i++){
 		if(i<src->actualSize-1){
-			printf(" %d, %d, %d, %d |",src->elements[i].srow, src->elements[i].scol, src->elements[i].drow, src->elements[i].dcol);
+			printf(" %d, %d, %d, %d |",src->elements[i]->srow, src->elements[i]->scol, src->elements[i]->drow, src->elements[i]->dcol);
 			fflush(stdout);
 		}
 		else{
-			printf(" %d, %d, %d, %d",src->elements[i].srow, src->elements[i].scol, src->elements[i].drow, src->elements[i].dcol);
+			printf(" %d, %d, %d, %d",src->elements[i]->srow, src->elements[i]->scol, src->elements[i]->drow, src->elements[i]->dcol);
 			fflush(stdout);
 		}
 	}
