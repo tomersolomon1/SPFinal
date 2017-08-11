@@ -5,36 +5,34 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "GameBoard.h"
-
 /**
  * ArrayList summary:
  *
  * A container that represents a fixed size linked list. The capcity of the list
- * is specified at the creation. The container supports typical list
+ * is ecified at the creation. The container supports typical list
  * functionalities with the addition of random access as in arrays.
  * Upon insertion, if the maximum capacity is reached then an error message is
  * returned and the list is not affected. A summary of the supported functions
  * is given below:
  *
- * ArrayListCreate       - Creates an empty array list with a specified
+ * ArrayListCreate       - Creates an empty array list with a ecified
  *                           max capacity.
- * ArrayListCopy         - Creates an exact copy of a specified array list.
+ * ArrayListCopy         - Creates an exact copy of a ecified array list.
  * ArrayListDestroy      - Frees all memory resources associated with an array
  *                           list.
- * ArrayListClear        - Clears all elements from a specified array list.
- * ArrayListAddAt        - Inserts an element at a specified index, elements
+ * ArrayListClear        - Clears all elements from a ecified array list.
+ * ArrayListAddAt        - Inserts an element at a ecified index, elements
  *                           will be shifted to make place.
  * ArrayListAddFirst     - Inserts an element at the beginning of the array
  *                           list, elements will be shifted to make place.
  * ArrayListAddLast      - Inserts an element at the end of the array list.
- * ArrayListRemoveAt     - Removes an element at the specified index, elements
+ * ArrayListRemoveAt     - Removes an element at the ecified index, elements
  *                           elements will be shifted as a result.
  * ArrayListRemoveFirst  - Removes an element from the beginning of the array
  *                           list, elements will be shifted as a result.
  * ArrayListRemoveLast   - Removes an element from the end of the array list
- * ArrayListGetAt        - Accesses the element at the specified index.
+ * ArrayListGetAt        - Accesses the element at the ecified index.
  * ArrayListGetFirst     - Accesses the first element of the array list.
  * ArrayListGetLast      - Accesses the last element of the array list.
  * ArrayListMaxCapcity   - Returns the maximum capcity of the array list.
@@ -42,25 +40,24 @@
  * ArrayListIsFull       - Returns if the array list reached its max capacity.
  * ArrayListIsEmpty      - Returns true if the array list contains no elements.
  */
-typedef struct sp_array_list_t {
+typedef struct ARRAY_list_t {
 	Step* elements;
 	int actualSize;
 	int maxSize;
 } ArrayList;
 
 /**
- *
  * A type used for errors
  */
-typedef enum sp_array_list_message_t {
-	SP_ARRAY_LIST_SUCCESS,
-	SP_ARRAY_LIST_INVALID_ARGUMENT,
-	SP_ARRAY_LIST_FULL,
-	SP_ARRAY_LIST_EMPTY
-} SP_ARRAY_LIST_MESSAGE;
+typedef enum ARRAY_list_message_t {
+	ARRAY_LIST_SUCCESS,
+	ARRAY_LIST_INVALID_ARGUMENT,
+	ARRAY_LIST_FULL,
+	ARRAY_LIST_EMPTY
+} ARRAY_LIST_MESSAGE;
 
 /**
- *  Creates an empty array list with the specified maximum capacity.
+ *  Creates an empty array list with the ecified maximum capacity.
  *  @param maxSize - the maximum capacity of the target array list.
  *  @return
  *  NULL, if an allocation error occurred or maxSize  <= 0.
@@ -91,14 +88,14 @@ void ArrayListDestroy(ArrayList* src);
  * not affected.
  * @param src - the source array list
  * @return
- * SP_ARRAY_LIST_INVALID_ARGUMENT if src == NULL
- * SP_ARRAY_LIST_SUCCESS otherwise
+ * ARRAY_LIST_INVALID_ARGUMENT if src == NULL
+ * ARRAY_LIST_SUCCESS otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src);
+ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src);
 
 /**
- * Inserts element at a specified index. The elements residing at and after the
- * specified index will be shifted to make place for the new element. If the
+ * Inserts element at a ecified index. The elements residing at and after the
+ * ecified index will be shifted to make place for the new element. If the
  * array list reached its maximum capacity and error message is returned and
  * the source list is not affected
  * @param src   - the source array list
@@ -106,11 +103,11 @@ SP_ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src);
  * @param index - the index where the new element will be placed. The index is
  *                0-based.
  * @return
- * SP_ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
- * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
- * SP_ARRAY_LIST_SUCCESS - otherwise
+ * ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
+ * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
+ * ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
+ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
 
 /**
  * Inserts element at a the beginning of the source element. The elements
@@ -120,11 +117,11 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
  * @param src   - the source array list
  * @param elem  - the new element to be inserted
  * @return
- * SP_ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
- * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
- * SP_ARRAY_LIST_SUCCESS - otherwise
+ * ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
+ * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
+ * ARRAY_LIST_SUCCESS - otherwise
  */
- SP_ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Step elem);
+ ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, Step elem);
 
 /**
  * Inserts element at a the end of the source element. If the array list
@@ -133,27 +130,27 @@ SP_ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, Step elem, int index);
  * @param src   - the source array list
  * @param elem  - the new element to be inserted
  * @return
- * SP_ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
- * SP_ARRAY_LIST_FULL - if the source array list reached its maximum capacity
- * SP_ARRAY_LIST_SUCCESS - otherwise
+ * ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
+ * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
+ * ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step elem);
+ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, Step elem);
 
 /**
- * Removes an element from a specified index. The elements residing after the
- * specified index will be shifted to make to keep the list continuous. If the
+ * Removes an element from a ecified index. The elements residing after the
+ * ecified index will be shifted to make to keep the list continuous. If the
  * array list is empty then an error message is returned and the source list
  * is not affected
  * @param src   - The source array list
  * @param elem  - The new element to be inserted
- * @param index - The index from where the new element will be Removed.
+ * @param index - The index from where the new element will be removed.
  *                The index is 0-based.
  * @return
- * SP_ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
- * SP_ARRAY_LIST_EMPTY - if the source array list is empty
- * SP_ARRAY_LIST_SUCCESS - otherwise
+ * ARRAY_LIST_INVALID_ARGUMENT - if src == NULL or the index is out of bound
+ * ARRAY_LIST_EMPTY - if the source array list is empty
+ * ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index);
+ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index);
 
 /**
  * Removes an element from a the beginning of the list.
@@ -163,11 +160,11 @@ SP_ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index);
  * @param src   - The source array list
  * @param elem  - The new element to be inserted
  * @return
- * SP_ARRAY_LIST_INVALID_ARGUMENT - if src == NULL
- * SP_ARRAY_LIST_EMPTY - if the source array list is empty
- * SP_ARRAY_LIST_SUCCESS - otherwise
+ * ARRAY_LIST_INVALID_ARGUMENT - if src == NULL
+ * ARRAY_LIST_EMPTY - if the source array list is empty
+ * ARRAY_LIST_SUCCESS - otherwise
  */
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
+ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
 
 /**
  * Removes an element from a the end of the list.
@@ -177,21 +174,21 @@ SP_ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
  * @param src   - The source array list
  * @param elem  - The new element to be inserted
  * @return
- * SP_ARRAY_LIST_INVALID_ARGUMENT - if src == NULL
- * SP_ARRAY_LIST_EMPTY - if the source array list is empty
- * SP_ARRAY_LIST_SUCCESS - otherwise.
+ * ARRAY_LIST_INVALID_ARGUMENT - if src == NULL
+ * ARRAY_LIST_EMPTY - if the source array list is empty
+ * ARRAY_LIST_SUCCESS - otherwise.
  */
-SP_ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
+ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
 
 /**
- * Returns the element at the specified index. The function is called
+ * Returns the element at the ecified index. The function is called
  * with the assertion that all arguments are valid. If any of the arguments is
  * invalid then an undefined value is returned.
  * @param src - the source array list
- * @param index - the specified index, the index is 0-based.
+ * @param index - the ecified index, the index is 0-based.
  * @return
  * Undefined value if either src == NULL or index out of bound.
- * Otherwise, the element at the specified index is returned.
+ * Otherwise, the element at the ecified index is returned.
  */
 Step ArrayListGetAt(ArrayList* src, int index);
 
@@ -262,13 +259,13 @@ bool ArrayListIsEmpty(ArrayList* src);
 
 /*
  * push element at first, if the src is full:
- * Remove the last element and then add at first
+ * remove the last element and then add at first
  * **/
-SP_ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem);
+ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step elem);
 
 /**
  * print the list
  * */
-void ArrayListprint(ArrayList* src);
+void ArrayListPrint(ArrayList* src);
 
 #endif

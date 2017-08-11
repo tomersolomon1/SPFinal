@@ -4,7 +4,7 @@
  *  Created on: Aug 10, 2017
  *      Author: sapir
  */
-#include <Pieces.h>
+#include "Pieces.h"
 
 Piece *create_piece(Piece_type type, int colur, int row, int col, char sign) {
 	Piece* newPiece = (Piece*) malloc(sizeof(Piece));

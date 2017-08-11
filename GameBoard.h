@@ -18,7 +18,7 @@ typedef struct gameboard_t  {
 	Piece *board[8][8];
 	int turn;
 	Piece *all_pieces[2][16];
-	ArrayList history;
+	ArrayList *history;
 	Piece *empty;
 } Gameboard;
 
@@ -31,7 +31,7 @@ typedef enum chess_board_message_t {
 
 Gameboard *create_board();
 
-void add_piece(Piece* board, Piece* all_pieces, Piece_type type, int colur, int row, int col, int indexat, char sign);
+void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat, char sign);
 
 void destroy_board(Gameboard *gameboard);
 

@@ -48,7 +48,7 @@ Gameboard *create_board() {
 	Piece* Empty_piece = create_piece(Empty, -1, -1, -1, '_');
 	for(int i = 2; i < 6; i++){
 		for(int j = 0; j < 8; j++){
-			board[i][j] = Empty_piece;
+			newBoard->board[i][j] = Empty_piece;
 		}
 	}
 	newBoard->turn = white;
@@ -109,7 +109,7 @@ Step create_step(int srow, int scol, int drow, int dcol, Piece *prev, bool is_sr
 	newStep.scol = scol;
 	newStep.prevPiece = prev;
 	newStep.is_srcPiece_was_moved = is_srcPiece_was_moved;
-	return Step;
+	return newStep;
 }
 
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
@@ -209,7 +209,7 @@ bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector_step v){
 void set_all_valid_steps(Gameboard *gameboard){
 	for(int i = 0; i < 16; i++){
 		Piece *piece = gameboard->all_pieces[gameboard->turn][i];
-		if(piece.alive){
+		if(piece->alive){
 			set_all_valid_steps_per_piece(gameboard, piece);
 		}
 	}
@@ -237,15 +237,15 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector_step v, int
 			break;
 		}
 		if(gameboard->board[row][col]->type == Empty){ // can go, empty
-			Step s = create_step(piece->row, piece->col, row, col, gameboard.empty, piece->has_moved);
-			if(!is_step_causes_check(gameboard, s, piece)){
+			Step s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece->has_moved);
+			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
 			}
 		}
 		else if(gameboard->board[row][col]->colur != piece->colur){ //eating opponent's piece
 			Step s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved);
-			if(!is_step_causes_check(gameboard, s, piece)){
+			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
 			}
@@ -260,14 +260,14 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector_step v, int
 
 bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step step){
 	bool answer = false;
-	gameboard->board[step->drow][step->dcol] = piece;
+	gameboard->board[step.drow][step.dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
 	gameboard->turn = abs(1-gameboard->turn);
 	if(is_check_curr_player(gameboard)){
 		answer = true;
 	}
 	gameboard->turn = abs(1-gameboard->turn);
-	gameboard->board[step->drow][step->dcol] = step.prevPiece;
+	gameboard->board[step.drow][step.dcol] = step.prevPiece;
 	gameboard->board[piece->row][piece->col] = piece;
 	return answer;
 }
@@ -277,7 +277,7 @@ Piece *get_piece_in_place(Gameboard *gameboard, int row, int col) {
 	if(row < 0 || row > 7 || col < 0 || col > 7){
 		return NULL;
 	}
-	return gameboard[row][col];
+	return gameboard->board[row][col];
 }
 
 CHESS_BOARD_MESSAGE undo_Step(Gameboard *gameboard) {

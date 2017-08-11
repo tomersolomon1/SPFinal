@@ -34,6 +34,8 @@ typedef struct vector_step_t{
 	int vector_size;
 } Vector_step;
 
+struct step_t;
+
 typedef struct piece_t {
 	Piece_type type;
 	int colur;
@@ -42,7 +44,7 @@ typedef struct piece_t {
 	bool alive;
 	bool has_moved;
 	char sign;
-	Step *steps; //all possible steps in a current game
+	struct step_t *steps; //all possible steps in a current game
 	int amount_steps; //how many possible steps in a current game
 	Vector_step *vectors; //all possible vector movements
 	int amount_vectors; //how many different vectors
