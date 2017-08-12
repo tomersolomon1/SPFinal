@@ -72,7 +72,7 @@ void destroy_vector(Vector *v);
 Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved);
 Step *copy_step(Step *old);
 void destroy_step(Step *step);
-
+void print_step(Step *step);
 
 //Piece:
 Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int indexat);
@@ -80,6 +80,6 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int
 Piece *copy_piece(Piece *old);
 void destroy_piece(Piece *piece);
 void set_vectors(Piece_type type, int colur, Vector **vectors);
-
+void print_all_steps(Piece *piece);
 
 #endif /* PIECES_H_ */

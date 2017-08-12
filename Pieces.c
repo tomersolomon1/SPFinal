@@ -34,7 +34,7 @@ void destroy_vector(Vector *v){
 	}
 }
 
-//Step
+//Step:
 
 Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved){
 	Step *newStep = (Step*) malloc(sizeof(Step));
@@ -62,6 +62,13 @@ void destroy_step(Step *step){
 	if(step != NULL){
 		free(step);
 	}
+}
+
+void print_step(Step *step){
+	printf("[%d][%c]->[%d][%c]", step->srow+1, 'A'+step->scol, step->drow+1, 'A' +step->dcol);
+	fflush(stdout);
+	printf(" eat %c |", step->prevPiece->sign);
+	fflush(stdout);
 }
 
 //Piece:
@@ -206,3 +213,14 @@ void set_vectors(Piece_type type, int colur, Vector **vectors){
 	}
 }
 
+void print_all_steps(Piece *piece){
+	if(piece->alive){
+		for(int i = 0; i < piece->amount_steps; i++){
+			print_step(piece->steps[i]);
+		}
+	}
+	else{
+		printf("dead");
+		fflush(stdout);
+	}
+}

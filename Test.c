@@ -31,8 +31,6 @@ int main(){
 	print_details_game(game);
 	set_step(game, 4,3,1,3);
 	print_details_game(game);
-	set_step(game, 2,0,3,0);
-	print_details_game(game);
-	set_step(game, 0,4,1,3);
+	set_step(game, 0,5,1,3);
 	print_details_game(game);
 }

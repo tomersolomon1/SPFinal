@@ -100,7 +100,7 @@ Gameboard *copy_board(Gameboard* old) {
 	new->turn = old->turn;
 	new->empty = empty;
 	//when we copy history, inside the steps we still point to piece in previous board
-	//so the loop changes it
+	//so the loop changes it:
 	new->history = ArrayListCopy(old->history);
 	for(int i = 0; i < new->history->actualSize; i++){
 		Piece* old_piece = new->history->elements[i]->prevPiece;
@@ -246,7 +246,8 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 				(*amount_steps)++;
 			}
 		}
-		else if(gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
+		else if(gameboard->board[row][col]->type != Empty &&
+				gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
 			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
@@ -265,11 +266,13 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step *step){
 	bool answer = false;
 	gameboard->board[step->drow][step->dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
+	step->prevPiece->alive = false;
 	gameboard->turn = abs(1-gameboard->turn);
 	if(is_check_curr_player(gameboard)){
 		answer = true;
 	}
 	gameboard->turn = abs(1-gameboard->turn);
+	step->prevPiece->alive = true;
 	gameboard->board[step->drow][step->dcol] = step->prevPiece;
 	gameboard->board[piece->row][piece->col] = piece;
 	return answer;
@@ -347,8 +350,19 @@ void print_board(Gameboard *gameboard) {
 }
 
 void print_details_game(Gameboard *gameboard){
+	printf("\n");
+	fflush(stdout);
 	print_board(gameboard);
+	printf("history: ");
+	fflush(stdout);
 	ArrayListPrint(gameboard->history);
 	printf("\n");
 	fflush(stdout);
+	for(int i = 0; i < 16; i++){
+		printf("%c: ", gameboard->all_pieces[gameboard->turn][i]->sign);
+		fflush(stdout);
+		print_all_steps(gameboard->all_pieces[gameboard->turn][i]);
+		printf("\n");
+		fflush(stdout);
+	}
 }
