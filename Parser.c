@@ -33,7 +33,7 @@ bool verify_command(Command *comm, const char *line, int offset, const char *com
 			return false;
 		}
 	}
-	if ((actual_len != comm_len - 1) || (offset == SP_MAX_LINE_LENGTH && need_param) ||
+	if ((actual_len != comm_len) || ((offset == SP_MAX_LINE_LENGTH || line[offset] == '\0') && need_param) ||
 			(!isspace(line[offset]) && line[offset] != '\0')) {
 		comm->comm_e = Ivalid_command;
 		return false;
