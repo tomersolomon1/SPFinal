@@ -40,6 +40,10 @@ typedef struct command_t {
 	char *file_name; /* useful for load & save commands */
 } Command;
 
+bool valid_tail(Command *comm, const char *line, int offset);
+bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len, bool need_param);
+int get_non_whitespace_offset(const char *str);
 void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s);
+void get_file_name(Command *comm, const char *line, int offset, const char *comm_s);
 void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound);
 #endif /* PARSER_H_ */

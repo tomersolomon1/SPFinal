@@ -7,7 +7,8 @@
 
 #include "GameBoard.h"
 
-int main(){
+
+void check_GameBoard() {
 	Gameboard * game = create_board();
 	print_details_game(game);
 	set_step(game, 1,1,2,1);
@@ -33,4 +34,12 @@ int main(){
 	print_details_game(game);
 	set_step(game, 0,5,1,3);
 	print_details_game(game);
+}
+
+void check_parser() {
+
+}
+
+int main(){
+	check_parser();
 }
