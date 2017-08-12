@@ -33,8 +33,8 @@ typedef struct Vector_t{
 	int delta_row;
 	int delta_col;
 	int vector_size;
-	bool can_eat;
-	bool can_go_to_empty_spot;
+	bool can_eat; //can the piece move in that direction if there's an enemy piece there?
+	bool can_go_to_empty_spot; //can the piece move in that direction if its empty?
 } Vector;
 
 typedef struct step_t {
@@ -80,6 +80,7 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int
 Piece *copy_piece(Piece *old);
 void destroy_piece(Piece *piece);
 void set_vectors(Piece_type type, int colur, Vector **vectors);
+//print all valid steps of a piece:
 void print_all_steps(Piece *piece);
 
 #endif /* PIECES_H_ */
