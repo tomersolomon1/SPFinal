@@ -8,11 +8,13 @@
 
 //Vector:
 
-Vector *create_vector(int delta_row, int delta_col, int vector_size){
+Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot){
 	Vector *v = (Vector*) malloc(sizeof(Vector));
 	v->delta_row = delta_row;
 	v->delta_col = delta_col;
 	v->vector_size = vector_size;
+	v->can_eat = can_eat;
+	v->can_go_to_empty_spot = can_go_to_empty_spot;
 	return v;
 }
 
@@ -21,6 +23,8 @@ Vector *copy_vector(Vector *old){
 	v->delta_col = old->delta_col;
 	v->delta_row = old->delta_row;
 	v->vector_size = old->vector_size;
+	v->can_eat = old->can_eat;
+	v->can_go_to_empty_spot = old->can_go_to_empty_spot;
 	return v;
 }
 
@@ -77,7 +81,7 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int
 
 	int amount_vectors = 0;
 	if(type == Pawn){
-		amount_vectors = 1;
+		amount_vectors = 3;
 	}
 	if(type == Knight || type == Queen || type == King){
 		amount_vectors = 8;
@@ -149,52 +153,56 @@ void destroy_piece(Piece *piece) {
 
 void set_vectors(Piece_type type, int colur, Vector **vectors){
 	if(type == Pawn && colur == white){
-		vectors[0] = create_vector(1, 0, 2);
+		vectors[0] = create_vector(1, 0, 2, false, true); //can go straight
+		vectors[1] = create_vector(1, 1, 1, true, false); //can eat diag
+		vectors[2] = create_vector(1, -1, 1, true, false); //can eat diag
 	}
 	if(type == Pawn && colur == black){
-		vectors[0] = create_vector(-1, 0, 2);
+		vectors[0] = create_vector(-1, 0, 2, false, true); //can go straight
+		vectors[1] = create_vector(-1, 1, 1, true, false); //can eat diag
+		vectors[2] = create_vector(-1, -1, 1, true, false); //can eat diag
 	}
 	if(type == Knight){
-		vectors[0] = create_vector(1, 2, 1);
-		vectors[1] = create_vector(1, -2, 1);
-		vectors[2] = create_vector(-1, 2, 1);
-		vectors[3] = create_vector(-1, -2, 1);
-		vectors[4] = create_vector(2, 1, 1);
-		vectors[5] = create_vector(2, -1, 1);
-		vectors[6] = create_vector(-2, 1, 1);
-		vectors[7] = create_vector(-2, -1, 1);
+		vectors[0] = create_vector(1, 2, 1, true, true);
+		vectors[1] = create_vector(1, -2, 1, true, true);
+		vectors[2] = create_vector(-1, 2, 1, true, true);
+		vectors[3] = create_vector(-1, -2, 1, true, true);
+		vectors[4] = create_vector(2, 1, 1, true, true);
+		vectors[5] = create_vector(2, -1, 1, true, true);
+		vectors[6] = create_vector(-2, 1, 1, true, true);
+		vectors[7] = create_vector(-2, -1, 1, true, true);
 	}
 	if(type == Bishop){
-		vectors[0] = create_vector(1, -1, 8);
-		vectors[1] = create_vector(-1, 1, 8);
-		vectors[2] = create_vector(1, 1, 8);
-		vectors[3] = create_vector(-1, -1, 8);
+		vectors[0] = create_vector(1, -1, 8, true, true);
+		vectors[1] = create_vector(-1, 1, 8, true, true);
+		vectors[2] = create_vector(1, 1, 8, true, true);
+		vectors[3] = create_vector(-1, -1, 8, true, true);
 	}
 	if(type == Rock){
-		vectors[0] = create_vector(1, 0, 8);
-		vectors[1] = create_vector(-1, 0, 8);
-		vectors[2] = create_vector(0, 1, 8);
-		vectors[3] = create_vector(0, -1, 8);
+		vectors[0] = create_vector(1, 0, 8, true, true);
+		vectors[1] = create_vector(-1, 0, 8, true, true);
+		vectors[2] = create_vector(0, 1, 8, true, true);
+		vectors[3] = create_vector(0, -1, 8, true, true);
 	}
 	if(type == Queen){
-		vectors[0] = create_vector(1, 0, 8);
-		vectors[1] = create_vector(-1, 0, 8);
-		vectors[2] = create_vector(0, 1, 8);
-		vectors[3] = create_vector(0, -1, 8);
-		vectors[4] = create_vector(1, -1, 8);
-		vectors[5] = create_vector(-1, 1, 8);
-		vectors[6] = create_vector(1, 1, 8);
-		vectors[7] = create_vector(-1, -1, 8);
+		vectors[0] = create_vector(1, 0, 8, true, true);
+		vectors[1] = create_vector(-1, 0, 8, true, true);
+		vectors[2] = create_vector(0, 1, 8, true, true);
+		vectors[3] = create_vector(0, -1, 8, true, true);
+		vectors[4] = create_vector(1, -1, 8, true, true);
+		vectors[5] = create_vector(-1, 1, 8, true, true);
+		vectors[6] = create_vector(1, 1, 8, true, true);
+		vectors[7] = create_vector(-1, -1, 8, true, true);
 	}
 	if(type == King){
-		vectors[0] = create_vector(1, 0, 1);
-		vectors[1] = create_vector(-1, 0, 1);
-		vectors[2] = create_vector(0, 1, 1);
-		vectors[3] = create_vector(0, -1, 1);
-		vectors[4] = create_vector(1, -1, 1);
-		vectors[5] = create_vector(-1, 1, 1);
-		vectors[6] = create_vector(1, 1, 1);
-		vectors[7] = create_vector(-1, -1, 1);
+		vectors[0] = create_vector(1, 0, 1, true, true);
+		vectors[1] = create_vector(-1, 0, 1, true, true);
+		vectors[2] = create_vector(0, 1, 1, true, true);
+		vectors[3] = create_vector(0, -1, 1, true, true);
+		vectors[4] = create_vector(1, -1, 1, true, true);
+		vectors[5] = create_vector(-1, 1, 1, true, true);
+		vectors[6] = create_vector(1, 1, 1, true, true);
+		vectors[7] = create_vector(-1, -1, 1, true, true);
 	}
 }
 

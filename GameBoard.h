@@ -50,12 +50,12 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step *step);
 //---
 
 Piece *get_piece_in_place(Gameboard *gameboard, int row, int col);
-CHESS_BOARD_MESSAGE undo_Step(Gameboard *gameboard);
+CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard);
 // return the winner's color
 // if tie return 2
 // if not game over return -1
 int is_game_over(Gameboard *gameboard);
 void print_board(Gameboard *gameboard);
-
+void print_details_game(Gameboard *gameboard);
 
 #endif /* GAMEBOARD_H_ */

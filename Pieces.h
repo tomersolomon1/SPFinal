@@ -33,6 +33,8 @@ typedef struct Vector_t{
 	int delta_row;
 	int delta_col;
 	int vector_size;
+	bool can_eat;
+	bool can_go_to_empty_spot;
 } Vector;
 
 typedef struct step_t {
@@ -62,7 +64,7 @@ typedef struct piece_t {
 
 
 //Vector:
-Vector *create_vector(int delta_row, int delta_col, int vector_size);
+Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot);
 Vector *copy_vector(Vector *old);
 void destroy_vector(Vector *v);
 

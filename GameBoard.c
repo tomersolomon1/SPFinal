@@ -5,6 +5,7 @@
  *      Author: User
  */
 
+//set step, undo step
 #include "GameBoard.h"
 
 Gameboard *create_board() {
@@ -180,6 +181,7 @@ bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector *v){
 	int delta_row = v->delta_row;
 	int delta_col = v->delta_col;
 	int amount_going = v->vector_size;
+	bool can_eat = v->can_eat;
 	int row = piece->row;
 	int col = piece->col;
 	while(amount_going > 0){
@@ -192,7 +194,7 @@ bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector *v){
 		else if(gameboard->board[row][col]->type == Empty){ // can go, empty
 			continue;
 		}
-		else if(gameboard->board[row][col]->type == King &&
+		else if(can_eat && gameboard->board[row][col]->type == King &&
 				gameboard->board[row][col]->colur != piece->colur){ //eating opponent's king
 			return true;
 		}
@@ -202,6 +204,7 @@ bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector *v){
 	}
 	return false;
 }
+
 //---
 
 void set_all_valid_steps(Gameboard *gameboard){
@@ -225,6 +228,8 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 	int delta_row = v->delta_row;
 	int delta_col = v->delta_col;
 	int amount_going = v->vector_size;
+	bool can_eat = v->can_eat;
+	bool can_go_to_empty_spot = v->can_go_to_empty_spot;
 	int row = piece->row;
 	int col = piece->col;
 	while(amount_going > 0){
@@ -234,14 +239,14 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 		if(row < 0 || row > 7 || col < 0 || col > 7){ //out of board
 			break;
 		}
-		if(gameboard->board[row][col]->type == Empty){ // can go, empty
+		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
 			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece->has_moved);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
 			}
 		}
-		else if(gameboard->board[row][col]->colur != piece->colur){ //eating opponent's piece
+		else if(gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
 			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
@@ -278,7 +283,7 @@ Piece *get_piece_in_place(Gameboard *gameboard, int row, int col) {
 	return gameboard->board[row][col];
 }
 
-CHESS_BOARD_MESSAGE undo_Step(Gameboard *gameboard) {
+CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard) {
 	if(gameboard == NULL){
 		return CHESS_BOARD_INVALID_ARGUMENT;
 	}
@@ -330,7 +335,6 @@ void print_board(Gameboard *gameboard) {
 		printf("%d| ", i + 1);
 		fflush(stdout);
 		for(int j = 0; j < 8; j++){
-			//printf("%c ", (*((*gameboard).board)[i][j])->sign);
 			printf("%c ", gameboard->board[i][j]->sign);
 			fflush(stdout);
 		}
@@ -339,5 +343,12 @@ void print_board(Gameboard *gameboard) {
 	}
 	printf("  -----------------\n");
 	printf("   A B C D E F G H\n\n");
+	fflush(stdout);
+}
+
+void print_details_game(Gameboard *gameboard){
+	print_board(gameboard);
+	ArrayListPrint(gameboard->history);
+	printf("\n");
 	fflush(stdout);
 }
