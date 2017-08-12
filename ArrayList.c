@@ -21,7 +21,7 @@ ArrayList* ArrayListCreate(int maxSize)
 	array->maxSize = maxSize;
 	array->elements = (Step**) malloc(sizeof(Step) * maxSize);
 	for(int i = 0; i < maxSize; i++){
-		array->elements[i] = create_step(0,0,0,0,NULL,0);
+		array->elements[i] = NULL;
 	}
 	array->actualSize = 0;
 	return array;

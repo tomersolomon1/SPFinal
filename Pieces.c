@@ -10,9 +10,9 @@
 
 Vector *create_vector(int delta_row, int delta_col, int vector_size){
 	Vector *v = (Vector*) malloc(sizeof(Vector));
-	v.delta_row = delta_row;
-	v.delta_col = delta_col;
-	v.vector_size = vector_size;
+	v->delta_row = delta_row;
+	v->delta_col = delta_col;
+	v->vector_size = vector_size;
 	return v;
 }
 
@@ -32,15 +32,14 @@ void destroy_vector(Vector *v){
 
 //Step
 
-Step *create_step(int srow, int scol, int drow, int dcol, int prevPiece_colur, int prevPiece_index, bool is_srcPiece_was_moved){
-	Step newStep = (Step*) malloc(sizeof(Step));
-	newStep.srow = srow;
-	newStep.dcol = dcol;
-	newStep.drow = drow;
-	newStep.scol = scol;
-	newStep.prevPiece_colur = prevPiece_colur;
-	newStep.prevPiece_index = prevPiece_index;
-	newStep.is_srcPiece_was_moved = is_srcPiece_was_moved;
+Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved){
+	Step *newStep = (Step*) malloc(sizeof(Step));
+	newStep->srow = srow;
+	newStep->dcol = dcol;
+	newStep->drow = drow;
+	newStep->scol = scol;
+	newStep->prevPiece = prevPiece;
+	newStep->is_srcPiece_was_moved = is_srcPiece_was_moved;
 	return newStep;
 }
 
@@ -50,8 +49,7 @@ Step *copy_step(Step *old){
 	new->scol = old->scol;
 	new->drow = old->drow;
 	new->dcol = old->dcol;
-	new->prevPiece_colur = old->prevPiece_colur;
-	new->prevPiece_index = old->prevPiece_index;
+	new->prevPiece = old->prevPiece;
 	new->is_srcPiece_was_moved = old->is_srcPiece_was_moved;
 	return new;
 }

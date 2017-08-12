@@ -98,6 +98,13 @@ Gameboard *copy_board(Gameboard* old) {
 	}
 	new->turn = old->turn;
 	new->empty = empty;
+	//when we copy history, inside the steps we still point to piece in previous board
+	//so the loop changes it
+	new->history = ArrayListCopy(old->history);
+	for(int i = 0; i < new->history->actualSize; i++){
+		Piece* old_piece = new->history->elements[i]->prevPiece;
+		new->history->elements[i] = new->all_pieces[old_piece->colur][old_piece->indexat];
+	}
 	//new->history
 	set_all_valid_steps(new);
 	return new;
@@ -110,7 +117,7 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 	Piece *source_p = gameboard->board[srow][scol];
 	Piece *dest_p = gameboard->board[drow][dcol];
 
-	Step step = create_step(srow, scol, drow, dcol, dest_p, source_p->has_moved);
+	Step *step = create_step(srow, scol, drow, dcol, dest_p, source_p->has_moved);
 	ArrayListPushFirst(gameboard->history, step);
 
 	gameboard->board[drow][dcol] = source_p;
@@ -121,7 +128,7 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 	source_p->col = dcol;
 	gameboard->turn = abs(1 - gameboard->turn);
 	if(source_p->type == Pawn){
-		source_p->vectors[0].vector_size = 1;
+		source_p->vectors[0]->vector_size = 1;
 	}
 	set_all_valid_steps(gameboard);
 	return CHESS_BOARD_SUCCESS;
@@ -138,10 +145,10 @@ bool is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol)
 	if(p->type == Empty){
 		return false;
 	}
-	Step s;
+	Step *s;
 	for(int i = 0; i < p->amount_steps; i++){
 		 s = p->steps[i];
-		 if(s.dcol == dcol && s.drow == drow){
+		 if(s->dcol == dcol && s->drow == drow){
 			 return true;
 		 }
 	}
@@ -169,10 +176,10 @@ bool is_check(Gameboard *gameboard, int colur) {
 	return false;
 }
 
-bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector v){
-	int delta_row = v.delta_row;
-	int delta_col = v.delta_col;
-	int amount_going = v.vector_size;
+bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector *v){
+	int delta_row = v->delta_row;
+	int delta_col = v->delta_col;
+	int amount_going = v->vector_size;
 	int row = piece->row;
 	int col = piece->col;
 	while(amount_going > 0){
@@ -214,10 +221,10 @@ void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece) {
 	piece->amount_steps = amount_steps;
 }
 
-void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector v, int *amount_steps){
-	int delta_row = v.delta_row;
-	int delta_col = v.delta_col;
-	int amount_going = v.vector_size;
+void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *amount_steps){
+	int delta_row = v->delta_row;
+	int delta_col = v->delta_col;
+	int amount_going = v->vector_size;
 	int row = piece->row;
 	int col = piece->col;
 	while(amount_going > 0){
@@ -228,14 +235,14 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector v, int *amo
 			break;
 		}
 		if(gameboard->board[row][col]->type == Empty){ // can go, empty
-			Step s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece->has_moved);
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece->has_moved);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
 			}
 		}
 		else if(gameboard->board[row][col]->colur != piece->colur){ //eating opponent's piece
-			Step s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved);
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
@@ -249,16 +256,16 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector v, int *amo
 
 }
 
-bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step step){
+bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step *step){
 	bool answer = false;
-	gameboard->board[step.drow][step.dcol] = piece;
+	gameboard->board[step->drow][step->dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
 	gameboard->turn = abs(1-gameboard->turn);
 	if(is_check_curr_player(gameboard)){
 		answer = true;
 	}
 	gameboard->turn = abs(1-gameboard->turn);
-	gameboard->board[step.drow][step.dcol] = step.prevPiece;
+	gameboard->board[step->drow][step->dcol] = step->prevPiece;
 	gameboard->board[piece->row][piece->col] = piece;
 	return answer;
 }
@@ -278,25 +285,25 @@ CHESS_BOARD_MESSAGE undo_Step(Gameboard *gameboard) {
 	if(ArrayListSize(gameboard->history) == 0){
 		return CHESS_BOARD_NO_HISTORY;
 	}
-	Step step = ArrayListGetFirst(gameboard->history);
+	Step *step = ArrayListGetFirst(gameboard->history);
 	ArrayListRemoveFirst(gameboard->history);
 
-	Piece *source_p = gameboard->board[step.drow][step.dcol];
-	Piece *dest_p = step.prevPiece;
+	Piece *source_p = gameboard->board[step->drow][step->dcol];
+	Piece *dest_p = step->prevPiece;
 
-	gameboard->board[step.drow][step.dcol] = dest_p;
-	gameboard->board[step.srow][step.scol] = source_p;
+	gameboard->board[step->drow][step->dcol] = dest_p;
+	gameboard->board[step->srow][step->scol] = source_p;
 	dest_p->alive = true;
-	if(!step.is_srcPiece_was_moved){
+	if(!step->is_srcPiece_was_moved){
 		source_p->has_moved = false;
 	}
-	source_p->row = step.srow;
-	source_p->col = step.scol;
-	dest_p->row = step.drow;
-	dest_p->col = step.dcol;
+	source_p->row = step->srow;
+	source_p->col = step->scol;
+	dest_p->row = step->drow;
+	dest_p->col = step->dcol;
 	gameboard->turn = abs(1 - gameboard->turn);
 	if(source_p->type == Pawn && !source_p->has_moved){
-		source_p->vectors[0].vector_size = 2;
+		source_p->vectors[0]->vector_size = 2;
 	}
 	set_all_valid_steps(gameboard);
 	return CHESS_BOARD_SUCCESS;
@@ -323,10 +330,11 @@ void print_board(Gameboard *gameboard) {
 		printf("%d| ", i + 1);
 		fflush(stdout);
 		for(int j = 0; j < 8; j++){
+			//printf("%c ", (*((*gameboard).board)[i][j])->sign);
 			printf("%c ", gameboard->board[i][j]->sign);
 			fflush(stdout);
 		}
-		printf("|\n", i + 1);
+		printf("|\n");
 		fflush(stdout);
 	}
 	printf("  -----------------\n");

@@ -40,8 +40,9 @@ typedef struct step_t {
 	int scol; //source col
 	int drow; //dest row
 	int dcol; //dest col
-	int prevPiece_colur; //colur of prev piece
-	int prevPiece_index; //index in "all_pieces array" of prev piece
+	struct piece_t *prevPiece;
+	//int prevPiece_colur; //colur of prev piece (=-1 if prevPiece=empty)
+	//int prevPiece_index; //index in "all_pieces[colur] array" of prev piece (=-1 if prevPiece=empty)
 	bool is_srcPiece_was_moved;
 } Step;
 
