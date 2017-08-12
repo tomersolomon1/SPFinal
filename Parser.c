@@ -78,7 +78,7 @@ void get_file_name(Command *comm, const char *line, int offset, const char *comm
 }
 
 /* gets a pointer to arg, fill it, and check it's within the proper bounds */
-bool get_arg(char char_arg, int offset, int *arg, char range_offset, int lower_bound, int upper_bound) {
+bool get_arg(char char_arg, int *arg, char range_offset, int lower_bound, int upper_bound) {
 	*arg = char_arg - range_offset;
 	if ((*arg < lower_bound) || (*arg > upper_bound)) {
 		return false;
@@ -90,7 +90,7 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
 	int len = strlen(comm_s);
 	if (verify_command(comm, line, offset, comm_s, len, true)) {
 		int arg_offset = get_non_whitespace_offset(line + offset + len) + offset + len;
-		comm->valid_arg = get_arg(line[arg_offset], arg_offset, &comm->arg1, '0', lower_bound, upper_bound);
+		comm->valid_arg = get_arg(line[arg_offset], &comm->arg1, '0', lower_bound, upper_bound);
 		valid_tail(comm, line, arg_offset + 1); /* should check the 1 constant */
 	}
 }
@@ -101,9 +101,9 @@ void getXY(Command *comm, const char *line, int offset, int *row, int *col) {
 		comm->comm_e = Ivalid_command; /* no room for parameters, treat the command as illegal */
 	} else {
 		if (line[offset] == '<') {
-			comm->valid_arg = get_int_arg(line[offset+1], row, '0', 1, 7);
+			comm->valid_arg = get_arg(line[offset+1], row, '0', 1, 7);
 			//comm->valid_arg = get_number(line, offset+1, row, '0');
-			comm->valid_arg = get_int_arg(line[offset+1], row, 'A', 1, 7) && comm->valid_arg;
+			comm->valid_arg = get_arg(line[offset+1], row, 'A', 1, 7) && comm->valid_arg;
 			//comm->valid_arg = get_number(line, offset+3, col, 'A') && comm->valid_arg;
 			comm->comm_e = (line[offset+2] == ',') && (line[offset+4] == '>') ? Make_Move : Ivalid_command;
 		}
