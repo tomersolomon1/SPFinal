@@ -6,12 +6,15 @@
  */
 
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <ctype.h>
 #include "Parser.h"
 
 bool valid_tail(Command *comm, const char *line, int offset) {
 	while (offset < SP_MAX_LINE_LENGTH) {
-		if (!isspace(line(offset))) { /* what about the null-char? ask moav */
+		if (!isspace(line[offset])) { /* what about the null-char? ask moav */
 			comm->comm_e = Ivalid_command; /* more non-whitespace chars than should be, therefore illegal command */
 			return false;
 		}
@@ -63,7 +66,7 @@ void get_file_name(Command *comm, const char *line, int offset, const char *comm
 		comm->file_name = (char *) malloc(sizeof(char) * MAX_FILE_NAME);
 		int j = 0;
 		while ((file_name_offset < SP_MAX_LINE_LENGTH) && (j < MAX_FILE_NAME - 1)
-				&& (!isspace(line(file_name_offset)))) {
+				&& (!isspace(line[file_name_offset]))) {
 			comm->file_name[j] = line[file_name_offset];
 			file_name_offset++;
 			j++;
@@ -74,7 +77,7 @@ void get_file_name(Command *comm, const char *line, int offset, const char *comm
 	}
 }
 
-void get_int_arg(Command *comm, char *line, int offset, const char *comm_s, int lower_bound, int upper_bound) {
+void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound) {
 	int len = strlen(comm_s);
 	if (verify_command(comm, line, offset, comm_s, len, true)) {
 		int arg_offset = get_non_whitespace_offset(line + offset + len) + offset + len;
@@ -111,8 +114,9 @@ void getXY(Command *comm, const char *line, int offset, int *row, int *col) {
 
 void get_move_arg(Command *comm, const char *line, int offset) {
 	int len = strlen("move");
-	if (verify_command(comm, line, offset, "move", len, true)) {
-		int barcket_offset = get_non_whitespace_offset(line + len + offset);
+	if (!verify_command(comm, line, offset, "move", len, true)) { /* not move after all... */
+		//int barcket_offset = get_non_whitespace_offset(line + len + offset);
+		return; /* no need for further evaluation */
 	}
 	offset = get_non_whitespace_offset(line+offset) + offset + len;
 	getXY(comm, line, offset, &(comm->arg1), &(comm->arg2)); /* getting the first coordinate */
@@ -141,14 +145,14 @@ Command *parser(const char *line) {
 	switch (line[offset]) {
 		case 'g': /* 'game_mode' */
 			comm->comm_e = Set_GameMode;
-			get_int_arg(comm, line, offset, 'game_mode', 1, 2);
+			get_int_arg(comm, line, offset, "game_mode", 1, 2);
 			break;
 
 		case 'd': /* either 'difficulty' or 'default' */
 			switch (line[offset+1]) {
 				case 'i': /* 'difficulty' */
 					comm->comm_e = Set_Difficulty;
-					get_int_arg(comm, line, offset, 'difficulty', 1, 5);
+					get_int_arg(comm, line, offset, "difficulty", 1, 5);
 					break;
 				case 'e': /* 'default' */
 					comm->comm_e = Restore_Default;
@@ -161,7 +165,7 @@ Command *parser(const char *line) {
 			switch (line[offset+1]) {
 				case 's': /* 'user_color */
 					comm->comm_e = Set_UserColor;
-					get_int_arg(comm, line, offset, 'user_color', 0, 1);
+					get_int_arg(comm, line, offset, "user_color", 0, 1);
 					break;
 				case 'n': /* 'undo' */
 					comm->comm_e = Undo_Move;

@@ -41,5 +41,5 @@ typedef struct command_t {
 } Command;
 
 void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s);
-void get_int_arg(Command *comm, const char * line, int offset, const char *comm_s, int lower_bound, int upper_bound);
+void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound);
 #endif /* PARSER_H_ */
