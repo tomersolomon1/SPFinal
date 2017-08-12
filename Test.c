@@ -5,6 +5,7 @@
  *      Author: sapir
  */
 
+#include <string.h>
 #include "GameBoard.h"
 
 #include "Parser.h"
@@ -68,7 +69,12 @@ void check_parser() {
 	check_valid_tail(&comm);
 }
 
-int main(){
-	//check_GameBoard();
-	check_parser();
+int main(int argc, char *argv[]){
+	if (argc == 2) {
+		if (strcmp(argv[1], "0") == 0) { /* Tomer's tests*/
+			check_parser();
+		} else if (strcmp(argv[1], "1") == 0) { /* Sapir's tests */
+			check_GameBoard();
+		}
+	}
 }
