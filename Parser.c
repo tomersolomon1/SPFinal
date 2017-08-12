@@ -12,9 +12,10 @@
 #include <ctype.h>
 #include "Parser.h"
 
+/* line[offset] is the first char to be checked */
 bool valid_tail(Command *comm, const char *line, int offset) {
-	while (offset < SP_MAX_LINE_LENGTH) {
-		if (!isspace(line[offset])) { /* what about the null-char? ask moav */
+	while ((offset < SP_MAX_LINE_LENGTH) && (line[offset] != '\0')) {
+		if (!isspace(line[offset])) {
 			comm->comm_e = Ivalid_command; /* more non-whitespace chars than should be, therefore illegal command */
 			return false;
 		}
