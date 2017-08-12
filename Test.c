@@ -12,7 +12,7 @@
 
 
 void check_GameBoard() {
-	Gameboard * game = create_board();
+	Gameboard * game = create_board(1, -1, black);
 	print_details_game(game);
 	set_step(game, 1,1,2,1);
 	print_details_game(game);
@@ -67,5 +67,5 @@ void check_parser() {
 }
 
 int main(){
-	check_parser();
+	check_GameBoard();
 }

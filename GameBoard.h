@@ -21,6 +21,9 @@ typedef struct gameboard_t  {
 	Piece *all_pieces[2][16];
 	ArrayList *history;
 	Piece *empty; //the game's empty piece
+	int game_mode; //=1 for 1-player, =2 for 2-player
+	int difficulty;
+	int user_color;
 } Gameboard;
 
 typedef enum chess_board_message_t {
@@ -31,7 +34,7 @@ typedef enum chess_board_message_t {
 } CHESS_BOARD_MESSAGE;
 
 /*create board*/
-Gameboard *create_board();
+Gameboard *create_board(int game_mode, int difficulty, int user_color);
 
 //helping function for create_board (adding piece to the board)
 void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat, char sign);

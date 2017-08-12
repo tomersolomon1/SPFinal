@@ -8,7 +8,7 @@
 //set step, undo step
 #include "GameBoard.h"
 
-Gameboard *create_board() {
+Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
 	assert(newBoard != NULL);
 	newBoard->history = ArrayListCreate(history_size * 2);
@@ -53,6 +53,9 @@ Gameboard *create_board() {
 		}
 	}
 	newBoard->turn = white;
+	newBoard->user_color = user_color;
+	newBoard->difficulty = difficulty;
+	newBoard->game_mode = game_mode;
 	set_all_valid_steps(newBoard);
 	return newBoard;
 }
@@ -107,6 +110,9 @@ Gameboard *copy_board(Gameboard* old) {
 		new->history->elements[i]->prevPiece = new->all_pieces[old_piece->colur][old_piece->indexat];
 	}
 	//new->history
+	new->user_color = old->user_color;
+	new->difficulty = old->difficulty;
+	new->game_mode = old->game_mode;
 	set_all_valid_steps(new);
 	return new;
 }
