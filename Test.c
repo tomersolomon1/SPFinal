@@ -38,7 +38,7 @@ void check_GameBoard() {
 	print_details_game(game);
 	set_step(game, 0,5,1,3);
 	print_details_game(game);
-	upload_Xml(game);
+	//upload_Xml(game);
 }
 
 void check_valid_tail(Command *comm) {
