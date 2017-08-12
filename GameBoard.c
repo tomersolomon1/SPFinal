@@ -11,7 +11,7 @@
 Gameboard *create_board() {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
 	assert(newBoard != NULL);
-	newBoard->history = ArrayListCreate(3 * 2);
+	newBoard->history = ArrayListCreate(history_size * 2);
 	int i = 0;
 	add_piece(newBoard, Pawn, black, 6, 0, i++, 'M');
 	add_piece(newBoard, Pawn, black, 6, 1, i++, 'M');

@@ -13,6 +13,7 @@
 #include "ArrayList.h"
 #define black 0
 #define white 1
+#define history_size 3
 
 typedef struct gameboard_t  {
 	Piece *board[8][8];
