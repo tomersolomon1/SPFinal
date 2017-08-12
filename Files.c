@@ -6,7 +6,7 @@
  */
 
 #include "Files.h"
-#define file_path "C:\\Users\\sapir\\Desktop\\try.txt"
+#define file_path "C:\\Users\\try.txt"
 
 void upload_Xml(Gameboard* game){
 	FILE *file = NULL;
