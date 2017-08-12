@@ -356,7 +356,7 @@ void print_details_game(Gameboard *gameboard){
 	printf("history: ");
 	fflush(stdout);
 	ArrayListPrint(gameboard->history);
-	printf("\n");
+	printf("all valid steps:\n");
 	fflush(stdout);
 	for(int i = 0; i < 16; i++){
 		printf("%c: ", gameboard->all_pieces[gameboard->turn][i]->sign);
