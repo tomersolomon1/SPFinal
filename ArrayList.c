@@ -347,8 +347,7 @@ ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step *elem){
  * */
 void ArrayListPrint(ArrayList* src){
 	for(int i=0; i<src->actualSize; i++){
-		printf(" %d, %d, %d, %d |",src->elements[i]->srow, src->elements[i]->scol, src->elements[i]->drow, src->elements[i]->dcol);
-		fflush(stdout);
+		print_step(src->elements[i]);
 	}
 	printf("\n");
 	fflush(stdout);
