@@ -25,17 +25,16 @@ bool valid_tail(Command *comm, const char *line, int offset) {
 }
 
 /* make sure this is the right command */
-bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len,
-		bool need_param) {
+bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len, bool need_param) {
 	int actual_len = 0;
 	for (; (actual_len < comm_len && offset < SP_MAX_LINE_LENGTH); actual_len++, offset++) {
-		if (comm_s[offset] != line[offset]) {
+		if (comm_s[actual_len] != line[offset]) {
 			comm->comm_e = Ivalid_command; /* it's not the command we thought it was */
 			return false;
 		}
 	}
 	if ((actual_len != comm_len - 1) || (offset == SP_MAX_LINE_LENGTH && need_param) ||
-			(need_param && !isspace(line[offset]))) {
+			(!isspace(line[offset]) && line[offset] != '\0')) {
 		comm->comm_e = Ivalid_command;
 		return false;
 	}
