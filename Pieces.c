@@ -54,7 +54,7 @@ Step *copy_step(Step *old){
 	return new;
 }
 
-void destroy_Step(Step *step){
+void destroy_step(Step *step){
 	if(step != NULL){
 		free(step);
 	}
@@ -173,7 +173,7 @@ void set_vectors(Piece_type type, int colur, Vector **vectors){
 	if(type == Rock){
 		vectors[0] = create_vector(1, 0, 8);
 		vectors[1] = create_vector(-1, 0, 8);
-		vectors[2] = reate_vector(0, 1, 8);
+		vectors[2] = create_vector(0, 1, 8);
 		vectors[3] = create_vector(0, -1, 8);
 	}
 	if(type == Queen){

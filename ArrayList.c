@@ -57,7 +57,7 @@ void ArrayListDestroy(ArrayList* src)
 {
 	if(src != NULL){
 		for(int i = 0; i< src->actualSize; i++){
-			destroy_Step(src->elements[i]);
+			destroy_step(src->elements[i]);
 		}
 		free(src->elements);
 		free(src);
@@ -78,7 +78,7 @@ ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src){
 		return ARRAY_LIST_INVALID_ARGUMENT;
 	}
 	for(int i = 0; i< src->actualSize; i++){
-		destroy_Step(src->elements[i]);
+		destroy_step(src->elements[i]);
 		src->elements[i] = NULL;
 	}
 	src->actualSize = 0;
@@ -178,7 +178,7 @@ ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index){
 	if(index + 1 > (src->actualSize)){
 		return ARRAY_LIST_INVALID_ARGUMENT;
 	}
-	destroy_Step(src->elements[index]);
+	destroy_step(src->elements[index]);
 	for(int i = index; i <= (src->actualSize) - 2; i++){
 		src->elements[i] = src->elements[i + 1];
 	}

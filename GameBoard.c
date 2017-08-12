@@ -45,7 +45,7 @@ Gameboard *create_board() {
 	add_piece(newBoard, Rock, white, 0, 7, i++, 'r');
 	add_piece(newBoard, Queen, white, 0, 3, i++, 'q');
 	add_piece(newBoard, King, white, 0, 4, i++, 'k');
-	newBoard->empty = create_piece(Empty, -1, -1, -1, '_', -1);
+	newBoard->empty = (Piece *) create_piece(Empty, -1, -1, -1, '_', -1);
 	for(int i = 2; i < 6; i++){
 		for(int j = 0; j < 8; j++){
 			newBoard->board[i][j] = newBoard->empty;
@@ -57,7 +57,7 @@ Gameboard *create_board() {
 }
 
 void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat, char sign){
-	Piece *piece = create_piece(type, colur, row, col, sign, indexat);
+	Piece *piece = (Piece *) create_piece(type, colur, row, col, sign, indexat);
 	gameboard->board[row][col] = piece;
 	gameboard->all_pieces[colur][indexat] = piece;
 }
@@ -103,7 +103,7 @@ Gameboard *copy_board(Gameboard* old) {
 	new->history = ArrayListCopy(old->history);
 	for(int i = 0; i < new->history->actualSize; i++){
 		Piece* old_piece = new->history->elements[i]->prevPiece;
-		new->history->elements[i] = new->all_pieces[old_piece->colur][old_piece->indexat];
+		new->history->elements[i]->prevPiece = new->all_pieces[old_piece->colur][old_piece->indexat];
 	}
 	//new->history
 	set_all_valid_steps(new);
@@ -167,7 +167,7 @@ bool is_check(Gameboard *gameboard, int colur) {
 			int amount_v = piece->amount_vectors; //check all vectors
 			while(amount_v > 0){
 				amount_v --;
-				if(is_check_by_vector(gameboard, piece, piece->vectors[amount_v])){
+				if( is_check_per_vector(gameboard, piece, piece->vectors[amount_v]) ){
 					return true;
 				}
 			}
@@ -216,7 +216,7 @@ void set_all_valid_steps(Gameboard *gameboard){
 void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece) {
 	int amount_steps = 0;
 	for(int i = 0; i < piece->amount_vectors; i++){
-		add_steps_by_vector(gameboard, piece, piece->vectors[i], &amount_steps);
+		add_steps_per_vector(gameboard, piece, piece->vectors[i], &amount_steps);
 	}
 	piece->amount_steps = amount_steps;
 }
@@ -338,6 +338,6 @@ void print_board(Gameboard *gameboard) {
 		fflush(stdout);
 	}
 	printf("  -----------------\n");
-	printf("   A B C D E F G H");
+	printf("   A B C D E F G H\n\n");
 	fflush(stdout);
 }

@@ -41,8 +41,6 @@ typedef struct step_t {
 	int drow; //dest row
 	int dcol; //dest col
 	struct piece_t *prevPiece;
-	//int prevPiece_colur; //colur of prev piece (=-1 if prevPiece=empty)
-	//int prevPiece_index; //index in "all_pieces[colur] array" of prev piece (=-1 if prevPiece=empty)
 	bool is_srcPiece_was_moved;
 } Step;
 
@@ -61,6 +59,25 @@ typedef struct piece_t {
 	int amount_vectors; //how many different vectors
 } Piece;
 
+
+
+//Vector:
+Vector *create_vector(int delta_row, int delta_col, int vector_size);
+Vector *copy_vector(Vector *old);
+void destroy_vector(Vector *v);
+
+//Step
+Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved);
+Step *copy_step(Step *old);
+void destroy_step(Step *step);
+
+
+//Piece:
+Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int indexat);
+//copy_piece but steps remain null
+Piece *copy_piece(Piece *old);
+void destroy_piece(Piece *piece);
+void set_vectors(Piece_type type, int colur, Vector **vectors);
 
 
 #endif /* PIECES_H_ */
