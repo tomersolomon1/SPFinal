@@ -86,11 +86,127 @@ void check_verify_command(Command *comm) {
 	valid_command = verify_command(comm, line8, 0, "print_setting", strlen("print_setting"), false) ? "true" : "false";
 	printf("comm->comm_e = %s, valid-command = %s\n", commands_es[comm->comm_e], valid_command);
 
+	/* doen't work for some crazy reason */
+	comm->comm_e = Save;
+	char line9[] = "save ";
+	valid_command = verify_command(comm, line9, 0, "save", strlen("save"), false) ? "true" : "false";
+	printf("comm->comm_e = %s, valid-command = %s\n", commands_es[comm->comm_e], valid_command);
+
+}
+
+// checks: int get_non_whitespace_offset(const char *str)
+void check_get_non_whitespace_offset() {
+	int offset1 = get_non_whitespace_offset("game_mode"); // offset = 0
+	printf("offset = %d\n", offset1);
+
+	int offset2 = get_non_whitespace_offset("     	game_mode"); // offset = 6
+	printf("offset = %d\n", offset2);
+
+	int offset3 = get_non_whitespace_offset(""); // offset = -1
+	printf("offset = %d\n", offset3);
+
+	int offset4 = get_non_whitespace_offset("           "); // offset = -1
+	printf("offset = %d\n", offset4);
+
+	int offset5 = get_non_whitespace_offset("save"); // offset = 0
+	printf("offset = %d\n", offset5);
+}
+
+void check_save_anommality(Command *comm) {
+	comm->comm_e = Save;
+	char line9[] = "save ";
+	char *valid_command = verify_command(comm, line9, 0, "save", strlen("save"), false) ? "true" : "false";
+	printf("comm->comm_e = %s, valid-command = %s\n", commands_es[comm->comm_e], valid_command);
+
+	char line2[] = "save "; // checks recognizing command, without offset
+	comm->comm_e = Save;
+	int offset = get_non_whitespace_offset(line2);
+	get_non_arg_command(comm, line2, offset, "save");
+	printf("line:%s END\noffset = %d, comm->comm_e = %s\n\n", line2, offset, commands_es[comm->comm_e]); // offset = 0, command-comm_e = Save
+}
+
+// checks: void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s)
+void check_get_non_arg_command(Command *comm) {
+	char line0[] = "save                           "; // checks recognizing command, with additional white-spaces and without offset
+	comm->comm_e = Save;
+	int offset = get_non_whitespace_offset(line0);
+	get_non_arg_command(comm, line0, offset, "save");
+	printf("line:%s END\noffset = %d, comm->comm_e = %s\n\n", line0, offset, commands_es[comm->comm_e]); // offset = 0, command-comm_e = Save
+
+	char line1[] = "          save                  "; // checks recognizing command, with offset
+	comm->comm_e = Save;
+	offset = get_non_whitespace_offset(line1);
+	get_non_arg_command(comm, line1, offset, "save");
+	printf("line:%s END\noffset = %d, comm->comm_e = %s\n\n", line1, offset, commands_es[comm->comm_e]); // offset = 10, command-comm_e = Save
+
+	char line2[] = "save "; // checks recognizing command, without offset
+	comm->comm_e = Save;
+	offset = get_non_whitespace_offset(line2);
+	get_non_arg_command(comm, line2, offset, "save");
+	printf("line:%s END\noffset = %d, comm->comm_e = %s\n\n", line2, offset, commands_es[comm->comm_e]); // offset = 0, command-comm_e = Save
+
+	char line3[] = "save                                5"; // checks redundant parameter, without offset
+	comm->comm_e = Save;
+	offset = get_non_whitespace_offset(line3);
+	get_non_arg_command(comm, line3, offset, "save");
+	printf("line:%s END\noffset = %d, comm->comm_e = %s\n\n", line3, offset, commands_es[comm->comm_e]); // offset = 0, command-comm_e = Ivalid_command
+
+	char line4[] = "  save     6"; // checks redundant parameter, with offset
+	comm->comm_e = Save;
+	offset = get_non_whitespace_offset(line4);
+	get_non_arg_command(comm, line4, offset, "save");
+	printf("line:%s END\noffset = %d, comm->comm_e = %s\n\n", line4, offset, commands_es[comm->comm_e]); // offset = 5, command-comm_e = Ivalid_command
+
+	char line5[] = "  save5"; // checks linked parameter
+	comm->comm_e = Save;
+	offset = get_non_whitespace_offset(line5);
+	get_non_arg_command(comm, line5, offset, "save");
+	printf("line:%s END\noffset = %d, comm->comm_e = %s\n\n", line5, offset, commands_es[comm->comm_e]); // offset = 6, command-comm_e = Ivalid_command
+
+	char line6[] = "sAvE"; // checks spelling-checker
+	comm->comm_e = Save;
+	offset = get_non_whitespace_offset(line6);
+	get_non_arg_command(comm, line6, offset, "save");
+	printf("line:%s END\noffset = %d, comm->comm_e = %s\n\n", line6, offset, commands_es[comm->comm_e]); // offset = 0, command-comm_e = Ivalid_command
+}
+
+// void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s)
+void check_get_command_with_file_name(Command *comm) {
+	char line0[] = "save /dir/dir/file.txt          "; // checks recognizing command, without additional white-spaces and without offset
+	comm->comm_e = Save;
+	int offset = get_non_whitespace_offset(line0);
+	get_command_with_file_name(comm, line0, offset, "save");
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s\nfile-name: %s\n\n",\
+			line0, offset, commands_es[comm->comm_e], comm->file_name); // offset = 0, command-comm_e = Save
+
+	char line1[] = "save /dir/dir/file.txt faffggdhdghh"; // checks extra parameter
+	comm->comm_e = Save;
+	offset = get_non_whitespace_offset(line1);
+	get_command_with_file_name(comm, line1, offset, "save");
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s\nfile-name: %s\n\n",\
+			line1, offset, commands_es[comm->comm_e], comm->file_name); // offset = 0, command-comm_e = Ivalid_command
+
+	char line2[] = "save  "; // absence of parameter
+	comm->comm_e = Save;
+	offset = get_non_whitespace_offset(line2);
+	get_command_with_file_name(comm, line2, offset, "save");
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s\nfile-name: %s\n\n",\
+			line2, offset, commands_es[comm->comm_e], comm->file_name); // offset = 0, command-comm_e = Ivalid_command
+
+	char line3[] = "Load  /adfadsfadsfa.txt"; // wrong command
+	comm->comm_e = Load;
+	offset = get_non_whitespace_offset(line3);
+	get_command_with_file_name(comm, line3, offset, "load");
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s\nfile-name: %s\n\n",\
+			line3, offset, commands_es[comm->comm_e], comm->file_name); // offset = 0, command-comm_e = Ivalid_command
 }
 
 void check_parser() {
 	Command comm;
 	comm.comm_e = Restore_Default; /* just for default value  */
 	//check_valid_tail(&comm);
-	check_verify_command(&comm);
+	//check_verify_command(&comm);
+	//check_get_non_whitespace_offset();
+	//check_get_non_arg_command(&comm);
+	check_get_command_with_file_name(&comm);
 }

@@ -27,8 +27,10 @@ bool valid_tail(Command *comm, const char *line, int offset) {
 /* make sure this is the right command */
 bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len, bool need_param) {
 	int actual_len = 0;
+	//printf("offset = %d\n", offset);
 	for (; (actual_len < comm_len && offset < SP_MAX_LINE_LENGTH); actual_len++, offset++) {
 		if (comm_s[actual_len] != line[offset]) {
+			printf("diff: comm_s[%d] = %c, line[%d] = %c\n", actual_len, comm_s[actual_len], offset, line[offset]);
 			comm->comm_e = Ivalid_command; /* it's not the command we thought it was */
 			return false;
 		}
@@ -41,39 +43,46 @@ bool verify_command(Command *comm, const char *line, int offset, const char *com
 	return true;
 }
 
-int get_non_whitespace_offset(const char *str) {
+int get_non_whitespace_offset(const char str[]) {
 	int i = 0;
-	int practical_max_legnth = SP_MAX_LINE_LENGTH - 4; /* if it's a valid command it should be at least 4-char length */
-	while ((i < practical_max_legnth - 4) && (isspace(*str))) {
+	while ((i < SP_MAX_LINE_LENGTH) && (isspace(*str)) && *str != '\0') {
 			i++;
 			str++;
 	}
-	if (i < practical_max_legnth) { return i; }
-	else { return -1; }
+	if (i < SP_MAX_LINE_LENGTH && *str != '\0') { return i; } /* found a beginning of a word */
+	else { return -1; } /* no legal command is stored in srt */
 }
 
-/* should transform it into a macro */
+/* should transform it into a macro?? */
 void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s) {
 	int len = strlen(comm_s);
+	comm->need_arg = false;
 	verify_command(comm, line, offset, comm_s, len, false);
 	valid_tail(comm, line, offset+len);
 }
 
-void get_file_name(Command *comm, const char *line, int offset, const char *comm_s) {
+void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s) {
 	int len = strlen(comm_s);
+	comm->need_arg  = true;
 	if (verify_command(comm, line, offset, comm_s, len, true)) {
-		int file_name_offset = get_non_whitespace_offset(line + offset + len) + offset + len;
-		comm->file_name = (char *) malloc(sizeof(char) * MAX_FILE_NAME);
-		int j = 0;
-		while ((file_name_offset < SP_MAX_LINE_LENGTH) && (j < MAX_FILE_NAME - 1)
-				&& (!isspace(line[file_name_offset]))) {
-			comm->file_name[j] = line[file_name_offset];
-			file_name_offset++;
-			j++;
+		int addi_offset = get_non_whitespace_offset(line + offset + len);
+		if (addi_offset == -1) {
+			comm->valid_arg = false;
+			comm->comm_e = Ivalid_command; /* maybe shouldn't change command-type? */
+		} else {
+			int file_name_offset =  addi_offset + offset + len;
+			comm->file_name = (char *) malloc(sizeof(char) * MAX_FILE_NAME);
+			int j = 0;
+			while ((file_name_offset < SP_MAX_LINE_LENGTH) && (j < MAX_FILE_NAME - 1)
+					&& (!isspace(line[file_name_offset])) && line[file_name_offset] != '\0') {
+				comm->file_name[j] = line[file_name_offset];
+				file_name_offset++;
+				j++;
+			}
+			comm->file_name[j] = '\0'; /* terminating the file-name */
+			comm->valid_arg = true;
+			valid_tail(comm, line, file_name_offset);
 		}
-		comm->file_name[j] = '\0'; /* terminating the file-name */
-		comm->valid_arg = true;
-		valid_tail(comm, line, file_name_offset);
 	}
 }
 
@@ -87,6 +96,7 @@ bool get_arg(char char_arg, int *arg, char range_offset, int lower_bound, int up
 }
 
 void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound) {
+	comm->need_arg = true;
 	int len = strlen(comm_s);
 	if (verify_command(comm, line, offset, comm_s, len, true)) {
 		int arg_offset = get_non_whitespace_offset(line + offset + len) + offset + len;
@@ -111,6 +121,7 @@ void getXY(Command *comm, const char *line, int offset, int *row, int *col) {
 }
 
 void get_move_arg(Command *comm, const char *line, int offset) {
+	comm->need_arg = true;
 	int len = strlen("move");
 	if (!verify_command(comm, line, offset, "move", len, true)) { /* not move after all... */
 		//int barcket_offset = get_non_whitespace_offset(line + len + offset);
@@ -173,7 +184,7 @@ Command *parser(const char *line) {
 
 		case 'l': /* 'load' */
 			comm->comm_e = Load;
-			get_file_name(comm, line, offset, "load");
+			get_command_with_file_name(comm, line, offset, "load");
 			break;
 
 		case 'p': /* 'print_settings */
@@ -185,7 +196,7 @@ Command *parser(const char *line) {
 			switch (line[offset+1]) {
 				case 'a': /* 'save' */
 					comm->comm_e = Save;
-					get_file_name(comm, line, offset, "save");
+					get_command_with_file_name(comm, line, offset, "save");
 					break;
 				case 't': /* 'start */
 					comm->comm_e = Start;
