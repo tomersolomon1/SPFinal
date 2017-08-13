@@ -155,7 +155,7 @@ void get_move_arg(Command *comm, const char *line, int offset) {
 	comm->valid_arg     = true; /* let's be optimistic */
 	comm->args_in_range = true; /* let's be optimistic */
 	int len = strlen("move");
-	if (!verify_command(comm, line, offset, "move", len, true)) { /* not move after all... */
+	if (!verify_command(comm, line, offset, "move", len, true)) { /* not "move" after all... */
 		return; /* no need for further evaluation */
 	}
 	offset = get_non_whitespace_offset(line + offset + len) + offset + len;
