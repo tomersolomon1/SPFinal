@@ -232,7 +232,7 @@ void check_get_int_arg(Command *comm) {
 
 	char line3[] = "difficulty    10     10"; // checks recognizing command, too much parameters
 	comm->comm_e = Set_Difficulty;
-	offset = get_non_whitespace_offset(line2);
+	offset = get_non_whitespace_offset(line3);
 	get_int_arg(comm, line3, offset, "difficulty", 1, 5);
 	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d\n\n",\
 			line3, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1);
@@ -241,11 +241,114 @@ void check_get_int_arg(Command *comm) {
 
 	char line4[] = "difficulty    00000000000004"; // checks recognizing command, too much parameters
 	comm->comm_e = Set_Difficulty;
-	offset = get_non_whitespace_offset(line2);
+	offset = get_non_whitespace_offset(line4);
 	get_int_arg(comm, line4, offset, "difficulty", 1, 5);
 	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d\n\n",\
 			line4, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1);
 	// offset = 0, command-comm_e = Set_Difficulty, arg is valid, not in range
+
+}
+
+// void getXY(Command *comm, const char *line, int *offset, int *row, int *col)
+void check_getXY(Command *comm) {
+	comm->comm_e = Make_Move;
+	char line1[] = "<1,A>";
+	int offset = get_non_whitespace_offset(line1);
+	getXY(comm, line1, &offset, &comm->arg1, &comm->arg2);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d, comm->arg2: %d\n\n",\
+			line1, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2);
+	// everything is in good shape
+
+	comm->comm_e = Make_Move;
+	char line2[] = "    <1,A>";
+	offset = get_non_whitespace_offset(line2);
+	getXY(comm, line2, &offset, &comm->arg1, &comm->arg2);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d, comm->arg2: %d\n\n",\
+			line2, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2);
+	// everything is in good shape
+
+	comm->comm_e = Make_Move;
+	char line3[] = "    <00000001,0000000A>";
+	offset = get_non_whitespace_offset(line3);
+	getXY(comm, line3, &offset, &comm->arg1, &comm->arg2);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d, comm->arg2: %d\n\n",\
+			line3, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2);
+	// everything is in good shape
+
+
+	comm->comm_e = Make_Move;
+	char line4[] = "    <11,A>";
+	offset = get_non_whitespace_offset(line4);
+	getXY(comm, line4, &offset, &comm->arg1, &comm->arg2);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d, comm->arg2: %d\n\n",\
+			line4, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2);
+	// arguments not in range
+}
+
+// void get_move_arg(Command *comm, const char *line, int offset)
+void check_get_move(Command *comm) {
+	// everything is in place, all parameters are in range
+	comm->comm_e = Make_Move;
+	char line1[] = "move <1,A> to <2,B>";
+	int offset = get_non_whitespace_offset(line1);
+	get_move_arg(comm, line1, offset);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line1, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+
+	// everything is in place, parameters are *not* in range
+	comm->comm_e = Make_Move;
+	char line2[] = "move <1,AA> to <2,B>";
+	offset = get_non_whitespace_offset(line2);
+	get_move_arg(comm, line2, offset);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line2, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+
+	// too many commas in the first argument
+	comm->comm_e = Make_Move;
+	char line3[] = "move <1,,A> to <2,B>";
+	offset = get_non_whitespace_offset(line3);
+	get_move_arg(comm, line3, offset);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line3, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+
+	// one extra '>' bracket
+	comm->comm_e = Make_Move;
+	char line4[] = "move <1,A>> to <2,B>";
+	offset = get_non_whitespace_offset(line4);
+	get_move_arg(comm, line4, offset);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line4, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+
+	// one extra '<' bracket - should ask Moav how to treat it (invalid command, or take the ASCII value of '<')
+	comm->comm_e = Make_Move;
+	char line5[] = "move <1,A> to <<2,B>";
+	offset = get_non_whitespace_offset(line5);
+	get_move_arg(comm, line5, offset);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line5, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+
+	// one extra '<' bracket - should ask Moav how to treat it (invalid command OR invalid input)
+	comm->comm_e = Make_Move;
+	char line6[] = "move <1,A> to <2,B>>";
+	offset = get_non_whitespace_offset(line6);
+	get_move_arg(comm, line6, offset);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line6, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+
+	// one extra '<' bracket - should ask Moav how to treat it (invalid command OR invalid input)
+	comm->comm_e = Make_Move;
+	char line7[] = "move <1,A> to <2,B> adsfasdfdf";
+	offset = get_non_whitespace_offset(line6);
+	get_move_arg(comm, line7, offset);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line7, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
 
 }
 
@@ -257,5 +360,7 @@ void check_parser() {
 	//check_get_non_whitespace_offset();
 	//check_get_non_arg_command(&comm);
 	//check_get_command_with_file_name(&comm);
-	check_get_int_arg(&comm);
+	//check_get_int_arg(&comm);
+	//check_getXY(&comm);
+	check_get_move(&comm);
 }

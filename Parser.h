@@ -49,4 +49,6 @@ void get_non_arg_command(Command *comm, const char *line, int offset, const char
 void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s);
 void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound);
 bool get_number(const char *line, int *offset, int *arg, char range_offset, int lower_bound, int upper_bound);
+void getXY(Command *comm, const char *line, int *offset, int *row, int *col);
+void get_move_arg(Command *comm, const char *line, int offset);
 #endif /* PARSER_H_ */

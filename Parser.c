@@ -24,13 +24,15 @@ bool valid_tail(Command *comm, const char *line, int offset) {
 	return true;
 }
 
-/* make sure this is the right command */
+/* make sure this is the right command
+ * return true if and only if line starts with the command in comm_s
+ */
 bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len, bool need_param) {
 	int actual_len = 0;
 	//printf("offset = %d\n", offset);
 	for (; (actual_len < comm_len && offset < SP_MAX_LINE_LENGTH); actual_len++, offset++) {
 		if (comm_s[actual_len] != line[offset]) {
-			printf("diff: comm_s[%d] = %c, line[%d] = %c\n", actual_len, comm_s[actual_len], offset, line[offset]);
+			//printf("diff: comm_s[%d] = %c, line[%d] = %c\n", actual_len, comm_s[actual_len], offset, line[offset]);
 			comm->comm_e = Ivalid_command; /* it's not the command we thought it was */
 			return false;
 		}
@@ -98,8 +100,9 @@ bool get_number(const char *line, int *offset, int *arg, char range_offset, int 
 		(*offset)++;
 	} /* we consume all the zeroes */
 
-	while (*offset < SP_MAX_LINE_LENGTH && !isspace(line[*offset]) && line[*offset] != '\0' && line[*offset] != ',') {
-		int m = line[*offset] - range_offset; /* typical values: range_offset = 'A' or '1' or '0' */
+	while (*offset < SP_MAX_LINE_LENGTH && !isspace(line[*offset]) && line[*offset] != '\0' && line[*offset] != ',' && line[*offset] != '>') {
+		int m = line[*offset] - range_offset; /* typical values: range_offset = '@' or '1' or '0' ('@' is the char before 'A' in the ascii table  */
+		printf("m = %d, line[%d], = %c\n", m, *offset, line[*offset]);
 		(*offset)++;
 		n *= 10;
 		n += m;
@@ -110,15 +113,6 @@ bool get_number(const char *line, int *offset, int *arg, char range_offset, int 
 	number_validity = (n < lower_bound || n> upper_bound) ? false : number_validity;
 	*arg = n;
 	return number_validity;
-}
-
-/* gets a pointer to arg, fill it, and check it's within the proper bounds */
-bool get_arg(char char_arg, int *arg, char range_offset, int lower_bound, int upper_bound) {
-	*arg = char_arg - range_offset;
-	if ((*arg < lower_bound) || (*arg > upper_bound)) {
-		return false;
-	}
-	return true;
 }
 
 void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound) {
@@ -133,46 +127,49 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
 			comm->valid_arg = true;
 			int arg_offset = addi + offset + len;
 			comm->args_in_range = get_number(line, &arg_offset, &comm->arg1, '0', lower_bound, upper_bound);
-			//comm->args_in_range = get_arg(line[arg_offset], &comm->arg1, '0', lower_bound, upper_bound);
 			valid_tail(comm, line, arg_offset + 1); /* should check the 1 constant */
 		}
 	}
 }
 
-
-void getXY(Command *comm, const char *line, int offset, int *row, int *col) {
-	if (offset >= SP_MAX_LINE_LENGTH - 6) { /* should check at home if it's 5 or 6 */
+/* the form of input should be <XXXXXX,YYYYYY>, where XXXXX is in range 1-8, and YYYYYY is in range A-H */
+void getXY(Command *comm, const char *line, int *offset, int *row, int *col) {
+	if (*offset > SP_MAX_LINE_LENGTH - 6) { /* at least 6 char: <x,y> and '\0' */
 		comm->comm_e = Ivalid_command; /* no room for parameters, treat the command as illegal */
 	} else {
-		if (line[offset] == '<') {
-			comm->valid_arg = get_arg(line[offset+1], row, '1', 0, 7);
-			//comm->valid_arg = get_number(line, offset+1, row, '0');
-			comm->valid_arg = get_arg(line[offset+1], row, 'A', 0, 7) && comm->valid_arg;
-			//comm->valid_arg = get_number(line, offset+3, col, 'A') && comm->valid_arg;
-			comm->comm_e = (line[offset+2] == ',') && (line[offset+4] == '>') ? Make_Move : Ivalid_command;
+		if (line[*offset] == '<') {
+			(*offset)++;
+			comm->args_in_range = get_number(line, offset, row, '0', 1, 8) && comm->args_in_range;
+			if (line[*offset] != ',') { comm->valid_arg = false; }
+			(*offset)++;
+			comm->args_in_range = get_number(line, offset, col, '@', 1, 8) && comm->args_in_range;
+			comm->valid_arg = (line[*offset] == '>') ? true : false;
+		} else {
+			 comm->valid_arg = false;
 		}
 	}
 }
 
 void get_move_arg(Command *comm, const char *line, int offset) {
-	comm->need_arg = true;
+	comm->need_arg      = true;
+	comm->valid_arg     = true; /* let's be optimistic */
+	comm->args_in_range = true; /* let's be optimistic */
 	int len = strlen("move");
 	if (!verify_command(comm, line, offset, "move", len, true)) { /* not move after all... */
-		//int barcket_offset = get_non_whitespace_offset(line + len + offset);
 		return; /* no need for further evaluation */
 	}
-	offset = get_non_whitespace_offset(line+offset) + offset + len;
-	getXY(comm, line, offset, &(comm->arg1), &(comm->arg2)); /* getting the first coordinate */
-	if (!comm->valid_arg || comm->comm_e == Ivalid_command) { return; } /* no need for further parsing */
-
-	offset += 5; /* 5? or 6? */
-
+	offset = get_non_whitespace_offset(line + offset + len) + offset + len;
+	getXY(comm, line, &offset, &(comm->arg1), &(comm->arg2)); /* getting the first coordinate */
+	if (!comm->valid_arg) { return; } /* no need for further parsing */
+	offset += 1; /* so now offset holds the index of the first char after the closing bracket in the first parameter */
 	offset += get_non_whitespace_offset(line + offset);
-	if ((offset < SP_MAX_LINE_LENGTH - 2) && (line[offset] == 't') && (line[offset+1] == 'o')) { /* first check there is enough space for 'to' */
+	if ((offset < SP_MAX_LINE_LENGTH - 2) && (line[offset] == 't') && (line[offset+1] == 'o')) { /* checking for the "to" (first checking we're within the boundaries) */
 		offset += 2 + get_non_whitespace_offset(line + offset + 2);
-		getXY(comm, line, offset, &(comm->arg3), &(comm->arg4)); /* getting the second coordinate */
-		offset += 6; /* should it be 6? or 5? */
+		getXY(comm, line, &offset, &(comm->arg3), &(comm->arg4)); /* getting the second coordinate */
+		offset += 1; /* should it be 6? or 5? */
 		valid_tail(comm, line, offset);
+	} else { /* the "to" is not in the right place */
+		comm->valid_arg = false;
 	}
 }
 
