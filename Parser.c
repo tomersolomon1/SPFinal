@@ -86,6 +86,32 @@ void get_command_with_file_name(Command *comm, const char *line, int offset, con
 	}
 }
 
+/* ignoring for the moment negative numbers
+ * gets a pointer to arg, fill it, and check it's within the proper bounds
+ * return true if and only if the lower_bound <= number <= upper_bound
+ * in the end of this function, offset is the index of the first char after the argument
+ */
+bool get_number(const char *line, int *offset, int *arg, char range_offset, int lower_bound, int upper_bound) {
+	int n = 0;
+	bool number_validity = true; /* we are optimistic */
+	while (*offset < SP_MAX_LINE_LENGTH && line[*offset] == '0') {
+		(*offset)++;
+	} /* we consume all the zeroes */
+
+	while (*offset < SP_MAX_LINE_LENGTH && !isspace(line[*offset]) && line[*offset] != '\0' && line[*offset] != ',') {
+		int m = line[*offset] - range_offset; /* typical values: range_offset = 'A' or '1' or '0' */
+		(*offset)++;
+		n *= 10;
+		n += m;
+		if (m < 0) {
+			number_validity = false; /* there is some problem with the input */
+		}
+	}
+	number_validity = (n < lower_bound || n> upper_bound) ? false : number_validity;
+	*arg = n;
+	return number_validity;
+}
+
 /* gets a pointer to arg, fill it, and check it's within the proper bounds */
 bool get_arg(char char_arg, int *arg, char range_offset, int lower_bound, int upper_bound) {
 	*arg = char_arg - range_offset;
@@ -99,9 +125,17 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
 	comm->need_arg = true;
 	int len = strlen(comm_s);
 	if (verify_command(comm, line, offset, comm_s, len, true)) {
-		int arg_offset = get_non_whitespace_offset(line + offset + len) + offset + len;
-		comm->valid_arg = get_arg(line[arg_offset], &comm->arg1, '0', lower_bound, upper_bound);
-		valid_tail(comm, line, arg_offset + 1); /* should check the 1 constant */
+		int addi = get_non_whitespace_offset(line + offset + len);
+		if (addi == -1) { /* there isn't any parameter */
+			comm->valid_arg = false;
+			comm->comm_e = Ivalid_command; /* maybe shouldn't change command-type? */
+		} else {
+			comm->valid_arg = true;
+			int arg_offset = addi + offset + len;
+			comm->args_in_range = get_number(line, &arg_offset, &comm->arg1, '0', lower_bound, upper_bound);
+			//comm->args_in_range = get_arg(line[arg_offset], &comm->arg1, '0', lower_bound, upper_bound);
+			valid_tail(comm, line, arg_offset + 1); /* should check the 1 constant */
+		}
 	}
 }
 
@@ -111,9 +145,9 @@ void getXY(Command *comm, const char *line, int offset, int *row, int *col) {
 		comm->comm_e = Ivalid_command; /* no room for parameters, treat the command as illegal */
 	} else {
 		if (line[offset] == '<') {
-			comm->valid_arg = get_arg(line[offset+1], row, '0', 1, 7);
+			comm->valid_arg = get_arg(line[offset+1], row, '1', 0, 7);
 			//comm->valid_arg = get_number(line, offset+1, row, '0');
-			comm->valid_arg = get_arg(line[offset+1], row, 'A', 1, 7) && comm->valid_arg;
+			comm->valid_arg = get_arg(line[offset+1], row, 'A', 0, 7) && comm->valid_arg;
 			//comm->valid_arg = get_number(line, offset+3, col, 'A') && comm->valid_arg;
 			comm->comm_e = (line[offset+2] == ',') && (line[offset+4] == '>') ? Make_Move : Ivalid_command;
 		}

@@ -37,6 +37,7 @@ typedef struct command_t {
 	SP_commands comm_e;
 	bool need_arg;
 	bool valid_arg;
+	bool args_in_range;
 	int arg1, arg2, arg3, arg4;
 	char *file_name; /* useful for load & save commands */
 } Command;
@@ -47,4 +48,5 @@ int get_non_whitespace_offset(const char *str);
 void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s);
 void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s);
 void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound);
+bool get_number(const char *line, int *offset, int *arg, char range_offset, int lower_bound, int upper_bound);
 #endif /* PARSER_H_ */

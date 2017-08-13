@@ -201,6 +201,54 @@ void check_get_command_with_file_name(Command *comm) {
 			line3, offset, commands_es[comm->comm_e], comm->file_name); // offset = 0, command-comm_e = Ivalid_command
 }
 
+// void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound)
+void check_get_int_arg(Command *comm) {
+	char line0[] = "user_color         "; // checks recognizing command, without offset and parameter
+	comm->comm_e = Set_UserColor;
+	int offset = get_non_whitespace_offset(line0);
+	get_int_arg(comm, line0, offset, "user_color", 0, 1);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d\n\n",\
+			line0, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1);
+	// offset = 0, command-comm_e = Set_UserColor, arg is invalid (no arg)
+
+
+	char line1[] = "user_color    1     "; // checks recognizing command, with good parameter
+	comm->comm_e = Set_UserColor;
+	offset = get_non_whitespace_offset(line1);
+	get_int_arg(comm, line1, offset, "user_color", 0, 1);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d\n\n",\
+			line1, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1);
+	// offset = 0, command-comm_e = Set_UserColor, arg is valid and in range
+
+
+	char line2[] = "difficulty    10     "; // checks recognizing command, with bad parameter
+	comm->comm_e = Set_Difficulty;
+	offset = get_non_whitespace_offset(line2);
+	get_int_arg(comm, line2, offset, "difficulty", 1, 5);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d\n\n",\
+			line2, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1);
+	// offset = 0, command-comm_e = Set_Difficulty, arg is valid, not in range
+
+
+	char line3[] = "difficulty    10     10"; // checks recognizing command, too much parameters
+	comm->comm_e = Set_Difficulty;
+	offset = get_non_whitespace_offset(line2);
+	get_int_arg(comm, line3, offset, "difficulty", 1, 5);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d\n\n",\
+			line3, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1);
+	// offset = 0, command-comm_e = invalid, arg is valid (????), not in range
+
+
+	char line4[] = "difficulty    00000000000004"; // checks recognizing command, too much parameters
+	comm->comm_e = Set_Difficulty;
+	offset = get_non_whitespace_offset(line2);
+	get_int_arg(comm, line4, offset, "difficulty", 1, 5);
+	printf("line:%s|END|\noffset = %d, comm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d, comm->arg1: %d\n\n",\
+			line4, offset, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1);
+	// offset = 0, command-comm_e = Set_Difficulty, arg is valid, not in range
+
+}
+
 void check_parser() {
 	Command comm;
 	comm.comm_e = Restore_Default; /* just for default value  */
@@ -208,5 +256,6 @@ void check_parser() {
 	//check_verify_command(&comm);
 	//check_get_non_whitespace_offset();
 	//check_get_non_arg_command(&comm);
-	check_get_command_with_file_name(&comm);
+	//check_get_command_with_file_name(&comm);
+	check_get_int_arg(&comm);
 }
