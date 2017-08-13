@@ -352,9 +352,142 @@ void check_get_move(Command *comm) {
 
 }
 
+void no_parameter_commands() {
+	// no parameters, should work
+	char line1[] = "start      ";
+	Command *comm = parser(line1);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line1, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// checking offset
+	char line2[] = "     default      ";
+	comm = parser(line2);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line2, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// too many parameters
+	char line3[] = "     print_setting    5555   ";
+	comm = parser(line3);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line3, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+
+	// reset command
+	char line4[] = "     reset   ";
+	comm = parser(line4);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line4, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// quit command
+	char line5[] = "     quit   ";
+	comm = parser(line5);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line5, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// undo command
+	char line6[] = "     undo   ";
+	comm = parser(line6);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line6, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+}
+
+void int_parameter_commands() {
+	// all parameters, everything should work fine
+	char line1[] = "game_mode 1";
+	Command *comm = parser(line1);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line1, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// missing parameter
+	char line2[] = "game_mode       ";
+	comm = parser(line2);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line2, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// too many parameters
+	char line3[] = "user_color 1 1       ";
+	comm = parser(line3);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line3, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// parameter not in range
+	char line4[] = "user_color 4       ";
+	comm = parser(line4);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line4, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// check offset
+	char line5[] = "    difficulty     4 ";
+	comm = parser(line5);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line5, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+}
+
+void file_commands() {
+	// exact parameters
+	char line1[] = "save f1.txt";
+	Command *comm = parser(line1);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\ncomm->file_name: %s\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line1, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// too many parameters
+	char line2[] = "save f1.txt f2.txt";
+	comm = parser(line2);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\ncomm->file_name: %s\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line2, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// no parameters
+	char line3[] = "load ";
+	comm = parser(line3);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\ncomm->file_name: %s\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line3, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	// exact parameters, with offset
+	char line4[] = " 	 	load f1.txt";
+	comm = parser(line4);
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\ncomm->file_name: %s\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line4, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+}
+
+void check_parser_itself() {
+	//int_parameter_commands();
+	//no_parameter_commands();
+	file_commands();
+}
+
 void check_parser() {
-	Command comm;
-	comm.comm_e = Restore_Default; /* just for default value  */
+	//ommand comm;
+	//comm.comm_e = Restore_Default; /* just for default value  */
 	//check_valid_tail(&comm);
 	//check_verify_command(&comm);
 	//check_get_non_whitespace_offset();
@@ -362,5 +495,6 @@ void check_parser() {
 	//check_get_command_with_file_name(&comm);
 	//check_get_int_arg(&comm);
 	//check_getXY(&comm);
-	check_get_move(&comm);
+	//check_get_move(&comm);
+	check_parser_itself();
 }

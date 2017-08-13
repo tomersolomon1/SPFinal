@@ -12,11 +12,19 @@
 #include <ctype.h>
 #include "Parser.h"
 
+void free_command(Command *comm) {
+	if (comm->file_name != NULL) {
+		free(comm->file_name);
+	}
+	free(comm);
+}
+
 /* line[offset] is the first char to be checked */
 bool valid_tail(Command *comm, const char *line, int offset) {
 	while ((offset < SP_MAX_LINE_LENGTH) && (line[offset] != '\0')) {
 		if (!isspace(line[offset])) {
-			comm->comm_e = Ivalid_command; /* more non-whitespace chars than should be, therefore illegal command */
+			//comm->comm_e = Ivalid_command; /* more non-whitespace chars than should be, therefore illegal command */
+			comm->valid_arg = false;
 			return false;
 		}
 		offset++;
@@ -74,6 +82,7 @@ void get_command_with_file_name(Command *comm, const char *line, int offset, con
 		} else {
 			int file_name_offset =  addi_offset + offset + len;
 			comm->file_name = (char *) malloc(sizeof(char) * MAX_FILE_NAME);
+			assert(comm->file_name != NULL);
 			int j = 0;
 			while ((file_name_offset < SP_MAX_LINE_LENGTH) && (j < MAX_FILE_NAME - 1)
 					&& (!isspace(line[file_name_offset])) && line[file_name_offset] != '\0') {
@@ -102,7 +111,7 @@ bool get_number(const char *line, int *offset, int *arg, char range_offset, int 
 
 	while (*offset < SP_MAX_LINE_LENGTH && !isspace(line[*offset]) && line[*offset] != '\0' && line[*offset] != ',' && line[*offset] != '>') {
 		int m = line[*offset] - range_offset; /* typical values: range_offset = '@' or '1' or '0' ('@' is the char before 'A' in the ascii table  */
-		printf("m = %d, line[%d], = %c\n", m, *offset, line[*offset]);
+		//printf("m = %d, line[%d], = %c\n", m, *offset, line[*offset]);
 		(*offset)++;
 		n *= 10;
 		n += m;
@@ -127,7 +136,7 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
 			comm->valid_arg = true;
 			int arg_offset = addi + offset + len;
 			comm->args_in_range = get_number(line, &arg_offset, &comm->arg1, '0', lower_bound, upper_bound);
-			valid_tail(comm, line, arg_offset + 1); /* should check the 1 constant */
+			valid_tail(comm, line, arg_offset); /* should check the 1 constant */
 		}
 	}
 }
@@ -178,7 +187,8 @@ Command *parser(const char *line) {
 	assert(comm != NULL);
 
 	comm->comm_e =  Ivalid_command;
-	comm->valid_arg = false;
+	comm->file_name = NULL;
+	comm->valid_arg = true; /* optimistic */
 	int offset = get_non_whitespace_offset(line);
 	if (offset == -1) { return comm; } /* invalid command */
 

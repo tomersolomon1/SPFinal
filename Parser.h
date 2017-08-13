@@ -9,7 +9,7 @@
 #define PARSER_H_
 
 #include <stdbool.h>
-
+#include <string.h>
 #define SP_MAX_LINE_LENGTH 1024
 #define MAX_FILE_NAME 1024
 
@@ -42,6 +42,7 @@ typedef struct command_t {
 	char *file_name; /* useful for load & save commands */
 } Command;
 
+void free_command(Command *comm);
 bool valid_tail(Command *comm, const char *line, int offset);
 bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len, bool need_param);
 int get_non_whitespace_offset(const char *str);
@@ -51,4 +52,5 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
 bool get_number(const char *line, int *offset, int *arg, char range_offset, int lower_bound, int upper_bound);
 void getXY(Command *comm, const char *line, int *offset, int *row, int *col);
 void get_move_arg(Command *comm, const char *line, int offset);
+Command *parser(const char *line);
 #endif /* PARSER_H_ */
