@@ -223,6 +223,10 @@ void set_all_valid_steps(Gameboard *gameboard){
 }
 
 void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece) {
+	for(int i = 0; i < piece->amount_steps; i++){
+		destroy_step(piece->steps[i]);
+		piece->steps[i] = NULL;
+	}
 	int amount_steps = 0;
 	for(int i = 0; i < piece->amount_vectors; i++){
 		add_steps_per_vector(gameboard, piece, piece->vectors[i], &amount_steps);

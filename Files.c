@@ -28,5 +28,4 @@ void upload_Xml(Gameboard* game){
 	fprintf(file, "\t</board>\n");
 	fprintf(file, "</game>");
 	fclose(file);
-
 }
