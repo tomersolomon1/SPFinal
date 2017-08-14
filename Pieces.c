@@ -10,6 +10,7 @@
 
 Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot){
 	Vector *v = (Vector*) malloc(sizeof(Vector));
+	assert(v != NULL);
 	v->delta_row = delta_row;
 	v->delta_col = delta_col;
 	v->vector_size = vector_size;
@@ -20,6 +21,7 @@ Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_ea
 
 Vector *copy_vector(Vector *old){
 	Vector *v = (Vector *) malloc(sizeof(Vector));
+	assert(v != NULL);
 	v->delta_col = old->delta_col;
 	v->delta_row = old->delta_row;
 	v->vector_size = old->vector_size;
@@ -38,6 +40,7 @@ void destroy_vector(Vector *v){
 
 Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved){
 	Step *newStep = (Step*) malloc(sizeof(Step));
+	assert(newStep != NULL);
 	newStep->srow = srow;
 	newStep->dcol = dcol;
 	newStep->drow = drow;
@@ -49,6 +52,7 @@ Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool
 
 Step *copy_step(Step *old){
 	Step *new = (Step*) malloc(sizeof(Step));
+	assert(new != NULL);
 	new->srow = old->srow;
 	new->scol = old->scol;
 	new->drow = old->drow;
