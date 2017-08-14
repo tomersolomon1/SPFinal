@@ -331,13 +331,13 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard) {
 // if tie return 2
 // if not game over return -1
 int is_game_over(Gameboard *gameboard) {
-	for(int i = 0; i < 16; i++){ //is there any piece that has legal move?
+	for(int i = 0; i < 16; i++){ // is there any piece that has legal move?
 		Piece *p = gameboard->all_pieces[gameboard->turn][i];
 		if(p->amount_steps > 0 && p->alive){
 			return -1;
 		}
 	}
-	if(is_check(gameboard, abs(1 - gameboard->turn))){ //is the other player threating me with check?
+	if(is_check(gameboard, abs(1 - gameboard->turn))){ // is my kind under check?
 		return abs(1 - gameboard->turn);
 	}
 	return 2;
