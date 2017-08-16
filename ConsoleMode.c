@@ -66,9 +66,12 @@ void set_color(Gameboard *gameboard, Command *comm) {
 
 void load_file(Gameboard **gameboard_p, Command *comm) {
 	FILE *input_file = fopen(comm->file_name, 'r');
-	assert(input_file != NULL);
-	destroy_board(*gameboard_p);
-	*gameboard_p = load_game(input_file);
+	if (input_file == NULL) {
+		printf("File cannot be created or modified\n");
+	} else {
+		destroy_board(*gameboard_p);
+		*gameboard_p = load_game(input_file);
+	}
 	fclose(input_file);
 	free(comm->file_name);
 }
@@ -130,8 +133,11 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 
 void save_game(Gameboard *gameboard, Command *comm) {
 	FILE *output_file = fopen(comm->file_name, 'w');
-	assert(output_file != NULL);
-	save_xml(output_file, gameboard);
+	if (output_file == NULL) {
+		printf("File cannot be created or modified\n");
+	} else {
+		save_xml(output_file, gameboard);
+	}
 	fclose(output_file);
 	free(comm->file_name);
 }
@@ -140,11 +146,19 @@ void undo_move(Gameboard *gameboard) {
 	if (gameboard->game_mode == 2) {
 		printf("Undo command not avaialbe in 2 players mode\n");
 	} else {
-		Step *last_step = ArrayListGetFirst(gameboard->history);
-		if (last_step == NULL) {
+		Step *step = ArrayListGetFirst(gameboard->history);
+		if (step == NULL) {
 			printf("Empty history, move cannot be undone\n");
 		} else { /* there is history */
-			printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n", );
+			printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n",
+					colors[1-gameboard->turn], step->srow, ABC[step->scol], step->drow, ABC[step->dcol]);
+			undo_step(gameboard);
+			step = ArrayListGetFirst(gameboard->history);
+			printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n",
+					colors[gameboard->turn], step->srow, ABC[step->scol], step->drow, ABC[step->dcol]);
+			undo_step(gameboard);
+			print_board(gameboard);
+			printf("%s player - enter your move:\n", colors[gameboard->turn]);
 		}
 	}
 }
