@@ -24,7 +24,6 @@ void void save_xml(FILE *f, Gameboard* game){
 	}
 	fprintf(f, "\t</board>\n");
 	fprintf(f, "</game>");
-	fclose(f);
 }
 
 
@@ -47,13 +46,18 @@ Gameboard *load_game(FILE* f){
 			game->all_pieces[i][j]->has_moved = true;
 		}
 	}
-	FILE *f = NULL;
+	for(int i = 0; i < 8; i++){
+		for(int j = 0 ; j < 8; j ++){
+			game->board[i][j] = game->empty;
+		}
+	}
 	char line[MAX_LEN_ROW];
 	char tag[MAX_TAG_LEN];
 	char data[MAX_DATA_LENGTH];
 	int data_int;
+	int row_number;
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){
-		if(sscanf(line, "<%s>%d</%s>\n", tag, data_int) == 2){
+		if(sscanf(line, "<%20s>%d</%20s>", tag, data_int) == 2){
 			if(is_str1_begins_with_str2(line, "current_turn")){
 				game->turn = data_int;
 			}
@@ -67,13 +71,40 @@ Gameboard *load_game(FILE* f){
 				game->user_color = data_int;
 			}
 		}
-		else if(sscanf(line, "<%s>%s</%s>\n", tag, data) == 2){
+		else if(sscanf(line, "<%20s_%d>%20s</%20s>", tag, row_number, data) == 3){
 			if(is_str1_begins_with_str2(line, "row")){
-
+				set_row(game, row_number - 1, data);
 			}
 		}
 	}
+	set_all_moves(game);
+	return game;
+}
 
-	fclose(f);
-	return NULL;
+void set_row(Gameboard* game, int row_number, char* str){
+	char sign;
+	int color;
+	Piece * p;
+	for(int col = 0; col < 8; col++){
+		sign = str[col];
+		color = (('a' <= sign && sign <= 'z') ? white: black);
+		for(int j = 0; j < 16; j++){
+			p = game->all_pieces[color][j];
+			if(p->sign == sign && !p->alive){
+				p->alive = true;
+				p->row = row_number;
+				p->col = col;
+				game->board[row_number][col] = p;
+				if(p->type == Pawn){
+					if(color == white){
+						p->vectors[0]->vector_size = (row_number == 1? 2: 1);
+					}
+					else{
+						p->vectors[0]->vector_size = (row_number == 6? 2: 1);
+					}
+
+				}
+			}
+		}
+	}
 }

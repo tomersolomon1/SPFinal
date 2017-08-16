@@ -12,7 +12,7 @@
 #include "GameBoard.h"
 #define file_path "C:\\Users\\try.txt"
 #define MAX_LEN_ROW 200
-#define MAX_TAG_LEN 40
+#define MAX_TAG_LEN 20
 #define MAX_DATA_LENGTH 8
 
 //

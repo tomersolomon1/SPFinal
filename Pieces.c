@@ -139,7 +139,7 @@ Piece *copy_piece(Piece *old){
 	}
 	newPiece->vectors = vectors;
 
-	Step **steps = (Step**) malloc(sizeof(Step*) * 28);
+	Step **steps = (Step**) malloc(sizeof(Step*) * 27);
 	assert(steps != NULL);
 	for(int i = 0; i < 28; i++){
 		steps[i] = NULL;
