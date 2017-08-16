@@ -86,7 +86,11 @@ void resore_default_values(Gameboard *gameboard) {
 int make_single_move(Gameboard *gameboard, int srow, int scol, int scol, int dcol) {
 	CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, scol, dcol);
 	if (move_message != CHESS_BOARD_SUCCESS) {
-		/* illegal move!!!!!!!!!!!!!!!!!!  */
+		if (move_message == CHESS_BOARD_INVALID_MOVE_NO_PIECE) {
+			printf("The specified position does not contain your piece\n");
+		} else {
+			printf("Illegal move\n");
+		}
 		return 0;
 	} else { /* legal move */
 		int game_over = is_game_over(gameboard);
@@ -97,7 +101,7 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int scol, int dco
 			printf("The game is tied\n");
 			return 1;
 		} else { /* the game is still on! */
-			if(check_is_check(gameboard)) { /* ask Sapir to implement */
+			if(is_under_check(gameboard)) {
 				printf("Check: %s King is threatend!\n", colors[gameboard->turn]); /* "threatend" appears in the instructions PDF */
 			}
 		}
