@@ -16,6 +16,7 @@ char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default"
 		"move", "save", "undo", "reset", "quit" };
 
 char *colors[] = {"black", "white"};
+char ABC[]     = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
 
 void set_game_mode(Gameboard *gameboard) {
 	destroy_board(gameboard);
@@ -136,7 +137,16 @@ void save_game(Gameboard *gameboard, Command *comm) {
 }
 
 void undo_move(Gameboard *gameboard) {
-
+	if (gameboard->game_mode == 2) {
+		printf("Undo command not avaialbe in 2 players mode\n");
+	} else {
+		Step *last_step = ArrayListGetFirst(gameboard->history);
+		if (last_step == NULL) {
+			printf("Empty history, move cannot be undone\n");
+		} else { /* there is history */
+			printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n", );
+		}
+	}
 }
 
 void reset_game(Gameboard **gameboard) {
