@@ -54,28 +54,27 @@ Gameboard *load_game(FILE* f){
 	char line[MAX_LEN_ROW];
 	char tag[MAX_TAG_LEN];
 	char data[MAX_DATA_LENGTH];
-	int data_int[1];
-	int row_number[1];
+	int data_int = -1;
+	int row_number;
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){
-		printf("%d",sscanf(line, "<%20s>%d</", tag, data_int));
-		fflush(stdout);
-		if(sscanf(line, "<%20s>%d</", tag, data_int) == 2){
-			if(is_str1_begins_with_str2(line, "current_turn")){
-				game->turn = data_int[0];
+		if(sscanf(line, "%*[ \t]<%20[^>]>%d", tag, &data_int) == 2){
+			if(is_str1_begins_with_str2(tag, "current_turn")){
+				game->turn = data_int;
 			}
-			if(is_str1_begins_with_str2(line, "game_mode")){
-				game->game_mode = data_int[0];
+			if(is_str1_begins_with_str2(tag, "game_mode")){
+				game->game_mode = data_int;
 			}
-			if(is_str1_begins_with_str2(line, "difficulty")){
-				game->difficulty = data_int[0];
+			if(is_str1_begins_with_str2(tag, "difficulty")){
+				game->difficulty = data_int;
 			}
-			if(is_str1_begins_with_str2(line, "user_color")){
-				game->user_color = data_int[0];
+			if(is_str1_begins_with_str2(tag, "user_color")){
+				game->user_color = data_int;
 			}
 		}
-		else if(sscanf(line, "<%20s_%d>%20s</", tag, row_number, data) == 3){
-			if(is_str1_begins_with_str2(line, "row")){
-				set_row(game, row_number[0] - 1, data);
+
+		else if(sscanf(line, "%*[ \t]<%20[^_]_%d>%20[^<]", tag, &row_number, data) == 3){
+			if(is_str1_begins_with_str2(tag, "row")){
+				set_row(game, row_number - 1, data);
 			}
 		}
 	}
@@ -89,6 +88,9 @@ void set_row(Gameboard* game, int row_number, char* str){
 	Piece * p;
 	for(int col = 0; col < 8; col++){
 		sign = str[col];
+		if(sign == '_'){
+			continue;
+		}
 		color = (('a' <= sign && sign <= 'z') ? white: black);
 		for(int j = 0; j < 16; j++){
 			p = game->all_pieces[color][j];
@@ -104,8 +106,8 @@ void set_row(Gameboard* game, int row_number, char* str){
 					else{
 						p->vectors[0]->vector_size = (row_number == 6? 2: 1);
 					}
-
 				}
+				break;
 			}
 		}
 	}
