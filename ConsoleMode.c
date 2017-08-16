@@ -10,9 +10,13 @@
 #include <string.h>
 #include "Parser.h"
 #include "DataDefinitions.h"
+#include "GameBoard.h"
 
 char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default", "print_setting", "start", \
 		"move", "save", "undo", "reset", "quit" };
+
+char *colors[] = {"black", "white"};
+char ABC[]     = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
 
 void set_game_mode(Gameboard *gameboard) {
 	destroy_board(gameboard);
@@ -23,10 +27,11 @@ void begin_game(Gameboard *gameboard) {
 	if (gameboard->game_mode == 1 && gameboard->user_color == 0) { /* performs a computer move only in mode 1, and if the user plays as black */
 		Gameboard *copy = copy_board(gameboard);
 		Move move = find_best_move(copy, gameboard->difficulty);
-		set_step(gameboard, move.srow, move.scol, move.drow, move.dcol);
 		destroy_board(copy);
+		CHESS_BOARD_MESSAGE move_message = set_step(gameboard, move.srow, move.scol, move.drow, move.dcol);
 	}
 	print_board(gameboard);
+	printf("%s player - enter your move:\n", colors[gameboard->user_color]);
 }
 
 void set_game_mode(Gameboard *gameboard, Command *comm) {
@@ -74,6 +79,55 @@ void resore_default_values(Gameboard *gameboard) {
 	gameboard->user_color = 1;
 }
 
+/* return 0 if it's illegal move, 1 if the game is over, and 2 if the game is not over */
+int make_single_move(Gameboard *gameboard, int srow, int scol, int scol, int dcol) {
+	CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, scol, dcol);
+	if (move_message != CHESS_BOARD_SUCCESS) {
+		/* illegal move!!!!!!!!!!!!!!!!!!  */
+		return 0;
+	} else { /* legal move */
+		int game_over = is_game_over(gameboard);
+		if (game_over == 0 || game_over == 1) {
+			printf("Checkmate! %s player wins the game\n", colors[game_over]);
+			return 1;
+		} else if (game_over == 2) {
+			printf("The game is tied\n");
+			return 1;
+		} else { /* the game is still on! */
+			if(check_is_check(gameboard)) { /* ask Sapir to implement */
+				printf("Check: %s King is threatend!\n", colors[gameboard->turn]); /* "threatend" appears in the instructions PDF */
+			}
+		}
+	}
+	return 2; /* the game is still on */
+}
+
+/* return true if the game is over, otherwise return false */
+bool make_move(Gameboard *gameboard, Command *comm) {
+	int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	if (move_consequences == 2) { /* the game is over */
+		return true;
+	} else { /* not over yet! */
+		if (gameboard->game_mode == 2) { /* there are two different players */
+			print_board(gameboard);
+			printf("%s player - enter your move:\n", colors[gameboard->turn]);
+			return false;
+		} else { /* it's now the computers turn */
+			Gameboard *copy = copy_board(gameboard);
+			Move move = find_best_move(copy, gameboard->difficulty);
+			destroy_board(copy);
+			move_consequences = make_single_move(gameboard, move.srow, move.scol, move.drow, move.dcol);
+			if (move_consequences == 2) { /* the game is over */
+				return true;
+			} else { /* the game is still on */
+				print_board(gameboard);
+				printf("%s player - enter your move:\n", colors[gameboard->turn]);
+				return false;
+			}
+		}
+	}
+}
+
 void save_game(Gameboard *gameboard, Command *comm) {
 	FILE *output_file = fopen(comm->file_name, 'w');
 	assert(output_file != NULL);
@@ -83,7 +137,16 @@ void save_game(Gameboard *gameboard, Command *comm) {
 }
 
 void undo_move(Gameboard *gameboard) {
-
+	if (gameboard->game_mode == 2) {
+		printf("Undo command not avaialbe in 2 players mode\n");
+	} else {
+		Step *last_step = ArrayListGetFirst(gameboard->history);
+		if (last_step == NULL) {
+			printf("Empty history, move cannot be undone\n");
+		} else { /* there is history */
+			printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n", );
+		}
+	}
 }
 
 void reset_game(Gameboard **gameboard) {
@@ -178,14 +241,4 @@ int manage_console(Gameboard *gameboard) {
 		free(comm);
 	}
 	return res;
-}
-
-int game_mode(Gameboard *gameboard) {
-	return 1;
-}
-
-void console_mode() {
-	int mode = 1; /* 1 is settings mode, 0 is game mode */
-
-
 }
