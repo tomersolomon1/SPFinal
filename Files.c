@@ -8,7 +8,7 @@
 #include "Files.h"
 
 
-void void save_xml(FILE *f, Gameboard* game){
+void save_xml(FILE *f, Gameboard* game){
 	fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	fprintf(f, "<game>\n");
 	fprintf(f, "\t<current_turn>%d</current_turn>\n", game->turn);
@@ -54,30 +54,30 @@ Gameboard *load_game(FILE* f){
 	char line[MAX_LEN_ROW];
 	char tag[MAX_TAG_LEN];
 	char data[MAX_DATA_LENGTH];
-	int data_int;
-	int row_number;
+	int data_int[1];
+	int row_number[1];
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){
-		if(sscanf(line, "<%20s>%d</%20s>", tag, data_int) == 2){
+		if(sscanf(line, "<%20s>%d</", tag, data_int) == 2){
 			if(is_str1_begins_with_str2(line, "current_turn")){
-				game->turn = data_int;
+				game->turn = data_int[0];
 			}
 			if(is_str1_begins_with_str2(line, "game_mode")){
-				game->game_mode = data_int;
+				game->game_mode = data_int[0];
 			}
 			if(is_str1_begins_with_str2(line, "difficulty")){
-				game->difficulty = data_int;
+				game->difficulty = data_int[0];
 			}
 			if(is_str1_begins_with_str2(line, "user_color")){
-				game->user_color = data_int;
+				game->user_color = data_int[0];
 			}
 		}
-		else if(sscanf(line, "<%20s_%d>%20s</%20s>", tag, row_number, data) == 3){
+		else if(sscanf(line, "<%20s_%d>%20s</", tag, row_number, data) == 3){
 			if(is_str1_begins_with_str2(line, "row")){
-				set_row(game, row_number - 1, data);
+				set_row(game, row_number[0] - 1, data);
 			}
 		}
 	}
-	set_all_moves(game);
+	set_all_valid_steps(game);
 	return game;
 }
 

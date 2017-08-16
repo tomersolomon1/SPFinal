@@ -27,7 +27,8 @@ typedef struct gameboard_t  {
 } Gameboard;
 
 typedef enum chess_board_message_t {
-	CHESS_BOARD_INVALID_MOVE,
+	CHESS_BOARD_INVALID_MOVE_NO_PIECE,
+	CHESS_BOARD_INVALID_MOVE_RULES_VIOLATION,
 	CHESS_BOARD_INVALID_ARGUMENT,
 	CHESS_BOARD_NO_HISTORY,
 	CHESS_BOARD_SUCCESS,
@@ -48,18 +49,22 @@ Gameboard *copy_board(Gameboard* old);
 /*make a step
  * gets source and destination coordinates as 0-7 numbers
  * returns CHESS_BOARD_SUCCESS if legal move
- * returns CHESS_BOARD_INVALID_MOVE if move is NOT legal
+ * returns CHESS_BOARD_INVALID_MOVE_<error-type> if move is NOT legal
  * */
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
 
 /* checks if a step is valid
+ * returns CHESS_BOARD_SUCCESS if legal move
+ * returns CHESS_BOARD_INVALID_MOVE_<error-type> if move is NOT legal
  * gets source and destination coordinates as 0-7 numbers
  * */
-bool is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
+CHESS_BOARD_MESSAGE is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
 
 /* is current player threatening the opponent's king?*/
 bool is_check_curr_player(Gameboard *gameboard);
 
+/*is current player under check?*/
+bool is_under_check(Gameboard * gameboard);
 /* is the player with color "colur" threatening the other player's king?*/
 bool is_check(Gameboard *gameboard, int colur);
 

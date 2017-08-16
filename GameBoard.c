@@ -118,8 +118,9 @@ Gameboard *copy_board(Gameboard* old) {
 }
 
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
-	if(!is_valid_step(gameboard, srow, scol, drow, dcol)){
-		return CHESS_BOARD_INVALID_MOVE;
+	CHESS_BOARD_MESSAGE cbm = is_valid_step(gameboard, srow, scol, drow, dcol);
+	if(cbm != CHESS_BOARD_SUCCESS){
+		return cbm;
 	}
 	Piece *source_p = gameboard->board[srow][scol];
 	Piece *dest_p = gameboard->board[drow][dcol];
@@ -141,29 +142,33 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 	return CHESS_BOARD_SUCCESS;
 }
 
-bool is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol){
+CHESS_BOARD_MESSAGE is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol){
 	Piece *p = gameboard->board[srow][scol];
 	if(p->colur != gameboard->turn){
-		return false;
+		return CHESS_BOARD_INVALID_MOVE_NO_PIECE;
 	}
 	if(!p->alive){
-		return false;
+		return CHESS_BOARD_INVALID_MOVE_NO_PIECE;
 	}
 	if(p->type == Empty){
-		return false;
+		return CHESS_BOARD_INVALID_MOVE_NO_PIECE;
 	}
 	Step *s;
 	for(int i = 0; i < p->amount_steps; i++){
 		 s = p->steps[i];
 		 if(s->dcol == dcol && s->drow == drow){
-			 return true;
+			 return CHESS_BOARD_SUCCESS;
 		 }
 	}
-	return false;
+	return CHESS_BOARD_INVALID_MOVE_RULES_VIOLATION;
 }
 
 bool is_check_curr_player(Gameboard *gameboard){
 	return is_check(gameboard, gameboard->turn);
+}
+
+bool is_under_check(Gameboard * gameboard){
+	return is_check(gameboard, abs(1 - gameboard->turn));
 }
 
 //is the player with color colur threating the other player?

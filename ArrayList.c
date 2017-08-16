@@ -231,7 +231,10 @@ ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src){
  * Otherwise, the element at the ecified index is returned.
  */
 Step *ArrayListGetAt(ArrayList* src, int index){
-	return *(src->elements + index);
+	if(index >= src->actualSize){
+		return NULL;
+	}
+	return src->elements[index];
 }
 
 /**
