@@ -8,7 +8,7 @@
 #include "Files.h"
 
 
-void upload_Xml(Gameboard* game){
+void void save_xml(FILE *f){
 	FILE *file = NULL;
 	file = fopen(file_path, "w");
 	assert(file != NULL);
@@ -42,7 +42,7 @@ bool is_str1_begins_with_str2(const char* str1, const char* str2){
 	return false;
 }
 
-Gameboard *upload_game(char* path){
+Gameboard *load_game(FILE* f){
 	Gameboard *game = create_board(0, 0, 0);
 	for(int i = 0; i < 2; i++){
 		for(int j = 0; j < 16; j++){

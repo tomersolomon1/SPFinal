@@ -15,7 +15,8 @@
 #define MAX_TAG_LEN 40
 #define MAX_DATA_LENGTH 8
 
-Gameboard *upload_game(char* path);
-void upload_Xml(Gameboard* game);
+//
+Gameboard *load_game(FILE* f);
+void save_xml(FILE *f);
 bool is_str1_begins_with_str2(const char* str1, const char* str2);
 #endif /* FILES_H_ */
