@@ -57,6 +57,8 @@ Gameboard *load_game(FILE* f){
 	int data_int[1];
 	int row_number[1];
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){
+		printf("%d",sscanf(line, "<%20s>%d</", tag, data_int));
+		fflush(stdout);
 		if(sscanf(line, "<%20s>%d</", tag, data_int) == 2){
 			if(is_str1_begins_with_str2(line, "current_turn")){
 				game->turn = data_int[0];
