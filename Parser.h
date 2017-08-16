@@ -34,8 +34,10 @@ typedef enum {
 
 typedef struct command_t {
 	SP_commands comm_e;
+	Mode mode; /* the mode associated with the command */
 	bool need_arg;
 	bool valid_arg;
+	bool extra_param;
 	bool args_in_range;
 	int arg1, arg2, arg3, arg4;
 	char *file_name; /* useful for load & save commands */

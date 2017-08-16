@@ -13,7 +13,8 @@
 
 typedef enum {
 	SettingsMode,
-	GameMode
+	GameMode,
+	Both
 } Mode;
 
 #endif /* DATADEFINITIONS_H_ */

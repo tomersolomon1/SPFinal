@@ -13,8 +13,7 @@ char *commands_es[] = {"Set_GameMode", "Set_Difficulty", "Set_UserColor", "Load"
 			"Make_Move", "Save", "Undo_Move", "Reset",\
 			"Quit", "Ivalid_command"}; /* string representation of the enums */
 
-char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default", "print_setting", "start", \
-		"move", "save", "undo", "reset", "quit" };
+
 
 // checks: bool valid_tail(Command *comm, const char *line, int offset)
 void check_valid_tail(Command *comm) {
