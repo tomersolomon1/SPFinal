@@ -30,26 +30,50 @@ void upload_Xml(Gameboard* game){
 	fclose(file);
 }
 
-char *get_data_by_tag(FILE *f, char *tag, int tag_len, int data_len){
 
-	return NULL;
+bool is_str1_begins_with_str2(const char* str1, const char* str2){
+	if(strlen(str1) < strlen(str2)){
+		return false;
+	}
+	int a = strncmp(str1, str2, strlen(str2));
+	if(a == 0){
+		return true;
+	}
+	return false;
 }
 
 Gameboard *upload_game(char* path){
-	int current_turn, game_mode, difficulty, user_color;
+	Gameboard *game = create_board(0, 0, 0);
+	for(int i = 0; i < 2; i++){
+		for(int j = 0; j < 16; j++){
+			game->all_pieces[i][j]->alive = false;
+			game->all_pieces[i][j]->has_moved = true;
+		}
+	}
 	FILE *f = NULL;
 	char line[MAX_LEN_ROW];
 	char tag[MAX_TAG_LEN];
 	char data[MAX_DATA_LENGTH];
-	int i;
+	int data_int;
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){
-		if(sscanf(line, "<%s>%d</%s>\n", tag, i) == 2){
-			if(strcmp(tag, "current_turn") ){
-
+		if(sscanf(line, "<%s>%d</%s>\n", tag, data_int) == 2){
+			if(is_str1_begins_with_str2(line, "current_turn")){
+				game->turn = data_int;
+			}
+			if(is_str1_begins_with_str2(line, "game_mode")){
+				game->game_mode = data_int;
+			}
+			if(is_str1_begins_with_str2(line, "difficulty")){
+				game->difficulty = data_int;
+			}
+			if(is_str1_begins_with_str2(line, "user_color")){
+				game->user_color = data_int;
 			}
 		}
 		else if(sscanf(line, "<%s>%s</%s>\n", tag, data) == 2){
+			if(is_str1_begins_with_str2(line, "row")){
 
+			}
 		}
 	}
 

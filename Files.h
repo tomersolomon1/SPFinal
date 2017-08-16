@@ -15,11 +15,7 @@
 #define MAX_TAG_LEN 40
 #define MAX_DATA_LENGTH 8
 
-typedef enum{
-	current_turn,
-	game_mode,
-	difficulty,
-	user_color
-} Tag;
-
+Gameboard *upload_game(char* path);
+void upload_Xml(Gameboard* game);
+bool is_str1_begins_with_str2(const char* str1, const char* str2);
 #endif /* FILES_H_ */
