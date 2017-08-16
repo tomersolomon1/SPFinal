@@ -8,26 +8,23 @@
 #include "Files.h"
 
 
-void void save_xml(FILE *f){
-	FILE *file = NULL;
-	file = fopen(file_path, "w");
-	assert(file != NULL);
-	fprintf(file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-	fprintf(file, "<game>\n");
-	fprintf(file, "\t<current_turn>%d</current_turn>\n", game->turn);
-	fprintf(file, "\t<game_mode>%d</game_mode>\n", game->game_mode);
-	fprintf(file, "\t<user_color>%d</user_color>\n", game->user_color);
-	fprintf(file, "\t<board>\n");
+void void save_xml(FILE *f, Gameboard* game){
+	fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	fprintf(f, "<game>\n");
+	fprintf(f, "\t<current_turn>%d</current_turn>\n", game->turn);
+	fprintf(f, "\t<game_mode>%d</game_mode>\n", game->game_mode);
+	fprintf(f, "\t<user_color>%d</user_color>\n", game->user_color);
+	fprintf(f, "\t<board>\n");
 	for(int i = 7; i >= 0; i--){
-		fprintf(file, "\t\t<row_%d>", i + 1);
+		fprintf(f, "\t\t<row_%d>", i + 1);
 		for(int j = 0; j < 8; j++){
-			fprintf(file, "%c", game->board[i][j]->sign);
+			fprintf(f, "%c", game->board[i][j]->sign);
 		}
-		fprintf(file, "</row_%d>\n", i + 1);
+		fprintf(f, "</row_%d>\n", i + 1);
 	}
-	fprintf(file, "\t</board>\n");
-	fprintf(file, "</game>");
-	fclose(file);
+	fprintf(f, "\t</board>\n");
+	fprintf(f, "</game>");
+	fclose(f);
 }
 
 
