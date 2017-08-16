@@ -71,7 +71,6 @@ Gameboard *load_game(FILE* f){
 				game->user_color = data_int;
 			}
 		}
-
 		else if(sscanf(line, "%*[ \t]<%20[^_]_%d>%20[^<]", tag, &row_number, data) == 3){
 			if(is_str1_begins_with_str2(tag, "row")){
 				set_row(game, row_number - 1, data);
