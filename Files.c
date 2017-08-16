@@ -6,7 +6,7 @@
  */
 
 #include "Files.h"
-#define file_path "C:\\Users\\try.txt"
+
 
 void upload_Xml(Gameboard* game){
 	FILE *file = NULL;
@@ -28,4 +28,31 @@ void upload_Xml(Gameboard* game){
 	fprintf(file, "\t</board>\n");
 	fprintf(file, "</game>");
 	fclose(file);
+}
+
+char *get_data_by_tag(FILE *f, char *tag, int tag_len, int data_len){
+
+	return NULL;
+}
+
+Gameboard *upload_game(char* path){
+	int current_turn, game_mode, difficulty, user_color;
+	FILE *f = NULL;
+	char line[MAX_LEN_ROW];
+	char tag[MAX_TAG_LEN];
+	char data[MAX_DATA_LENGTH];
+	int i;
+	while(fgets(line, MAX_LEN_ROW, f) != NULL){
+		if(sscanf(line, "<%s>%d</%s>\n", tag, i) == 2){
+			if(strcmp(tag, "current_turn") ){
+
+			}
+		}
+		else if(sscanf(line, "<%s>%s</%s>\n", tag, data) == 2){
+
+		}
+	}
+
+	fclose(f);
+	return NULL;
 }
