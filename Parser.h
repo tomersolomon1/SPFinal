@@ -10,8 +10,7 @@
 
 #include <stdbool.h>
 #include <string.h>
-#define SP_MAX_LINE_LENGTH 1024
-#define MAX_FILE_NAME 1024
+#include "DataDefinitions.h"
 
 typedef enum {
 	/* Settings-Mode commands */
