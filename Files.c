@@ -54,7 +54,7 @@ Gameboard *load_game(FILE* f){
 	char line[MAX_LEN_ROW];
 	char tag[MAX_TAG_LEN];
 	char data[MAX_DATA_LENGTH];
-	int data_int = -1;
+	int data_int;
 	int row_number;
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){
 		if(sscanf(line, "%*[ \t]<%20[^>]>%d", tag, &data_int) == 2){
