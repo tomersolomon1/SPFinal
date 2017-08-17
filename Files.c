@@ -40,7 +40,7 @@ bool is_str1_begins_with_str2(const char* str1, const char* str2){
 
 Gameboard *load_game(FILE* f){
 	Gameboard *game = create_board(0, 0, 0);
-	for(int i = 0; i < 2; i++){
+	for(int i = 0; i < 2; i++){ //"clean" game
 		for(int j = 0; j < 16; j++){
 			game->all_pieces[i][j]->alive = false;
 			game->all_pieces[i][j]->has_moved = true;
@@ -56,22 +56,22 @@ Gameboard *load_game(FILE* f){
 	char data[MAX_DATA_LENGTH];
 	int data_int;
 	int row_number;
-	while(fgets(line, MAX_LEN_ROW, f) != NULL){
-		if(sscanf(line, "%*[ \t]<%20[^>]>%d", tag, &data_int) == 2){
+	while(fgets(line, MAX_LEN_ROW, f) != NULL){ //go over lines
+		if(sscanf(line, "%*[ \t]<%13[^>]>%d", tag, &data_int) == 2){
 			if(is_str1_begins_with_str2(tag, "current_turn")){
 				game->turn = data_int;
 			}
-			if(is_str1_begins_with_str2(tag, "game_mode")){
+			else if(is_str1_begins_with_str2(tag, "game_mode")){
 				game->game_mode = data_int;
 			}
-			if(is_str1_begins_with_str2(tag, "difficulty")){
+			else if(is_str1_begins_with_str2(tag, "difficulty")){
 				game->difficulty = data_int;
 			}
-			if(is_str1_begins_with_str2(tag, "user_color")){
+			else if(is_str1_begins_with_str2(tag, "user_color")){
 				game->user_color = data_int;
 			}
 		}
-		else if(sscanf(line, "%*[ \t]<%20[^_]_%d>%20[^<]", tag, &row_number, data) == 3){
+		else if(sscanf(line, "%*[ \t]<%13[^_]_%d>%8[^<]", tag, &row_number, data) == 3){
 			if(is_str1_begins_with_str2(tag, "row")){
 				set_row(game, row_number - 1, data);
 			}

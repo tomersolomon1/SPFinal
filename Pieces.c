@@ -5,7 +5,8 @@
  *      Author: sapir
  */
 #include "Pieces.h"
-
+int type_amount_vectors[7] = {3,8,4,4,8,8,0};
+int type_max_amount_steps[7] = {3,8,14,14,27,8,0};
 //Vector:
 
 Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot){
@@ -50,6 +51,7 @@ Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool
 	return newStep;
 }
 
+//copy but without pointer to prev Piece
 Step *copy_step(Step *old){
 	Step *new = (Step*) malloc(sizeof(Step));
 	assert(new != NULL);
@@ -57,7 +59,7 @@ Step *copy_step(Step *old){
 	new->scol = old->scol;
 	new->drow = old->drow;
 	new->dcol = old->dcol;
-	new->prevPiece = old->prevPiece;
+	new->prevPiece = NULL;
 	new->is_srcPiece_was_moved = old->is_srcPiece_was_moved;
 	return new;
 }
@@ -90,24 +92,17 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int
 	newPiece->indexat = indexat;
 	newPiece->amount_steps = 0;
 
-	int amount_vectors = 0;
-	if(type == Pawn){
-		amount_vectors = 3;
-	}
-	if(type == Knight || type == Queen || type == King){
-		amount_vectors = 8;
-	}
-	if(type == Bishop || type == Rock){
-		amount_vectors = 4;
-	}
+	int amount_vectors = type_amount_vectors[Pawn + type];
+	int max_amount_steps = type_max_amount_steps[Pawn + type];
+
 	Vector **vectors = (Vector**)malloc(sizeof(Vector*) * amount_vectors);
 	set_vectors(type, colur, vectors);
 	newPiece->amount_vectors = amount_vectors;
 	newPiece->vectors = vectors;
 
-	Step **steps = (Step**) malloc(sizeof(Step*) * 28);
+	Step **steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
 	assert(steps != NULL);
-	for(int i = 0; i < 28; i++){
+	for(int i = 0; i < max_amount_steps; i++){
 		steps[i] = NULL;
 	}
 	newPiece->steps = steps;
@@ -138,10 +133,11 @@ Piece *copy_piece(Piece *old){
 		vectors[i] = copy_vector(old->vectors[i]);
 	}
 	newPiece->vectors = vectors;
+	int max_amount_steps = type_max_amount_steps[Pawn + newPiece->type];
 
-	Step **steps = (Step**) malloc(sizeof(Step*) * 27);
+	Step **steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
 	assert(steps != NULL);
-	for(int i = 0; i < 28; i++){
+	for(int i = 0; i < max_amount_steps; i++){
 		steps[i] = NULL;
 	}
 	newPiece->steps = steps;
@@ -149,8 +145,9 @@ Piece *copy_piece(Piece *old){
 }
 
 void destroy_piece(Piece *piece) {
+	int max_amount_steps = type_max_amount_steps[Pawn + piece->type];
 	if(piece != NULL){
-		for(int i = 0; i < 28; i++){
+		for(int i = 0; i < max_amount_steps; i++){
 			destroy_step(piece->steps[i]);
 		}
 		for(int i = 0; i < piece->amount_vectors; i++){

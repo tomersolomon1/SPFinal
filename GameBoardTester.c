@@ -19,7 +19,7 @@ void check_GameBoard() {
 	print_details_game(game);
 	set_step(game, 6,2,4,2);
 	print_details_game(game);
-
+	Gameboard * new = copy_board(game);
 	undo_step(game);
 	print_details_game(game);
 	set_step(game, 6,3,4,3);
