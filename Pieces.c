@@ -51,6 +51,7 @@ Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool
 	return newStep;
 }
 
+//copy but without pointer to prev Piece
 Step *copy_step(Step *old){
 	Step *new = (Step*) malloc(sizeof(Step));
 	assert(new != NULL);
@@ -58,7 +59,7 @@ Step *copy_step(Step *old){
 	new->scol = old->scol;
 	new->drow = old->drow;
 	new->dcol = old->dcol;
-	new->prevPiece = old->prevPiece;
+	new->prevPiece = NULL;
 	new->is_srcPiece_was_moved = old->is_srcPiece_was_moved;
 	return new;
 }

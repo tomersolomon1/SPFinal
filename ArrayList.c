@@ -19,7 +19,7 @@ ArrayList* ArrayListCreate(int maxSize)
 	ArrayList* array = (ArrayList*) malloc(sizeof(ArrayList));
 
 	array->maxSize = maxSize;
-	array->elements = (Step**) malloc(sizeof(Step) * maxSize);
+	array->elements = (Step**) malloc(sizeof(Step*) * maxSize);
 	for(int i = 0; i < maxSize; i++){
 		array->elements[i] = NULL;
 	}
@@ -42,7 +42,12 @@ ArrayList* ArrayListCopy(ArrayList* src)
 
 	dst->actualSize = src->actualSize;
 	dst->maxSize = src->maxSize;
-	for(int i = 0; i< dst->actualSize; i++){
+	dst->elements = (Step**) malloc(sizeof(Step*) * src->maxSize);
+
+	for(int i = 0; i < src->maxSize; i++){
+		dst->elements[i] = NULL;
+	}
+	for(int i = 0; i< src->actualSize; i++){
 		dst->elements[i] = copy_step(src->elements[i]);
 	}
 	return dst;

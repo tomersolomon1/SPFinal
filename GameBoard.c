@@ -106,7 +106,7 @@ Gameboard *copy_board(Gameboard* old) {
 	//so the loop changes it:
 	new->history = ArrayListCopy(old->history);
 	for(int i = 0; i < new->history->actualSize; i++){
-		Piece* old_piece = new->history->elements[i]->prevPiece;
+		Piece* old_piece = old->history->elements[i]->prevPiece;
 		new->history->elements[i]->prevPiece = new->all_pieces[old_piece->colur][old_piece->indexat];
 	}
 	//new->history
