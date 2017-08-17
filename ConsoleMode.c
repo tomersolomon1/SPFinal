@@ -8,9 +8,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "Parser.h"
 #include "DataDefinitions.h"
 #include "GameBoard.h"
+#include "MiniMax.h"
+#include "Files.h"
 
 char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default", "print_setting", "start", \
 		"move", "save", "undo", "reset", "quit" };
@@ -18,17 +21,13 @@ char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default"
 char *colors[] = {"black", "white"};
 char ABC[]     = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
 
-void set_game_mode(Gameboard *gameboard) {
-	destroy_board(gameboard);
-	printf("Exiting...\n");
-}
 
 void begin_game(Gameboard *gameboard) {
 	if (gameboard->game_mode == 1 && gameboard->user_color == 0) { /* performs a computer move only in mode 1, and if the user plays as black */
 		Gameboard *copy = copy_board(gameboard);
 		Move move = find_best_move(copy, gameboard->difficulty);
 		destroy_board(copy);
-		CHESS_BOARD_MESSAGE move_message = set_step(gameboard, move.srow, move.scol, move.drow, move.dcol);
+		set_step(gameboard, move.srow, move.scol, move.drow, move.dcol);
 	}
 	print_board(gameboard);
 	printf("%s player - enter your move:\n", colors[gameboard->user_color]);
@@ -65,7 +64,7 @@ void set_color(Gameboard *gameboard, Command *comm) {
 }
 
 void load_file(Gameboard **gameboard_p, Command *comm) {
-	FILE *input_file = fopen(comm->file_name, 'r');
+	FILE *input_file = fopen(comm->file_name, "r");
 	if (input_file == NULL) {
 		printf("File cannot be created or modified\n");
 	} else {
@@ -83,8 +82,8 @@ void resore_default_values(Gameboard *gameboard) {
 }
 
 /* return 0 if it's illegal move, 1 if the game is over, and 2 if the game is not over */
-int make_single_move(Gameboard *gameboard, int srow, int scol, int scol, int dcol) {
-	CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, scol, dcol);
+int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
+	CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, drow, dcol);
 	if (move_message != CHESS_BOARD_SUCCESS) {
 		if (move_message == CHESS_BOARD_INVALID_MOVE_NO_PIECE) {
 			printf("The specified position does not contain your piece\n");
@@ -136,7 +135,7 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 }
 
 void save_game(Gameboard *gameboard, Command *comm) {
-	FILE *output_file = fopen(comm->file_name, 'w');
+	FILE *output_file = fopen(comm->file_name, "w");
 	if (output_file == NULL) {
 		printf("File cannot be created or modified\n");
 	} else {
@@ -168,9 +167,9 @@ void undo_move(Gameboard *gameboard) {
 }
 
 void reset_game(Gameboard **gameboard) {
-	int old_game_mode = *gameboard->game_mode;
-	int old_user_color= *gameboard->user_color;
-	int old_difficulty = *gameboard->difficulty;
+	int old_game_mode = (*gameboard)->game_mode;
+	int old_user_color= (*gameboard)->user_color;
+	int old_difficulty = (*gameboard)->difficulty;
 	destroy_board(*gameboard);
 	*gameboard = create_board(old_game_mode, old_difficulty, old_user_color);
 }
@@ -196,8 +195,8 @@ int manage_console(Gameboard *gameboard) {
 		free(line);
 		if (comm->comm_e == Ivalid_command) {
 			printf("ERROR: invalid command\n"); /* should ask in the forum? */
-		} else if (comm->mode != GameMode){
-			if (comm->mode == Undo_Move) {
+		} else if (comm->mode != GameMode) { /* the command is not appropriate in this mode */
+			if (comm->comm_e == Undo_Move) {
 				printf("Undo command not avaialbe in 2 players mode\n"); /* "avaialbe" appears in the instructions PDF */
 			} else {
 				char *mode_s = (console_mode == SettingsMode) ? "Settings" : "Game";
@@ -206,9 +205,9 @@ int manage_console(Gameboard *gameboard) {
 
 		} else { /* appropriate command and enough args  */
 			if (!comm->need_arg && comm->extra_param) {
-				printf("ERROR: command '%s' shouldn't get any parameters", commands_s[comm]);
+				printf("ERROR: command '%s' shouldn't get any parameters", commands_s[comm->comm_e]);
 			} else if (comm->need_arg && comm->extra_param) {
-				printf("ERROR: command '%s' got too many parameters", commands_s[comm]);
+				printf("ERROR: command '%s' got too many parameters", commands_s[comm->comm_e]);
 			} else if(comm->need_arg && !comm->valid_arg) {
 				printf("ERROR: invalid parameter\n");
 			} else if (comm->comm_e == Start || comm->comm_e == Quit) {
@@ -253,6 +252,8 @@ int manage_console(Gameboard *gameboard) {
 					case Quit:
 						quit_game(gameboard);
 						return res;
+					case Ivalid_command: /* the compiler rises warning without this case */
+						break;
 				}
 			}
 		}

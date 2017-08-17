@@ -7,9 +7,7 @@
 
 #include <limits.h>
 #include "GameBoard.h"
-
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#include "MiniMax.h"
 
 int pieces_value[] = {1, 3, 3, 5, 9, 100 };
 
@@ -35,9 +33,9 @@ int eval(Gameboard *board, int eval_perspective) {
 
 void prune(int *alpha, int *beta, int step_value, int node_type) {
 	if (node_type == 0) { /* it's a min-node */
-		MIN(*beta, step_value);
+		*beta = (*beta < step_value) ? *beta : step_value;
 	} else { /* it's a max-node */
-		MAX(*beta, step_value);
+		*alpha = (*alpha > step_value) ? *alpha : step_value;
 	}
 }
 
