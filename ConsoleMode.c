@@ -19,6 +19,7 @@ char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default"
 		"move", "save", "undo", "reset", "quit" };
 
 char *colors[] = {"black", "white"};
+char *colors_upper[] = {"BLACK", "WHITE"};
 char ABC[]     = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
 
 
@@ -44,8 +45,8 @@ void set_game_mode(Gameboard *gameboard, Command *comm) {
 }
 
 void set_difficulty(Gameboard *gameboard, Command *comm) {
-	if (comm->arg1 == 5) {
-		printf("Expert level not supported, please choose a value between 1 to 4:\n");
+	if (comm->arg1 == 5) { /* we are not supporting expert level */
+		printf("Expert level not supported, please choose a value between 1 to 4:\n"); /* the ':' in the end of the string appears in the instructions PDF */
 	} else if (comm->arg1 > 5 || comm->arg1 < 1) {
 		printf("Wrong difficulty level. The value should be between 1 to 5\n");
 	} else { /* arg is in the right range */
@@ -57,7 +58,7 @@ void set_color(Gameboard *gameboard, Command *comm) {
 	if (gameboard->game_mode == 2) {
 		printf("ERROR: invalid command when GAME-MODE = 2\n");
 	} else if (comm->arg1 > 1 || comm->arg1 < 0) {
-		printf("ERROR: no such color. color values are either 1 or 0\n");
+		printf("ERROR: no such color. color values are either 1 or 0.\n");
 	} else {
 		gameboard->user_color = comm->arg1;
 	}
@@ -81,9 +82,23 @@ void resore_default_values(Gameboard *gameboard) {
 	gameboard->user_color = 1;
 }
 
+void print_settings(Gameboard *gameboard) {
+	printf("SETTINGS:\n");
+	if (gameboard->game_mode == 1) {
+		printf("GAME_MODE: 1\n");
+		printf("DIFFICULTY_LVL: %d\n", gameboard->difficulty);
+		printf("USER_CLR: %s\n", colors_upper[gameboard->user_color]);
+	} else { /* game_mode = 2 */
+		printf("GAME_MODE: 2\n");
+	}
+}
+
+
 /* return 0 if it's illegal move, 1 if the game is over, and 2 if the game is not over */
 int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
 	CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, drow, dcol);
+	printf("made a move, new board:\n");
+	print_board(gameboard); /* for debugging */
 	if (move_message != CHESS_BOARD_SUCCESS) {
 		if (move_message == CHESS_BOARD_INVALID_MOVE_NO_PIECE) {
 			printf("The specified position does not contain your piece\n");
@@ -111,7 +126,7 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 /* return true if the game is over, otherwise return false */
 bool make_move(Gameboard *gameboard, Command *comm) {
 	int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
-	if (move_consequences == 2) { /* the game is over */
+	if (move_consequences == 1) { /* the game is over */
 		return true;
 	} else { /* not over yet! */
 		if (gameboard->game_mode == 2) { /* there are two different players */
@@ -119,7 +134,11 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 			printf("%s player - enter your move:\n", colors[gameboard->turn]);
 			return false;
 		} else { /* it's now the computers turn */
+			printf("copying new board\n"); /* for debugging */
+			fflush(stdout); /* for debugging */
 			Gameboard *copy = copy_board(gameboard);
+			printf("done copying\n"); /* for debugging */
+			fflush(stdout); /* for debugging */
 			Move move = find_best_move(copy, gameboard->difficulty);
 			destroy_board(copy);
 			move_consequences = make_single_move(gameboard, move.srow, move.scol, move.drow, move.dcol);
@@ -174,28 +193,27 @@ void reset_game(Gameboard **gameboard) {
 	*gameboard = create_board(old_game_mode, old_difficulty, old_user_color);
 }
 
-void quit_game(Gameboard *gameboard) {
-	free(gameboard);
-	printf("Exiting...\n");
-}
-
 /* return 1 if we should enter game-mode, and 0 if should quit */
 int manage_console(Gameboard *gameboard) {
-	//bool keep_on = true;
+	bool keep_on = true;
 	char *line = NULL;
 	int res = 0;
 	Mode console_mode = SettingsMode;
 	printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
-
-	while (true) {
+	fflush(stdout);
+	int counter = 0; /* for debugging */
+	while (keep_on && counter < 1000) {
+		counter++; /* for debugging */
 		line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1)); /* tentative, until moav says what should we do */
 		assert(line != NULL);
-		scanf("SP_MAX_LINE_LENGTH%s", line); /* safe reading from line? asked in the forum */
+		//scanf("%" SP_MAX_LINE_LENGTH_STRING "[^\n]", line); /* safe reading from line? asked in the forum */
+		fgets(line, SP_MAX_LINE_LENGTH, stdin);
+		printf("line||%s\n", line);
 		Command *comm = parser(line);
 		free(line);
 		if (comm->comm_e == Ivalid_command) {
-			printf("ERROR: invalid command\n"); /* should ask in the forum? */
-		} else if (comm->mode != GameMode) { /* the command is not appropriate in this mode */
+			printf("ERROR: invalid command111\n"); /* should ask in the forum? */
+		} else if ((comm->mode != console_mode) && (comm->mode != Both)) { /* the command is not appropriate in the current mode */
 			if (comm->comm_e == Undo_Move) {
 				printf("Undo command not avaialbe in 2 players mode\n"); /* "avaialbe" appears in the instructions PDF */
 			} else {
@@ -210,8 +228,6 @@ int manage_console(Gameboard *gameboard) {
 				printf("ERROR: command '%s' got too many parameters", commands_s[comm->comm_e]);
 			} else if(comm->need_arg && !comm->valid_arg) {
 				printf("ERROR: invalid parameter\n");
-			} else if (comm->comm_e == Start || comm->comm_e == Quit) {
-				res = (comm->comm_e == Start) ? 1 : 0;
 			} else { /* the command is appropriate for the mode, and got enough parameters */
 				switch (comm->comm_e) {
 					case Start:
@@ -234,7 +250,7 @@ int manage_console(Gameboard *gameboard) {
 						resore_default_values(gameboard);
 						break;
 					case Print_Settings:
-						print_board(gameboard);
+						print_settings(gameboard);
 						break;
 					case Make_Move:
 						make_move(gameboard, comm);
@@ -250,13 +266,15 @@ int manage_console(Gameboard *gameboard) {
 						reset_game(&gameboard);
 						break;
 					case Quit:
-						quit_game(gameboard);
-						return res;
+						printf("Exiting...\n");
+						keep_on = false;
+						break;
 					case Ivalid_command: /* the compiler rises warning without this case */
 						break;
 				}
 			}
 		}
+		fflush(stdout);
 		free(comm);
 	}
 	return res;

@@ -9,6 +9,7 @@
 #define DATADEFINITIONS_H_
 
 #define SP_MAX_LINE_LENGTH 1024
+#define SP_MAX_LINE_LENGTH_STRING "1024"
 #define MAX_FILE_NAME 1024
 
 typedef enum {

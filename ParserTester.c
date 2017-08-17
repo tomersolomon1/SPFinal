@@ -8,6 +8,7 @@
 #include "Parser.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 char *commands_es[] = {"Set_GameMode", "Set_Difficulty", "Set_UserColor", "Load", "Restore_Default", "Print_Settings", "Start",\
 			"Make_Move", "Save", "Undo_Move", "Reset",\
@@ -19,18 +20,21 @@ char *commands_es[] = {"Set_GameMode", "Set_Difficulty", "Set_UserColor", "Load"
 void check_valid_tail(Command *comm) {
 	comm->comm_e = Restore_Default;
 	char line1[] = "aaa a";
-	char *valid_line = valid_tail(comm, line1, 3) ? "true" : "false";
+	valid_tail(comm, line1, 3);
+	char *valid_line = comm->extra_param ? "true" : "false";
 
 	printf("comm->comm_e = %s, valid_line = %s\n", commands_es[comm->comm_e], valid_line);
 
 	comm->comm_e = Restore_Default;
 	char line2[] = "a b";
-	valid_line = valid_tail(comm, line2, 1) ? "true" : "false";
+	valid_tail(comm, line2, 3);
+	valid_line = comm->extra_param ? "true" : "false";
 	printf("comm->comm_e = %s, valid_line = %s\n", commands_es[comm->comm_e], valid_line);
 
 	comm->comm_e = Restore_Default;
 	char line3[] = "a ";
-	valid_line = valid_tail(comm, line3, 1) ? "true" : "false";
+	valid_tail(comm, line3, 3);
+	valid_line = comm->extra_param ? "true" : "false";
 	printf("comm->comm_e = %s, valid_line = %s\n", commands_es[comm->comm_e], valid_line);
 }
 
@@ -445,6 +449,7 @@ void int_parameter_commands() {
 }
 
 void file_commands() {
+	printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	// exact parameters
 	char line1[] = "save f1.txt";
 	Command *comm = parser(line1);
@@ -481,7 +486,33 @@ void file_commands() {
 void check_parser_itself() {
 	//int_parameter_commands();
 	//no_parameter_commands();
-	file_commands();
+	//file_commands();
+}
+
+// void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s)
+void check_more_commands() {
+	char line[] = "print_setting";
+	Command *comm = parser(line);
+	printf("line 1:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	char line2[] = "quit";
+	int offset = get_non_whitespace_offset(line);
+	comm = (Command *) malloc(sizeof(Command));
+	comm->comm_e = Quit;
+	get_non_arg_command(comm, line2, offset, "quit");
+	printf("line 2:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line2, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
+
+	comm = parser(line2);
+	printf("line 3:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\n"
+			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
+			line2, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+	free_command(comm);
 }
 
 void check_parser() {
@@ -495,5 +526,6 @@ void check_parser() {
 	//check_get_int_arg(&comm);
 	//check_getXY(&comm);
 	//check_get_move(&comm);
-	check_parser_itself();
+	//check_parser_itself();
+	check_more_commands();
 }

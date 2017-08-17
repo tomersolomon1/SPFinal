@@ -9,5 +9,5 @@
 #define PARSERTESTER_H_
 
 void check_parser();
-
+void check_print_settings();
 #endif /* PARSERTESTER_H_ */
