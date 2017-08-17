@@ -33,4 +33,19 @@ void check_Files(){
 	fclose(fr);
 	print_details_game(game2);
 
+	printf("\n%d", Pawn);
+	fflush(stdout);
+	printf("\n%d", Knight);
+	fflush(stdout);
+	printf("\n%d", Bishop);
+	fflush(stdout);
+	printf("\n%d", Rock);
+	fflush(stdout);
+	printf("\n%d", Queen);
+	fflush(stdout);
+	printf("\n%d", King);
+	fflush(stdout);
+	printf("\n%d", Empty);
+	fflush(stdout);
+
 }

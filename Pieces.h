@@ -19,15 +19,20 @@
 #define white 1
 
 typedef enum {
-	Pawn, // Hayal
-	Knight, // Parash
-	Bishop, // Ratz
-	Rock, // Tzarih
-	Queen,
-	King,
-	Empty
+	Pawn, // = 0 (Hayal)
+	Knight, // = 1 (Parash)
+	Bishop, // = 2 (Ratz)
+	Rock, // = 3 (Tzarih)
+	Queen, // = 4
+	King, // = 5
+	Empty // = 6
 } Piece_type;
-//Piece* Empty_piece = create_piece(Empty, -1, -1, -1, -1, '');
+/* implementation in Piecec.c - how many vectors per type?
+ * types by the order in enum*/
+extern int type_amount_vectors[7];
+/* implementation in Piecec.c
+ * what is the max amount of steps per type?*/
+extern int type_max_amount_steps[7];
 
 typedef struct Vector_t{
 	int delta_row;
