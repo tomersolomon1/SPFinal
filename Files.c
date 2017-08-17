@@ -57,21 +57,21 @@ Gameboard *load_game(FILE* f){
 	int data_int;
 	int row_number;
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){
-		if(sscanf(line, "%*[ \t]<%20[^>]>%d", tag, &data_int) == 2){
+		if(sscanf(line, "%*[ \t]<%13[^>]>%d", tag, &data_int) == 2){
 			if(is_str1_begins_with_str2(tag, "current_turn")){
 				game->turn = data_int;
 			}
-			if(is_str1_begins_with_str2(tag, "game_mode")){
+			else if(is_str1_begins_with_str2(tag, "game_mode")){
 				game->game_mode = data_int;
 			}
-			if(is_str1_begins_with_str2(tag, "difficulty")){
+			else if(is_str1_begins_with_str2(tag, "difficulty")){
 				game->difficulty = data_int;
 			}
-			if(is_str1_begins_with_str2(tag, "user_color")){
+			else if(is_str1_begins_with_str2(tag, "user_color")){
 				game->user_color = data_int;
 			}
 		}
-		else if(sscanf(line, "%*[ \t]<%20[^_]_%d>%20[^<]", tag, &row_number, data) == 3){
+		else if(sscanf(line, "%*[ \t]<%13[^_]_%d>%8[^<]", tag, &row_number, data) == 3){
 			if(is_str1_begins_with_str2(tag, "row")){
 				set_row(game, row_number - 1, data);
 			}
