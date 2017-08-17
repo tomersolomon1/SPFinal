@@ -134,7 +134,7 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 			printf("%s player - enter your move:\n", colors[gameboard->turn]);
 			return false;
 		} else { /* it's now the computers turn */
-			printf("copying new board\n"); /* for debugging */
+			printf("copying new board\n"); /* for debugging  */
 			fflush(stdout); /* for debugging */
 			Gameboard *copy = copy_board(gameboard);
 			printf("done copying\n"); /* for debugging */
