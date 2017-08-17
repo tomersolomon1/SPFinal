@@ -40,7 +40,7 @@ bool is_str1_begins_with_str2(const char* str1, const char* str2){
 
 Gameboard *load_game(FILE* f){
 	Gameboard *game = create_board(0, 0, 0);
-	for(int i = 0; i < 2; i++){
+	for(int i = 0; i < 2; i++){ //"clean" game
 		for(int j = 0; j < 16; j++){
 			game->all_pieces[i][j]->alive = false;
 			game->all_pieces[i][j]->has_moved = true;
@@ -56,7 +56,7 @@ Gameboard *load_game(FILE* f){
 	char data[MAX_DATA_LENGTH];
 	int data_int;
 	int row_number;
-	while(fgets(line, MAX_LEN_ROW, f) != NULL){
+	while(fgets(line, MAX_LEN_ROW, f) != NULL){ //go over lines
 		if(sscanf(line, "%*[ \t]<%13[^>]>%d", tag, &data_int) == 2){
 			if(is_str1_begins_with_str2(tag, "current_turn")){
 				game->turn = data_int;
