@@ -27,12 +27,7 @@ typedef enum {
 	King, // = 5
 	Empty // = 6
 } Piece_type;
-/* implementation in Piecec.c - how many vectors per type?
- * types by the order in enum*/
-extern int type_amount_vectors[7];
-/* implementation in Piecec.c
- * what is the max amount of steps per type?*/
-extern int type_max_amount_steps[7];
+
 
 typedef struct Vector_t{
 	int delta_row;
