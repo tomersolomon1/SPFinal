@@ -107,7 +107,12 @@ Gameboard *copy_board(Gameboard* old) {
 	new->history = ArrayListCopy(old->history);
 	for(int i = 0; i < new->history->actualSize; i++){
 		Piece* old_piece = old->history->elements[i]->prevPiece;
-		new->history->elements[i]->prevPiece = new->all_pieces[old_piece->colur][old_piece->indexat];
+		if(old_piece->type == Empty){
+			new->history->elements[i]->prevPiece = new->empty;
+		}
+		else{
+			new->history->elements[i]->prevPiece = new->all_pieces[old_piece->colur][old_piece->indexat];
+		}
 	}
 	//new->history
 	new->user_color = old->user_color;
