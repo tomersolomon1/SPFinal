@@ -13,6 +13,7 @@ void save_xml(FILE *f, Gameboard* game){
 	fprintf(f, "<game>\n");
 	fprintf(f, "\t<current_turn>%d</current_turn>\n", game->turn);
 	fprintf(f, "\t<game_mode>%d</game_mode>\n", game->game_mode);
+	fprintf(f, "\t<difficulty>%d</difficulty>\n", game->difficulty);
 	fprintf(f, "\t<user_color>%d</user_color>\n", game->user_color);
 	fprintf(f, "\t<board>\n");
 	for(int i = 7; i >= 0; i--){
