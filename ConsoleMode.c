@@ -15,6 +15,10 @@
 #include "MiniMax.h"
 #include "Files.h"
 
+# define DEBUGGING_STATE 1 /* for debugging purposes */
+
+#define in_range(x) (((x) > 0) && ((x) < (8)))
+
 char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default", "print_setting", "start", \
 		"move", "save", "undo", "reset", "quit" };
 
@@ -22,6 +26,7 @@ char *colors[] = {"black", "white"};
 char *colors_upper[] = {"BLACK", "WHITE"};
 char ABC[]     = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
 
+char *debug_comm[] = {"load s1.txt\n", "move <2,E> to <4,E>\n" };
 
 void begin_game(Gameboard *gameboard) {
 	if (gameboard->game_mode == 1 && gameboard->user_color == 0) { /* performs a computer move only in mode 1, and if the user plays as black */
@@ -64,16 +69,19 @@ void set_color(Gameboard *gameboard, Command *comm) {
 	}
 }
 
-void load_file(Gameboard **gameboard_p, Command *comm) {
+/* return true if succeeded in loading the file, otherwise return false */
+bool load_file(Gameboard **gameboard_p, Command *comm) {
 	FILE *input_file = fopen(comm->file_name, "r");
 	if (input_file == NULL) {
 		printf("File cannot be created or modified\n");
+		return false;
 	} else {
 		destroy_board(*gameboard_p);
 		*gameboard_p = load_game(input_file);
 	}
 	fclose(input_file);
 	free(comm->file_name);
+	return true;
 }
 
 void resore_default_values(Gameboard *gameboard) {
@@ -97,8 +105,6 @@ void print_settings(Gameboard *gameboard) {
 /* return 0 if it's illegal move, 1 if the game is over, and 2 if the game is not over */
 int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
 	CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, drow, dcol);
-	printf("made a move, new board:\n");
-	print_board(gameboard); /* for debugging */
 	if (move_message != CHESS_BOARD_SUCCESS) {
 		if (move_message == CHESS_BOARD_INVALID_MOVE_NO_PIECE) {
 			printf("The specified position does not contain your piece\n");
@@ -125,31 +131,35 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 
 /* return true if the game is over, otherwise return false */
 bool make_move(Gameboard *gameboard, Command *comm) {
-	int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
-	if (move_consequences == 1) { /* the game is over */
-		return true;
-	} else { /* not over yet! */
-		if (gameboard->game_mode == 2) { /* there are two different players */
-			print_board(gameboard);
-			printf("%s player - enter your move:\n", colors[gameboard->turn]);
-			return false;
-		} else { /* it's now the computers turn */
-			printf("copying new board\n"); /* for debugging  */
-			fflush(stdout); /* for debugging */
-			Gameboard *copy = copy_board(gameboard);
-			printf("done copying\n"); /* for debugging */
-			fflush(stdout); /* for debugging */
-			Move move = find_best_move(copy, gameboard->difficulty);
-			destroy_board(copy);
-			move_consequences = make_single_move(gameboard, move.srow, move.scol, move.drow, move.dcol);
-			if (move_consequences == 2) { /* the game is over */
-				return true;
-			} else { /* the game is still on */
+	//printf("make_move - move: <%d, %d> to <%d, %d>\n", comm->arg1, comm->arg2, comm->arg3, comm->arg4); /* for debugging */
+	if (in_range(comm->arg1) && in_range(comm->arg2) && in_range(comm->arg3) && in_range(comm->arg4)) { /* the move coordinates represent a valid squares */
+		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+		if (move_consequences == 1) { /* the game is over */
+			return true;
+		} else if (move_consequences == 2) { /* legal move, and the game is still on */
+			if (gameboard->game_mode == 2) { /* there are two different players */
 				print_board(gameboard);
 				printf("%s player - enter your move:\n", colors[gameboard->turn]);
 				return false;
+			} else { /* it's now the computers turn */
+				Gameboard *copy = copy_board(gameboard);
+				Move move = find_best_move(copy, gameboard->difficulty);
+				destroy_board(copy);
+				move_consequences = make_single_move(gameboard, move.srow, move.scol, move.drow, move.dcol);
+				if (move_consequences == 1) { /* the game is over */
+					return true;
+				} else { /* the game is still on */
+					print_board(gameboard);
+					printf("%s player - enter your move:\n", colors[gameboard->turn]);
+					return false;
+				}
 			}
+		} else { /* illegal move */
+			return false; /* the game is still on */
 		}
+	} else { /* invalid position on the board */
+		printf("Invalid position on the board\n");
+		return false; /* the game is still on */
 	}
 }
 
@@ -166,22 +176,20 @@ void save_game(Gameboard *gameboard, Command *comm) {
 
 void undo_move(Gameboard *gameboard) {
 	if (gameboard->game_mode == 2) {
-		printf("Undo command not avaialbe in 2 players mode\n");
+		printf("Undo command not avaialbe in 2 players mode\n"); /* "avaialbe" appears in the Instructions PDF */
+	} else if (ArrayListSize(gameboard->history) < 2) { /* no history */
+		printf("Empty history, move cannot be undone\n");
 	} else {
 		Step *step = ArrayListGetFirst(gameboard->history);
-		if (step == NULL) {
-			printf("Empty history, move cannot be undone\n");
-		} else { /* there is history */
-			printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n",
-					colors[1-gameboard->turn], step->srow, ABC[step->scol], step->drow, ABC[step->dcol]);
-			undo_step(gameboard);
-			step = ArrayListGetFirst(gameboard->history);
-			printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n",
-					colors[gameboard->turn], step->srow, ABC[step->scol], step->drow, ABC[step->dcol]);
-			undo_step(gameboard);
-			print_board(gameboard);
-			printf("%s player - enter your move:\n", colors[gameboard->turn]);
-		}
+		printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n",
+				colors[1-gameboard->turn], step->drow+1, ABC[step->scol], step->srow+1, ABC[step->dcol]);
+		undo_step(gameboard);
+		step = ArrayListGetFirst(gameboard->history);
+		printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n",
+				colors[1-gameboard->turn], step->drow+1, ABC[step->scol], step->srow+1, ABC[step->dcol]);
+		undo_step(gameboard);
+		print_board(gameboard);
+		printf("%s player - enter your move:\n", colors[gameboard->turn]);
 	}
 }
 
@@ -201,16 +209,20 @@ int manage_console(Gameboard *gameboard) {
 	Mode console_mode = SettingsMode;
 	printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 	fflush(stdout);
-	int counter = 0; /* for debugging */
-	while (keep_on && counter < 1000) {
-		counter++; /* for debugging */
+	int counter = 0; /* for debugging!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+	while (keep_on && counter < 2) {
+		Command *comm;
 		line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1)); /* tentative, until moav says what should we do */
 		assert(line != NULL);
-		//scanf("%" SP_MAX_LINE_LENGTH_STRING "[^\n]", line); /* safe reading from line? asked in the forum */
-		fgets(line, SP_MAX_LINE_LENGTH, stdin);
-		printf("line||%s\n", line);
-		Command *comm = parser(line);
-		free(line);
+		if(DEBUGGING_STATE) {
+			strcpy(line, debug_comm[counter]);
+			comm = parser(line);
+		} else {
+			fgets(line, SP_MAX_LINE_LENGTH, stdin);
+			printf("line||%s\n", line);
+			comm = parser(line);
+			free(line);
+		}
 		if (comm->comm_e == Ivalid_command) {
 			printf("ERROR: invalid command111\n"); /* should ask in the forum? */
 		} else if ((comm->mode != console_mode) && (comm->mode != Both)) { /* the command is not appropriate in the current mode */
@@ -244,7 +256,9 @@ int manage_console(Gameboard *gameboard) {
 						set_color(gameboard, comm);
 						break;
 					case Load:
-						load_file(&gameboard, comm);
+						if(load_file(&gameboard, comm)) { /* changes game-mode if loading succeeded */
+							console_mode = GameMode;
+						}
 						break;
 					case Restore_Default:
 						resore_default_values(gameboard);
@@ -274,6 +288,7 @@ int manage_console(Gameboard *gameboard) {
 				}
 			}
 		}
+		counter++; /* for debugging */
 		fflush(stdout);
 		free(comm);
 	}

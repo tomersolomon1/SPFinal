@@ -49,13 +49,11 @@ Move find_best_move(Gameboard *board, int search_depth) {
 	int eval_perspective = board->turn;
 	while ((alpha < beta) && (piece_index < 16)) { /* each player has 16 pieces */
 		Piece *current_piece = board->all_pieces[board->turn][piece_index];
-		printf("piece_index: %d\n", piece_index); /* for debugging */
-		fflush(stdout); /* for debugging */
+		// printf("piece_index: %d\n", piece_index); /* for debugging */
+		// fflush(stdout); /* for debugging */
 		if (current_piece->alive) {
 			for (int step_index = 0; (step_index < current_piece->amount_steps) && (alpha < beta); step_index++){
 				Step *step = current_piece->steps[step_index];
-				printf("step: <%d, %d> to <%d, %d>\n", step->srow, step->scol, step->drow, step->dcol); /* for debugging */
-				fflush(stdout); /* for debugging */
 				set_step(board, step->srow, step->scol, step->drow, step->dcol);
 				int step_value = MiniMaxAlgo(board, alpha, beta, search_depth-1, 0, eval_perspective);
 				if ((step_value > alpha) || first_option) { /* we have found a better move or it's the first move to be considered */
@@ -84,9 +82,6 @@ int MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, int nod
 		int result = node_type ? INT_MIN : INT_MAX;
 		return result;
 	} else if (game_over == 2 || search_depth == 0) { /* it's a tie or a leaf in the mini-max tree */
-		printf("board to eval:\n"); /* for debugging */
-		fflush(stdout); /* for debugging */
-		print_board(board);
 		return eval(board, eval_perspective);
 	} else { /* the game is still on */
 		int piece_index = 0;
