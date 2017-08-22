@@ -32,4 +32,5 @@ void console_tester() {
 void emulate_problem() {
 	Gameboard *gameboard = create_board(1, 2, 1);
 	Gameboard *copy = copy_board(gameboard);
+	destroy_board(copy);
 }

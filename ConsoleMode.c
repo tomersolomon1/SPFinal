@@ -15,9 +15,10 @@
 #include "MiniMax.h"
 #include "Files.h"
 
-# define DEBUGGING_STATE 1 /* for debugging purposes */
+# define DEBUGGING_STATE 0 /* for debugging purposes */
+# define ROUNDS			 100 /* for debugging purposes */
 
-#define in_range(x) (((x) > 0) && ((x) < (8)))
+#define in_range(x) (((x) > -1) && ((x) < (8)))
 
 char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default", "print_setting", "start", \
 		"move", "save", "undo", "reset", "quit" };
@@ -26,7 +27,8 @@ char *colors[] = {"black", "white"};
 char *colors_upper[] = {"BLACK", "WHITE"};
 char ABC[]     = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
 
-char *debug_comm[] = {"load s1.txt\n", "move <2,E> to <4,E>\n", "move <2,C> to <4,C>\n", "move <2,F> to <4,F>\n"};
+// "load s1.txt\n"
+char *debug_comm[] = {"start", "move <1,B> to <3,C>\n", "move <2,C> to <4,C>\n", "move <2,F> to <4,F>\n"};
 
 void begin_game(Gameboard *gameboard) {
 	if (gameboard->game_mode == 1 && gameboard->user_color == 0) { /* performs a computer move only in mode 1, and if the user plays as black */
@@ -129,37 +131,37 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 	return 2; /* the game is still on */
 }
 
-/* return true if the game is over, otherwise return false */
+/* return false if the game is over, otherwise return true */
 bool make_move(Gameboard *gameboard, Command *comm) {
 	//printf("make_move - move: <%d, %d> to <%d, %d>\n", comm->arg1, comm->arg2, comm->arg3, comm->arg4); /* for debugging */
 	if (in_range(comm->arg1) && in_range(comm->arg2) && in_range(comm->arg3) && in_range(comm->arg4)) { /* the move coordinates represent a valid squares */
 		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
 		if (move_consequences == 1) { /* the game is over */
-			return true;
+			return false;
 		} else if (move_consequences == 2) { /* legal move, and the game is still on */
 			if (gameboard->game_mode == 2) { /* there are two different players */
 				print_board(gameboard);
 				printf("%s player - enter your move:\n", colors[gameboard->turn]);
-				return false;
-			} else { /* it's now the computers turn */
+				return true;
+			} else { /* it's now the computer turn */
 				Gameboard *copy = copy_board(gameboard);
 				Move move = find_best_move(copy, gameboard->difficulty);
 				destroy_board(copy);
 				move_consequences = make_single_move(gameboard, move.srow, move.scol, move.drow, move.dcol);
 				if (move_consequences == 1) { /* the game is over */
-					return true;
+					return false;
 				} else { /* the game is still on */
 					print_board(gameboard);
 					printf("%s player - enter your move:\n", colors[gameboard->turn]);
-					return false;
+					return true;
 				}
 			}
-		} else { /* illegal move */
-			return false; /* the game is still on */
+		} else { /* illegal move, the user should try again */
+			return true; /* the game is still on */
 		}
 	} else { /* invalid position on the board */
 		printf("Invalid position on the board\n");
-		return false; /* the game is still on */
+		return true; /* the game is still on */
 	}
 }
 
@@ -210,7 +212,7 @@ int manage_console(Gameboard *gameboard) {
 	printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 	fflush(stdout);
 	int counter = 0; /* for debugging!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-	while (keep_on && counter < 3) {
+	while (keep_on && counter < ROUNDS) {
 		Command *comm;
 		line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1)); /* tentative, until moav says what should we do */
 		assert(line != NULL);
@@ -267,7 +269,7 @@ int manage_console(Gameboard *gameboard) {
 						print_settings(gameboard);
 						break;
 					case Make_Move:
-						make_move(gameboard, comm);
+						keep_on = make_move(gameboard, comm);
 						break;
 					case Save:
 						save_game(gameboard, comm);
@@ -288,7 +290,7 @@ int manage_console(Gameboard *gameboard) {
 				}
 			}
 		}
-		counter++; /* for debugging */
+		counter += 1; /* for debugging */
 		fflush(stdout);
 		free(comm);
 	}
