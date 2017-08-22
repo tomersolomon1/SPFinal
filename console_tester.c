@@ -28,3 +28,8 @@ void console_tester() {
 	manage_console(gameboard);
 	destroy_board(gameboard);
 }
+
+void emulate_problem() {
+	Gameboard *gameboard = create_board(1, 2, 1);
+	Gameboard *copy = copy_board(gameboard);
+}

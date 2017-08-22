@@ -26,7 +26,7 @@ char *colors[] = {"black", "white"};
 char *colors_upper[] = {"BLACK", "WHITE"};
 char ABC[]     = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
 
-char *debug_comm[] = {"load s1.txt\n", "move <2,E> to <4,E>\n" };
+char *debug_comm[] = {"load s1.txt\n", "move <2,E> to <4,E>\n", "move <2,C> to <4,C>\n", "move <2,F> to <4,F>\n"};
 
 void begin_game(Gameboard *gameboard) {
 	if (gameboard->game_mode == 1 && gameboard->user_color == 0) { /* performs a computer move only in mode 1, and if the user plays as black */
@@ -210,7 +210,7 @@ int manage_console(Gameboard *gameboard) {
 	printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 	fflush(stdout);
 	int counter = 0; /* for debugging!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-	while (keep_on && counter < 2) {
+	while (keep_on && counter < 3) {
 		Command *comm;
 		line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1)); /* tentative, until moav says what should we do */
 		assert(line != NULL);
