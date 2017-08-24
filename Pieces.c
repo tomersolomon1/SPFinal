@@ -5,8 +5,8 @@
  *      Author: sapir
  */
 #include "Pieces.h"
-int type_amount_vectors[7] = {3,8,4,4,8,8,0};
-int type_max_amount_steps[7] = {3,8,14,14,27,8,0};
+int type_amount_vectors[7] = {3,8,4,4,8,2,0};
+int type_max_amount_steps[7] = {3,8,14,14,27,10,0};
 //Vector:
 
 Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot){

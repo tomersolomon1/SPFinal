@@ -7,6 +7,8 @@
 
 //set step, undo step
 #include "GameBoard.h"
+#define MIN(A,B) (((A) < (B)) ? (A) : (B))
+#define MAX(A,B) (((A) > (B)) ? (A) : (B))
 
 Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
@@ -230,6 +232,7 @@ void set_all_valid_steps(Gameboard *gameboard){
 			set_all_valid_steps_per_piece(gameboard, piece);
 		}
 	}
+	//set_hazraha_steps(gameboard);
 }
 
 void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece) {
@@ -282,7 +285,7 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 
 }
 
-bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step *step){
+bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step* step){
 	bool answer = false;
 	gameboard->board[step->drow][step->dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
@@ -297,6 +300,55 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step *step){
 	gameboard->board[piece->row][piece->col] = piece;
 	return answer;
 }
+
+void set_hazraha_steps(Gameboard * gameboard){
+	int turn = gameboard->turn;
+	Piece * king = gameboard->all_pieces[turn][15];
+	if(king->has_moved) return;
+	if(is_under_check(gameboard)) return;
+	if(!king->alive) return;
+	Piece * rock;
+	int delta_col;
+	for(int i = 0; i <= 1; i++){ //go over the two rocks
+		rock = gameboard->all_pieces[turn][12+i];
+		if(is_hazraha_valid_with_rock_curr_player(gameboard, king, rock)){
+			delta_col = (king->col < rock->col) ? 2 : -2;
+			Step * new_step = create_step(king->row, king->col, king->row, delta_col, gameboard->empty, false);
+			king->steps[king->amount_steps] = new_step;
+			king->amount_steps++;
+		}
+	}
+
+}
+
+bool is_hazraha_valid_with_rock_curr_player(Gameboard * gameboard, Piece* king, Piece* rock){
+	if(rock->has_moved) return false;
+	if(!rock->alive) return false;
+	int row = king->row;
+	int left_col = MIN(king->col, rock->col);
+	int right_col = MAX(king->col, rock->col);
+	for(int i = left_col + 1; i < right_col; i++){//there's no tool between rock and king
+		if(gameboard->board[row][i] != gameboard->empty){
+			return false;
+		}
+	}
+	int delta_col = (king->col < rock->col) ? 1 : -1;
+	int col = king->col;
+	int new_col;
+	bool result = true;
+	for(int i = 1; i <=2 ; i++){ //there's no check in king's path
+		new_col = king->col + i * delta_col;
+		gameboard->board[row][col] = gameboard->empty;
+		gameboard->board[row][new_col] = king;
+		king->col = new_col;
+		if(is_under_check) result = false;
+		king->col = col;
+		gameboard->board[row][new_col] = gameboard->empty;
+		gameboard->board[row][col] = king;
+	}
+	return result;
+}
+
 //---
 
 Piece *get_piece_in_place(Gameboard *gameboard, int row, int col) {
