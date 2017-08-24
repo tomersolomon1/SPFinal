@@ -328,7 +328,7 @@ bool is_hazraha_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock){
 	int left_col = MIN(king->col, rock->col);
 	int right_col = MAX(king->col, rock->col);
 	for(int i = left_col + 1; i < right_col; i++){//there's no tool between rock and king
-		if(gameboard->board[row][i] != gameboard->empty){
+		if(gameboard->board[row][i]->type != Empty){
 			return false;
 		}
 	}
