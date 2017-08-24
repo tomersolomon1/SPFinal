@@ -311,7 +311,7 @@ void set_hazraha_steps(Gameboard * gameboard){
 	int delta_col;
 	for(int i = 0; i <= 1; i++){ //go over the two rocks
 		rock = gameboard->all_pieces[turn][12+i];
-		if(is_hazraha_valid_with_rock_curr_player(gameboard, king, rock)){
+		if(is_hazraha_valid_per_rock(gameboard, king, rock)){
 			delta_col = (king->col < rock->col) ? 2 : -2;
 			Step * new_step = create_step(king->row, king->col, king->row, delta_col, gameboard->empty, false);
 			king->steps[king->amount_steps] = new_step;
@@ -321,7 +321,7 @@ void set_hazraha_steps(Gameboard * gameboard){
 
 }
 
-bool is_hazraha_valid_with_rock_curr_player(Gameboard * gameboard, Piece* king, Piece* rock){
+bool is_hazraha_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock){
 	if(rock->has_moved) return false;
 	if(!rock->alive) return false;
 	int row = king->row;
@@ -341,7 +341,7 @@ bool is_hazraha_valid_with_rock_curr_player(Gameboard * gameboard, Piece* king, 
 		gameboard->board[row][col] = gameboard->empty;
 		gameboard->board[row][new_col] = king;
 		king->col = new_col;
-		if(is_under_check) result = false;
+		if(is_under_check(gameboard)) result = false;
 		king->col = col;
 		gameboard->board[row][new_col] = gameboard->empty;
 		gameboard->board[row][col] = king;
