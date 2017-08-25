@@ -58,6 +58,10 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
  * returns CHESS_BOARD_INVALID_MOVE_<error-type> if move is NOT legal
  * gets source and destination coordinates as 0-7 numbers
  * */
+
+//helping function for set_step: setting step when hazraha
+void set_hazraha_move(Gameboard *gameboard, int row, int scol, int dcol);
+
 CHESS_BOARD_MESSAGE is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
 
 /* is current player threatening the opponent's king?*/
@@ -93,6 +97,8 @@ Piece *get_piece_in_place(Gameboard *gameboard, int row, int col);
  * returns CHESS_BOARD_SUCCESS if succeed*/
 CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard);
 
+//helping function for undo_step, doing undo to hazraha step
+void undo_step_hazraha(Gameboard *gameboard, Step* step);
 /* return the winner's color
  * if tie return 2
  * if not game over return -1*/

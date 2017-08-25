@@ -131,22 +131,41 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 	}
 	Piece *source_p = gameboard->board[srow][scol];
 	Piece *dest_p = gameboard->board[drow][dcol];
-
 	Step *step = create_step(srow, scol, drow, dcol, dest_p, source_p->has_moved);
 	ArrayListPushFirst(gameboard->history, step);
 
-	gameboard->board[drow][dcol] = source_p;
-	gameboard->board[srow][scol] = gameboard->empty;
-	dest_p->alive = false;
-	source_p->has_moved = true;
-	source_p->row = drow;
-	source_p->col = dcol;
-	gameboard->turn = abs(1 - gameboard->turn);
-	if(source_p->type == Pawn){
-		source_p->vectors[0]->vector_size = 1;
+	if(source_p->type == King && abs(dcol - scol) > 1 && srow == drow){ // hazraha
+		set_hazraha_move(gameboard, srow, scol, dcol);
 	}
+	else{
+		gameboard->board[drow][dcol] = source_p;
+		gameboard->board[srow][scol] = gameboard->empty;
+		dest_p->alive = false;
+		source_p->has_moved = true;
+		source_p->row = drow;
+		source_p->col = dcol;
+		if(source_p->type == Pawn){
+			source_p->vectors[0]->vector_size = 1;
+		}
+	}
+	gameboard->turn = abs(1 - gameboard->turn);
 	set_all_valid_steps(gameboard);
 	return CHESS_BOARD_SUCCESS;
+}
+
+void set_hazraha_move(Gameboard *gameboard, int row, int scol, int dcol){
+	int side_rock = ((scol < dcol) ? 1 : -1); // -1 = left to king, 1 = right to king,
+	int scol_rock = ((scol < dcol) ? 7 : 0);
+	Piece *rock = gameboard->board[row][scol_rock];
+	Piece *king = gameboard->board[row][scol];
+	gameboard->board[row][scol] = gameboard->empty;
+	gameboard->board[row][dcol] = king;
+	king->col = dcol;
+	gameboard->board[row][scol_rock] = gameboard->empty;
+	gameboard->board[row][dcol - side_rock] = rock;
+	rock->col = dcol - side_rock;
+	rock->has_moved = true;
+	king->has_moved = true;
 }
 
 CHESS_BOARD_MESSAGE is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol){
@@ -232,7 +251,7 @@ void set_all_valid_steps(Gameboard *gameboard){
 			set_all_valid_steps_per_piece(gameboard, piece);
 		}
 	}
-	//set_hazraha_steps(gameboard);
+	set_hazraha_steps(gameboard);
 }
 
 void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece) {
@@ -313,7 +332,7 @@ void set_hazraha_steps(Gameboard * gameboard){
 		rock = gameboard->all_pieces[turn][12+i];
 		if(is_hazraha_valid_per_rock(gameboard, king, rock)){
 			delta_col = (king->col < rock->col) ? 2 : -2;
-			Step * new_step = create_step(king->row, king->col, king->row, delta_col, gameboard->empty, false);
+			Step * new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, false);
 			king->steps[king->amount_steps] = new_step;
 			king->amount_steps++;
 		}
@@ -366,27 +385,50 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard) {
 		return CHESS_BOARD_NO_HISTORY;
 	}
 	Step *step = ArrayListGetFirst(gameboard->history);
-	ArrayListRemoveFirst(gameboard->history);
-
 	Piece *source_p = gameboard->board[step->drow][step->dcol];
-	Piece *dest_p = step->prevPiece;
 
-	gameboard->board[step->drow][step->dcol] = dest_p;
-	gameboard->board[step->srow][step->scol] = source_p;
-	dest_p->alive = true;
-	if(!step->is_srcPiece_was_moved){
-		source_p->has_moved = false;
+	if(source_p->type == King && abs(step->dcol - step->scol) > 1){ //hazraha
+		undo_step_hazraha(gameboard, step);
 	}
-	source_p->row = step->srow;
-	source_p->col = step->scol;
-	dest_p->row = step->drow;
-	dest_p->col = step->dcol;
+	else{ //not hazraha
+		Piece *dest_p = step->prevPiece;
+		gameboard->board[step->drow][step->dcol] = dest_p;
+		gameboard->board[step->srow][step->scol] = source_p;
+		dest_p->alive = true;
+		if(!step->is_srcPiece_was_moved){
+			source_p->has_moved = false;
+		}
+		source_p->row = step->srow;
+		source_p->col = step->scol;
+		dest_p->row = step->drow;
+		dest_p->col = step->dcol;
+
+		if(source_p->type == Pawn && !source_p->has_moved){
+			source_p->vectors[0]->vector_size = 2;
+		}
+	}
 	gameboard->turn = abs(1 - gameboard->turn);
-	if(source_p->type == Pawn && !source_p->has_moved){
-		source_p->vectors[0]->vector_size = 2;
-	}
+	ArrayListRemoveFirst(gameboard->history);
 	set_all_valid_steps(gameboard);
 	return CHESS_BOARD_SUCCESS;
+}
+
+void undo_step_hazraha(Gameboard *gameboard, Step* step){
+	int row = step->drow;
+	int king_dcol = step->dcol;
+	int rock_dcol = (king_dcol = 2 ? 3 : 5);
+	int rock_scol = (king_dcol = 2 ? 0 : 7);
+	Piece *king = gameboard->board[row][king_dcol];
+	Piece *rock = gameboard->board[row][rock_dcol];
+	gameboard->board[row][king_dcol] = gameboard->empty;
+	gameboard->board[row][rock_dcol] = gameboard->empty;
+
+	gameboard->board[row][step->scol] = king;
+	king->col = step->scol;
+	gameboard->board[row][rock_scol] = rock;
+	rock->col = rock_scol;
+	rock->has_moved = false;
+	king->has_moved = false;
 }
 
 // return the winner's color
