@@ -8,11 +8,14 @@
 #include "GameBoard.h"
 #include "Files.h"
 
+
+
 void check_GameBoard() {
 	Gameboard * game = create_board(1, -1, black);
-
+	//hazraha:
 	set_step(game, 1,1,2,1);
 	set_step(game, 7,1,5,0);
+
 
 	set_step(game, 0,2,2,0);
 	set_step(game, 5,0,7,1);

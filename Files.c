@@ -24,7 +24,15 @@ void save_xml(FILE *f, Gameboard* game){
 		fprintf(f, "</row_%d>\n", i + 1);
 	}
 	fprintf(f, "\t</board>\n");
-	fprintf(f, "</game>");
+	fprintf(f, "</game>\n");
+	fprintf(f,"<general>\n");
+	fprintf(f, "\t<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 15, game->all_pieces[white][15]->has_moved, white, 15);
+	fprintf(f, "\t<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 12, game->all_pieces[white][12]->has_moved, white, 12);
+	fprintf(f, "\t<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 13, game->all_pieces[white][13]->has_moved, white, 13);
+	fprintf(f, "\t<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 15, game->all_pieces[black][15]->has_moved, black, 15);
+	fprintf(f, "\t<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 12, game->all_pieces[black][12]->has_moved, black, 12);
+	fprintf(f, "\t<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 13, game->all_pieces[black][13]->has_moved, black, 13);
+	fprintf(f, "</general>");
 }
 
 
@@ -57,6 +65,8 @@ Gameboard *load_game(FILE* f){
 	char data[MAX_DATA_LENGTH];
 	int data_int;
 	int row_number;
+	int piece_number;
+	int piece_color;
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){ //go over lines
 		if(sscanf(line, "%*[ \t]<%13[^>]>%d", tag, &data_int) == 2){
 			if(is_str1_begins_with_str2(tag, "current_turn")){
@@ -76,6 +86,9 @@ Gameboard *load_game(FILE* f){
 			if(is_str1_begins_with_str2(tag, "row")){
 				set_row(game, row_number - 1, data);
 			}
+		}
+		else if(sscanf(line,"%*[ \t]<piece_%d_%d_moved>%d", &piece_color, &piece_number, &data_int) == 3){
+			game->all_pieces[piece_color][piece_number]->has_moved = data_int;
 		}
 	}
 	set_all_valid_steps(game);

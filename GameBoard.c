@@ -413,11 +413,11 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard) {
 	return CHESS_BOARD_SUCCESS;
 }
 
-void undo_step_hazraha(Gameboard *gameboard, Step* step){
+void undo_step_hazraha(Gameboard *gameboard, Step *step){
 	int row = step->drow;
 	int king_dcol = step->dcol;
-	int rock_dcol = (king_dcol = 2 ? 3 : 5);
-	int rock_scol = (king_dcol = 2 ? 0 : 7);
+	int rock_dcol = (king_dcol == 2 ? 3 : 5);
+	int rock_scol = (king_dcol == 2 ? 0 : 7);
 	Piece *king = gameboard->board[row][king_dcol];
 	Piece *rock = gameboard->board[row][rock_dcol];
 	gameboard->board[row][king_dcol] = gameboard->empty;
