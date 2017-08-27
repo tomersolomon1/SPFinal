@@ -8,7 +8,7 @@
 #ifndef GRAPHICS_BUTTON_H_
 #define GRAPHICS_BUTTON_H_
 
-#include "Widget.h" // A button is a widget also
+#include <stdbool.h>
 
 typedef enum {
 	/* general button */
@@ -49,6 +49,7 @@ typedef struct button_t {
 	SDL_Renderer* windowRenderer;
 	SDL_Rect* location;
 	ButtonType type;
+	bool active;
 } Button;
 
 ButtonType which_button_clicked(SDL_Event* event, Button *buttons, int buttons_number);
@@ -60,7 +61,7 @@ Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 // this function is in charge of destroying all the data Associated with a button
 void destroyButton(Button*);
 
-void drawButton(Widget* src);
+void drawButton(Button*);
 
 
 #endif /* GRAPHICS_BUTTON_H_ */

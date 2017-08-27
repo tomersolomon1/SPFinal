@@ -58,8 +58,14 @@ void drawButton(Button button) {
 			button->location);
 }
 
-ButtonType which_button_clicked(Button *buttons, int buttons_number) {
-	for (intv i = 0; i < buttons_number; i++) {
-		point
+ButtonType which_button_clicked(SDL_Event* event, Button *buttons, int buttons_number) {
+	for (int i = 0; i < buttons_number; i++) {
+		SDL_Point point;
+		point.x = event->button.x;
+		point.y = event->button.y;
+		if (SDL_PointInRect(&point, buttons[i]->location)) {
+			return buttons[i]->type;
+		}
 	}
+	return NoButton;
 }
