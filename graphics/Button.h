@@ -54,13 +54,11 @@ typedef struct button_t {
 ButtonType which_button_clicked(Button *buttons, int buttons_number);
 
 //You need a create function:
-Widget* createButton(SDL_Renderer* windowRender, SDL_Rect* location,
+Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 		const char* image);
 
-// this function in order to destroy all data Associate with a button:
+// this function is in charge of destroying all the data Associated with a button
 void destroyButton(Widget*);
-
-void handleButtonEvenet(Widget* src, SDL_Event* event);
 
 void drawButton(Widget* src);
 
