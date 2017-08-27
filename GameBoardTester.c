@@ -21,18 +21,16 @@ void check_GameBoard() {
 	set_step(game, 5,0,7,1);
 
 	set_step(game, 0,1,2,2);
-	set_step(game, 7,1,5,0);
+	set_step(game, 7,1,5,2);
 
 	set_step(game, 1,4,3,4);
-	set_step(game, 5,0,7,1);
+	set_step(game, 5,2,3,3);
 
 	set_step(game, 0,3,3,6);
-	set_step(game, 7,1,5,0);
+	set_step(game, 3,3,1,4);
 
-	set_step(game, 0,4,0,2);
-	print_details_game(game);
 
-	undo_step(game);
+
 
 
 
