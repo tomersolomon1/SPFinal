@@ -12,6 +12,11 @@
 #define WIDGET_H_
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
+typedef enum window_type_t{
+	Menu,
+	Load,
+	Game
+} WindowType;
 
 struct widget_t {
 	void (*drawWidget)(Widget*);
@@ -19,6 +24,14 @@ struct widget_t {
 	void (*destroyWidget)(Widget*);
 	void* data;
 } Widget;
+
+typedef struct window_t{
+	WindowType type;
+	SDL_Window* window;
+	SDL_Renderer* windowRenderer;
+	Widget** widgets;
+	int numOfWidgets;
+} Window;
 
 //This function would be usefull for NULL safe desetroy
 void destroyWidget(Widget* src);

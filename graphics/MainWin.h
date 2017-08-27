@@ -11,19 +11,19 @@
 #include <SDl2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include <stdio.h>
-///mas
-typedef enum{
-	MAIN_NEW_GAME,
-	MAIN_LOAD,
-	MAIN_EXIT,
-} MAIN_EVENT;
+#include "Widget.h"
+
+//typedef enum{
+//	MAIN_NEW_GAME,
+//	MAIN_LOAD,
+//	MAIN_EXIT,
+//} MAIN_EVENT;
 
 typedef struct{
 	SDL_Window* main_winodw;
 	SDL_Renderer* main_renderer;
-	SDL_Texture* new_game_tex;
-	SDL_Texture* load_tex;
-	SDL_Texture* exit_tex;
+	Widget** widgets;
+	int numOfWidgets;
 } MainWin;
 
 #endif /* GRAPHICS_MAINWIN_H_ */
