@@ -11,9 +11,6 @@
 #include "Button.h"
 #include "SPCommon.h"
 
-// #include "SPCommon.h"
-
-// You need a create function:
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 		const char *active_image, const char *inactive_image, ButtonType type, bool active, bool visibility) {
 	if (windowRender == NULL || location == NULL || active_image == NULL || inactive_image == NULL) {
