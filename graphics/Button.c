@@ -15,7 +15,7 @@
 
 // You need a create function:
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
-		const char *active_image, const char *inactive_image, ButtonType type, bool active) {
+		const char *active_image, const char *inactive_image, ButtonType type, bool active, bool visibility) {
 	if (windowRender == NULL || location == NULL || active_image == NULL || inactive_image == NULL) {
 		return NULL ;
 	}
@@ -44,6 +44,7 @@ Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 	button->windowRenderer = windowRender;
 	button->type = type;
 	button->active = active;
+	button->visibility = visibility;
 	return button;
 }
 
@@ -59,8 +60,8 @@ void destroyButton(Button* button) {
 }
 
 void drawButton(Button button) {
-	if (button == NULL ) {
-		return;
+	if (button == NULL || !(button->visibility)) {
+		return; /* not drawing the button at all */
 	}
 	if (button->active) {
 		SDL_RenderCopy(button->windowRenderer, button->active_buttonTexture, NULL, button->location);
@@ -78,5 +79,5 @@ ButtonType which_button_clicked(SDL_Event* event, Button *buttons, int buttons_n
 			return buttons[i]->type;
 		}
 	}
-	return NoButton;
+	return NoButton; /* the mouse-click wasn't inside any of the buttons */
 }
