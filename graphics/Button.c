@@ -15,7 +15,7 @@
 
 // You need a create function:
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
-		const char* image, EventOP event_op) {
+		const char* image, ButtonType type) {
 	if (windowRender == NULL || location == NULL || image == NULL ) {
 		return NULL ;
 	}
@@ -54,7 +54,6 @@ void drawButton(Button button) {
 	if (button == NULL ) {
 		return;
 	}
-	//Button* castData = (Button*) src->data;
 	SDL_RenderCopy(button->windowRenderer, button->buttonTexture, NULL,
 			button->location);
 }

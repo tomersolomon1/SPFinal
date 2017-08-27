@@ -55,7 +55,7 @@ ButtonType which_button_clicked(Button *buttons, int buttons_number);
 
 //You need a create function:
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
-		const char* image);
+		const char* image, ButtonType type);
 
 // this function is in charge of destroying all the data Associated with a button
 void destroyButton(Button*);
