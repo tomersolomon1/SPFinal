@@ -11,7 +11,7 @@
 #include <SDl2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include <stdio.h>
-///mashu
+///mas
 typedef enum{
 	MAIN_NEW_GAME,
 	MAIN_LOAD,
