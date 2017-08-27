@@ -7,11 +7,11 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "Button.h"
-#include "Widget.h"
+#include "./Button.h"
+#include "./Widget.h"
 // #include "SPCommon.h"
 
-//You need a create function:
+// You need a create function:
 Widget* createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 		const char* image) {
 	if (windowRender == NULL || location == NULL || image == NULL ) {
