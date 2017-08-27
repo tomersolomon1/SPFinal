@@ -41,7 +41,7 @@ typedef enum {
 
 	/* set color buttons */
 	SetBlack,
-	SetBlack
+	SetWhite
 } ButtonType;
 
 typedef struct button_t {
@@ -58,7 +58,7 @@ Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 		const char* image);
 
 // this function is in charge of destroying all the data Associated with a button
-void destroyButton(Widget*);
+void destroyButton(Button*);
 
 void drawButton(Widget* src);
 
