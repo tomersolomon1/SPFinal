@@ -18,14 +18,16 @@ typedef enum window_type_t{
 	Game
 } WindowType;
 
+typedef struct widget_t Widget;
 struct widget_t {
 	void (*drawWidget)(Widget*);
 	void (*handleEvent)(Widget*, SDL_Event*);
 	void (*destroyWidget)(Widget*);
 	void* data;
-} Widget;
+};
 
-typedef struct window_t{
+typedef struct window_t Window;
+struct window_t {
 	WindowType type;
 	SDL_Window* window;
 	void (*drawWindow)(Window* );
@@ -34,7 +36,7 @@ typedef struct window_t{
 	SDL_Renderer* windowRenderer;
 	Widget** widgets;
 	int numOfWidgets;
-} Window;
+};
 
 //This function would be usefull for NULL safe desetroy
 void destroyWidget(Widget* src);

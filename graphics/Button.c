@@ -7,8 +7,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "./Button.h"
-#include "./Widget.h"
+#include "Widget.h"
+#include "Button.h"
+#include "SPCommon.h"
+
 // #include "SPCommon.h"
 
 // You need a create function:

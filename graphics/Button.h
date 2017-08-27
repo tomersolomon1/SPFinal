@@ -10,7 +10,7 @@
 
 #include "Widget.h" // A button is a widget also
 
-struct button_t {
+typedef struct button_t {
 	SDL_Texture* buttonTexture;
 	SDL_Renderer* windowRenderer;
 	SDL_Rect* location;
