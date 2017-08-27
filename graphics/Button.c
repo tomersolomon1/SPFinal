@@ -15,11 +15,11 @@
 
 // You need a create function:
 Widget* createButton(SDL_Renderer* windowRender, SDL_Rect* location,
-		const char* image) {
+		const char* image, EventOP event_op) {
 	if (windowRender == NULL || location == NULL || image == NULL ) {
 		return NULL ;
 	}
-	//Allocate data
+	// Allocate data
 	Widget* res = (Widget*) malloc(sizeof(Widget));
 	Button* data = (Button*) malloc(sizeof(Button));
 	SDL_Surface* loadingSurface = SDL_LoadBMP(image); //We use the surface as a temp var;
@@ -40,6 +40,7 @@ Widget* createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 	res->destroyWidget = destroyButton;
 	res->drawWidget = drawButton;
 	res->handleEvent = handleButtonEvenet;
+	res->op = event_op;
 	res->data = data;
 	return res;
 }
@@ -66,8 +67,7 @@ void handleButtonEvenet(Widget* src, SDL_Event* event) {
 		point.x = event->button.x;
 		point.y = event->button.y;
 		if (SDL_PointInRect(&point, castData->location)) {
-			SDL_ShowMessageBox(SDL_MESSAGEBOX_INFORMATION, "Title",
-					"We did it", NULL );
+			src->op(src->)
 		}
 	} else {
 		return;

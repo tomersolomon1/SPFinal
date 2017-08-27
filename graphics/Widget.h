@@ -19,11 +19,15 @@ typedef enum window_type_t{
 } WindowType;
 
 typedef struct widget_t Widget;
+
+typedef void (*EventOP)(Widget*, SDL_Event*);
+
 struct widget_t {
 	void (*drawWidget)(Widget*);
 	void (*handleEvent)(Widget*, SDL_Event*);
+	void (*op)(Widget*, SDL_Event*);
 	void (*destroyWidget)(Widget*);
-	void* data;
+	void *data;
 };
 
 typedef struct window_t Window;
