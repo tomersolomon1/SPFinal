@@ -7,8 +7,11 @@
 
 #ifndef GRAPHICS_BUTTON_H_
 #define GRAPHICS_BUTTON_H_
-
+#define DEFAULT_BTN_HIGHT 70
+#define DEFAULT_BTN_WIDTH 150
+#define DEFAULT_BTN_GAP 120
 #include <stdbool.h>
+//.y = position_buttons + DEFAULT_BTN_GAP*(i++)
 
 typedef enum {
 	/* general button */
