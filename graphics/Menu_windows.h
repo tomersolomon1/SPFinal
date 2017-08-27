@@ -11,12 +11,14 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
+#define IMG(x) "./images/"#x".bmp"
+#define IMG_INCTV(x) "./images/"#x"_inactive.bmp"
 
 
 typedef enum menu_window_type_t{
 	Enterance,
 	LoadGame,
-	GameMode,
+	ModeGame,
 	Difficulty,
 	ChooseColor
 } menu_window_type;
@@ -27,7 +29,6 @@ typedef struct menu_window_t{
 	SDL_Renderer* windowRenderer;
 	int num_buttons;
 	Button** buttons;
-	void (*drawWindow)(MenuWindow*);
 	void (*handleEventWindow)(MenuWindow* , SDL_Event* );
 } MenuWindow;
 
