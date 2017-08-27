@@ -19,11 +19,5 @@
 //	MAIN_EXIT,
 //} MAIN_EVENT;
 
-typedef struct{
-	SDL_Window* main_winodw;
-	SDL_Renderer* main_renderer;
-	Widget** widgets;
-	int numOfWidgets;
-} MainWin;
 
 #endif /* GRAPHICS_MAINWIN_H_ */

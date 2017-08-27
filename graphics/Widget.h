@@ -28,6 +28,9 @@ struct widget_t {
 typedef struct window_t{
 	WindowType type;
 	SDL_Window* window;
+	void (*drawWindow)(Window* );
+	void (*handleEventWindow)(Window* , SDL_Event* );
+	void (*destroyWindow)(Window* );
 	SDL_Renderer* windowRenderer;
 	Widget** widgets;
 	int numOfWidgets;
