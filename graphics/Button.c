@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "Button.h"
 #include "Widget.h"
-//#include "SPCommon.h"
+// #include "SPCommon.h"
 
 //You need a create function:
 Widget* createButton(SDL_Renderer* windowRender, SDL_Rect* location,
