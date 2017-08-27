@@ -7,7 +7,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "Widget.h"
+
 #include "Button.h"
 #include "SPCommon.h"
 
@@ -56,4 +56,10 @@ void drawButton(Button button) {
 	}
 	SDL_RenderCopy(button->windowRenderer, button->buttonTexture, NULL,
 			button->location);
+}
+
+ButtonType which_button_clicked(Button *buttons, int buttons_number) {
+	for (intv i = 0; i < buttons_number; i++) {
+		point
+	}
 }
