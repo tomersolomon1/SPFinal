@@ -45,7 +45,8 @@ typedef enum {
 } ButtonType;
 
 typedef struct button_t {
-	SDL_Texture* buttonTexture;
+	SDL_Texture* active_buttonTexture;
+	SDL_Texture* inactive_buttonTexture;
 	SDL_Renderer* windowRenderer;
 	SDL_Rect* location;
 	ButtonType type;
@@ -56,7 +57,7 @@ ButtonType which_button_clicked(SDL_Event* event, Button *buttons, int buttons_n
 
 //You need a create function:
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
-		const char* image, ButtonType type);
+		const char *active_image, const char *inactive_image, ButtonType type, bool active);
 
 // this function is in charge of destroying all the data Associated with a button
 void destroyButton(Button*);
