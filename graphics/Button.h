@@ -9,7 +9,9 @@
 #define GRAPHICS_BUTTON_H_
 #define DEFAULT_BTN_HIGHT 70
 #define DEFAULT_BTN_WIDTH 150
-#define DEFAULT_BTN_GAP 120
+#define DEFAULT_BTN_GAP_VERTICAL 120
+#define DEFAULT_BTN_GAP_HORIZONTAL 60
+#define DEFAULT_GAP_WINDOW 100
 #include <stdbool.h>
 //.y = position_buttons + DEFAULT_BTN_GAP*(i++)
 
