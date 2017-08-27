@@ -7,6 +7,7 @@
 
 #ifndef GRAPHICS_MAINWIN_H_
 #define GRAPHICS_MAINWIN_H_
+#include <assert.h>
 #include <SDl2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include <stdio.h>
