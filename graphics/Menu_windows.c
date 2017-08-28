@@ -5,7 +5,7 @@
  *      Author: sapir
  */
 #include "Menu_windows.h"
-const char* window_name[] = {"Enterance","LoadGame","GameMode","Difficulty","ChooseColor"};
+const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game Mode","Chess: Difficulty","Chess: Choose Color"};
 int num_buttons[] = {3,7,5,7,4};
 
 MenuWindow* create_menu_window(menu_window_type type){
@@ -59,10 +59,10 @@ Button** create_enterance_buttons(SDL_Renderer* renderer){
 	int x_btn_places[] = {horiz_center, horiz_center, horiz_center};
 	int y_btn_places[] = {DEFAULT_GAP_WINDOW, DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL, DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 2};
 	ButtonType types[] = {NewGameButton, LoadButton, ExitButton};
-//	const char* image[] = {IMG(start), IMG(load), IMG(exit)};
-//	const char* image_inavtice[] = {IMG_INCTV(start), IMG_INCTV(load), IMG_INCTV(exit)};
-	const char* image[] = {"./graphics/images/start.bmp", "./graphics/images/load.bmp", "./graphics/images/exit.bmp"};
-	const char* image_inavtice[] = {"./graphics/images/start_inactive.bmp", "./graphics/images/load_inactive.bmp", "./graphics/images/exit_inactive.bmp"};
+	const char* image[] = {IMG(start), IMG(load), IMG(exit)};
+	const char* image_inavtice[] = {IMG_INCTV(start), IMG_INCTV(load), IMG_INCTV(exit)};
+//	const char* image[] = {"./graphics/images/start.bmp", "./graphics/images/load.bmp", "./graphics/images/exit.bmp"};
+//	const char* image_inavtice[] = {"./graphics/images/start_inactive.bmp", "./graphics/images/load_inactive.bmp", "./graphics/images/exit_inactive.bmp"};
 
 	//create buttons:
 	for(int i = 0; i < 3; i++){
@@ -239,10 +239,9 @@ void drawWindow(MenuWindow* src) {
 		return;
 	}
 	//draw window:
-	SDL_SetRenderDrawColor(src->windowRenderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(src->windowRenderer, 100, 255, 255, 255);
 	SDL_RenderClear(src->windowRenderer);
-	int i = 0;
-	for (; i < src->num_buttons; i++) {
+	for (int i = 0; i < src->num_buttons; i++) {
 		drawButton(src->buttons[i]);
 	}
 	SDL_RenderPresent(src->windowRenderer);
