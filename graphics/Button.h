@@ -8,7 +8,7 @@
 #ifndef GRAPHICS_BUTTON_H_
 #define GRAPHICS_BUTTON_H_
 #define DEFAULT_MENU_WINDOW_WIDTH 1000
-#define DEFAULT_MENU_WINDOW_HIGHT 1000
+#define DEFAULT_MENU_WINDOW_HIGHT 100
 #define DEFAULT_BTN_HIGHT 70
 #define DEFAULT_BTN_WIDTH 150
 #define DEFAULT_BTN_GAP_VERTICAL 120
@@ -64,7 +64,7 @@ typedef struct button_t {
 	bool visibility;
 } Button;
 
-ButtonType which_button_clicked(SDL_Event* event, Button *buttons, int buttons_number);
+ButtonType which_button_clicked(SDL_Event* event, Button **buttons, int buttons_number);
 
 //You need a create function:
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,

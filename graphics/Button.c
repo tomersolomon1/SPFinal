@@ -56,7 +56,7 @@ void destroyButton(Button* button) {
 	free(button);
 }
 
-void drawButton(Button button) {
+void drawButton(Button* button) {
 	if (button == NULL || !(button->visibility)) {
 		return; /* not drawing the button at all */
 	}
@@ -67,7 +67,7 @@ void drawButton(Button button) {
 	}
 }
 
-ButtonType which_button_clicked(SDL_Event* event, Button *buttons, int buttons_number) {
+ButtonType which_button_clicked(SDL_Event* event, Button** buttons, int buttons_number) {
 	for (int i = 0; i < buttons_number; i++) {
 		SDL_Point point;
 		point.x = event->button.x;

@@ -65,7 +65,7 @@ Button** create_enterance_buttons(SDL_Renderer* renderer){
 	//create buttons:
 	for(int i = 0; i < 3; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
-		buttons[i] = createButton(renderer, Rec, image[i], image_inavtice[i], types[i], true, true);
+		buttons[i] = createButton(renderer, &Rec, image[i], image_inavtice[i], types[i], true, true);
 		if(buttons[i] == NULL){
 			for(int j = 0; j < i; j++)
 				destroyButton(buttons[j]);
@@ -99,7 +99,7 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 	//create buttons:
 	for(int i = 0; i < 7; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
-		buttons[i] = createButton(renderer, Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
+		buttons[i] = createButton(renderer, &Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
 		if(buttons[i] == NULL){
 			for(int j = 0; j < i; j++)
 				destroyButton(buttons[j]);
@@ -136,7 +136,7 @@ Button** create_game_mode_buttons(SDL_Renderer* renderer){
 	//create buttons:
 	for(int i = 0; i < 5; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
-		buttons[i] = createButton(renderer, Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
+		buttons[i] = createButton(renderer, &Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
 		if(buttons[i] == NULL){
 			for(int j = 0; j < i; j++)
 				destroyButton(buttons[j]);
@@ -172,7 +172,7 @@ Button** create_difficulty_buttons(SDL_Renderer* renderer){
 	//create buttons:
 	for(int i = 0; i < 6; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
-		buttons[i] = createButton(renderer, Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
+		buttons[i] = createButton(renderer, &Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
 		if(buttons[i] == NULL){
 			for(int j = 0; j < i; j++)
 				destroyButton(buttons[j]);
@@ -207,7 +207,7 @@ Button** create_choose_color_buttons(SDL_Renderer* renderer){
 	//create buttons:
 	for(int i = 0; i < 4; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
-		buttons[i] = createButton(renderer, Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
+		buttons[i] = createButton(renderer, &Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
 		if(buttons[i] == NULL){
 			for(int j = 0; j < i; j++)
 				destroyButton(buttons[j]);
@@ -218,7 +218,7 @@ Button** create_choose_color_buttons(SDL_Renderer* renderer){
 	return buttons;
 }
 
-void destroyMenuWindow(MenuWindow src) {
+void destroyMenuWindow(MenuWindow* src) {
 	if (src == NULL ) {
 		return;
 	}
@@ -248,7 +248,7 @@ void drawWindow(MenuWindow* src) {
 
 ButtonType handleEvenet_enterance(MenuWindow* src, SDL_Event* event){
 	if(src == NULL || event==NULL)
-		return NULL;
+		return NoButton;
 	if (event->type == SDL_MOUSEBUTTONUP){
 		ButtonType type = which_button_clicked(event, src->buttons, src->num_buttons);
 		return type;
