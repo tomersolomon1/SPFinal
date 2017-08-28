@@ -10,6 +10,7 @@
 #include "ParserTester.h"
 #include "FilesTester.h"
 #include "ConsoleTester.h"
+#include "graphics/Menu_windowsTester.h"
 
 int main(int argc, char *argv[]){
 	if (argc == 2) {
@@ -17,7 +18,8 @@ int main(int argc, char *argv[]){
 			//check_parser();
 			console_tester();
 		} else if (strcmp(argv[1], "1") == 0) { /* Sapir's tests */
-			check_GameBoard();
+			//check_GameBoard();
+			check_menu_window();
 		}
 	}
 }

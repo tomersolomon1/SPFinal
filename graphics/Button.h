@@ -15,6 +15,9 @@
 #define DEFAULT_BTN_GAP_HORIZONTAL 210
 #define DEFAULT_GAP_WINDOW 100
 #include <stdbool.h>
+#include <stdlib.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 //.y = position_buttons + DEFAULT_BTN_GAP*(i++)
 
 typedef enum {

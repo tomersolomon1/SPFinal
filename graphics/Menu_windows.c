@@ -49,10 +49,6 @@ MenuWindow* create_menu_window(menu_window_type type){
 		SDL_DestroyRenderer(renderer);
 		return NULL;
 	}
-
-		void (*drawWindow)(MenuWindow*);
-		void (*handleEventWindow)(MenuWindow* , SDL_Event* );
-
 	return src;
 }
 
@@ -250,13 +246,13 @@ void drawWindow(MenuWindow* src) {
 	SDL_RenderPresent(src->windowRenderer);
 }
 
-void handleEvenet_enterance(MenuWindow* src, SDL_Event* event){
-	if(src == NULL || event==NULL) return;
+ButtonType handleEvenet_enterance(MenuWindow* src, SDL_Event* event){
+	if(src == NULL || event==NULL)
+		return NULL;
 	if (event->type == SDL_MOUSEBUTTONUP){
 		ButtonType type = which_button_clicked(event, src->buttons, src->num_buttons);
-		if(type == NoButton)
-			return;
+		return type;
 	}
 	else
-		return;
+		return NoButton;
 }

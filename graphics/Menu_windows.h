@@ -29,7 +29,15 @@ typedef struct menu_window_t{
 	SDL_Renderer* windowRenderer;
 	int num_buttons;
 	Button** buttons;
-	void (*handleEventWindow)(MenuWindow* , SDL_Event* );
 } MenuWindow;
 
+MenuWindow* create_menu_window(menu_window_type type);
+Button** create_enterance_buttons(SDL_Renderer* renderer);
+Button** create_load_game_buttons(SDL_Renderer* renderer);
+Button** create_game_mode_buttons(SDL_Renderer* renderer);
+Button** create_difficulty_buttons(SDL_Renderer* renderer);
+Button** create_choose_color_buttons(SDL_Renderer* renderer);
+void destroyMenuWindow(MenuWindow src);
+void drawWindow(MenuWindow* src);
+ButtonType handleEvenet_enterance(MenuWindow* src, SDL_Event* event);
 #endif /* GRAPHICS_MENU_WINDOWS_H_ */
