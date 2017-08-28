@@ -26,24 +26,23 @@ MenuWindow* create_menu_window(menu_window_type type){
 
 	src->num_buttons = num_buttons[type];
 
-	Button** buttons;
 	if(type == Enterance){
-		buttons = create_enterance_buttons(renderer);
+		src->buttons = create_enterance_buttons(renderer);
 	}
 	else if(type == LoadGame){
-		buttons = create_load_game_buttons(renderer);
+		src->buttons = create_load_game_buttons(renderer);
 	}
 	else if(type == ModeGame){
-		buttons = create_game_mode_buttons(renderer);
+		src->buttons = create_game_mode_buttons(renderer);
 	}
 	else if(type == Difficulty){
-		buttons = create_difficulty_buttons(renderer);
+		src->buttons = create_difficulty_buttons(renderer);
 	}
 	else if(type == ChooseColor){
-		buttons = create_choose_color_buttons(renderer);
+		src->buttons = create_choose_color_buttons(renderer);
 	}
 
-	if(buttons == NULL){
+	if(src->buttons == NULL){
 		free(src);
 		SDL_DestroyWindow(window);
 		SDL_DestroyRenderer(renderer);
@@ -60,8 +59,11 @@ Button** create_enterance_buttons(SDL_Renderer* renderer){
 	int x_btn_places[] = {horiz_center, horiz_center, horiz_center};
 	int y_btn_places[] = {DEFAULT_GAP_WINDOW, DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL, DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 2};
 	ButtonType types[] = {NewGameButton, LoadButton, ExitButton};
-	const char* image[] = {IMG(new_game), IMG(load), IMG(exit)};
-	const char* image_inavtice[] = {IMG_INCTV(new_game), IMG_INCTV(load), IMG_INCTV(exit)};
+//	const char* image[] = {IMG(start), IMG(load), IMG(exit)};
+//	const char* image_inavtice[] = {IMG_INCTV(start), IMG_INCTV(load), IMG_INCTV(exit)};
+	const char* image[] = {"./graphics/images/start.bmp", "./graphics/images/load.bmp", "./graphics/images/exit.bmp"};
+	const char* image_inavtice[] = {"./graphics/images/start_inactive.bmp", "./graphics/images/load_inactive.bmp", "./graphics/images/exit_inactive.bmp"};
+
 	//create buttons:
 	for(int i = 0; i < 3; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
