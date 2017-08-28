@@ -112,6 +112,7 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 	return buttons;
 }
 
+
 Button** create_game_mode_buttons(SDL_Renderer* renderer){
 	Button** buttons = malloc(sizeof(Button*) * 5);
 	if(buttons == NULL) return NULL;
