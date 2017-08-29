@@ -35,7 +35,7 @@ GameWindow *create_game_window(Gameboard *board) {
 	game_window->buttons = NULL;
 	SDL_Rect board_rec = {.x = 0, .y = 0, .h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
 	game_window->board_widget = create_widget_board(renderer, board, &board_rec);
-	game_window->left_button_clicked = false;
+	game_window->picked_piece = false;
 	game_window->selected_piece_color = -1;
 	game_window->selected_piece_index = -1;
 	return game_window;
@@ -101,6 +101,7 @@ void draw_board(BoardWidget *board_widget, SDL_Event* event, int selected_piece_
 		Piece *piece = board_widget->board->all_pieces[selected_piece_color][selected_piece_index];
 		SDL_RenderCopy(board_widget->renderer, board_widget->piece_textures[selected_piece_color][piece->type], NULL, &piece_rec);
 	}
+	SDL_RenderPresent(board_widget->renderer);
 }
 
 void drawGameWindow(GameWindow* src) {
@@ -147,25 +148,41 @@ void handle_game_events(GameWindow *window, SDL_Event* event) {
 				int y = event->button.y;
 				int x_board = (8*x / window->board_widget->location->w);
 				int y_board = 7 - (8*y / window->board_widget->location->h);
-				recognize_square(window, event->button.x, event->button.y);
+				recognize_square(window, event->button.x, event->button.y); // for debug
 				Piece *piece = window->board_widget->board->board[y_board][x_board];
 				if (piece->type != Empty) { /* this piece will be selected now */
 					window->selected_piece_color = piece->colur;
 					window->selected_piece_index = piece->indexat;
-					window->left_button_clicked  = true;
+					window->picked_piece  = true;
 					printf("selcted parameters: (%d, %d)\n", window->selected_piece_color, window->selected_piece_index);
 					fflush(stdout);
 				}
 			}
-			//recognize_square(window, event->button.x, event->button.y);
+			break;
+		case SDL_MOUSEBUTTONUP:
+			if (event->button.button == SDL_BUTTON_LEFT && window->picked_piece) { /* the selected piece was dropped */
+				window->picked_piece  = false;
+				if (mouse_in_rec(event->button.x, event->button.y, window->board_widget->location)) {
+					int x = event->button.x;
+					int y = event->button.y;
+					int x_board = (8*x / window->board_widget->location->w);
+					int y_board = 7 - (8*y / window->board_widget->location->h);
+					Piece *piece = window->board_widget->board->all_pieces[window->selected_piece_color][window->selected_piece_index];
+					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->board_widget->board, piece->row, piece->col, y_board, x_board);
+					if (mssg == CHESS_BOARD_SUCCESS) {
+						set_step(window->board_widget->board, piece->row, piece->col, y_board, x_board);
+					}
+					window->selected_piece_color = -1;
+					window->selected_piece_index = -1;
+					draw_board(window->board_widget, event, window->selected_piece_color, window->selected_piece_index);
+				}
+			}
 			break;
 		case SDL_MOUSEMOTION:
-			if(mouse_in_rec(event->motion.x, event->motion.y, window->board_widget->location)
-					&& window->left_button_clicked) {
+			if(mouse_in_rec(event->motion.x, event->motion.y, window->board_widget->location) && window->picked_piece) {
 				//printf("in the board\n");
 				draw_board(window->board_widget, event, window->selected_piece_color, window->selected_piece_index);
 				//draw_board(window->board_widget, event, -1, -1);
-				SDL_RenderPresent(window->windowRenderer);
 			}
 			break;
 	}

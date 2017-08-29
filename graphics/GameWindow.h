@@ -42,7 +42,7 @@
 
 // for drawing the pieces in the center of the squares
 #define VERTICAL_CENTERING 2
-#define HORIZONTAL_CENTERING 2
+#define HORIZONTAL_CENTERING 4
 
 
 typedef struct board_widget {
@@ -64,7 +64,7 @@ typedef struct game_window_t {
 	SDL_Renderer* windowRenderer;
 	int num_buttons;
 	Button** buttons;
-	bool left_button_clicked;
+	bool picked_piece;
 	int selected_piece_color;
 	int selected_piece_index;
 	BoardWidget *board_widget;
