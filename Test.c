@@ -11,7 +11,7 @@
 #include "FilesTester.h"
 #include "ConsoleTester.h"
 #include "graphics/Menu_windowsTester.h"
-#include "graphics/Game_Window_Tester.h"
+//#include "graphics/Game_Window_Tester.h"
 
 int main(int argc, char *argv[]){
 	if (argc == 2) {
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
 			//check_GameBoard();
 			check_menu_window();
 		} else if (strcmp(argv[1], "g") == 0) { /* game window (gui) test */
-			check_game_window();
+			//check_game_window();
 		}
 	}
 	return 0;

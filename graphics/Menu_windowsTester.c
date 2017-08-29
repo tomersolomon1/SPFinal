@@ -6,19 +6,24 @@
  */
 
 #include "Menu_windowsTester.h"
+#include "../GameBoard.h"
 
 void check_menu_window(){
-	MenuWindow* enter = create_menu_window(Enterance);
-	if(enter == NULL){
-		return;
-	}
-	SDL_Event event;
+	menu_window_type type_window = Enterance;
+
 	while(1){
-		SDL_WaitEvent(&event);
-		if(event.type == SDL_QUIT){
-			break;
+		MenuWindow* window = create_menu_window(type_window);
+		if(window == NULL){
+			return;
 		}
-		drawWindow(enter);
+		if(type_window == Enterance)
+			type_window = handleEvenet_enterance(window);
+
+
+		destroyMenuWindow(window);
+		if(type_window == None)
+			break;
 	}
+
 
 }

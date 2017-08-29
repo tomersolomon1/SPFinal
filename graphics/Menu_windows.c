@@ -114,7 +114,6 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 	return buttons;
 }
 
-
 Button** create_game_mode_buttons(SDL_Renderer* renderer){
 	Button** buttons = malloc(sizeof(Button*) * 5);
 	if(buttons == NULL) return NULL;
@@ -129,13 +128,13 @@ Button** create_game_mode_buttons(SDL_Renderer* renderer){
 
 	int y_btn_places[] = {DEFAULT_GAP_WINDOW,
 			DEFAULT_GAP_WINDOW,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 6,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 6,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 6};
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5,
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5,
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5};
 
 	ButtonType types[] = {OnePlayer, TwoPlayer, StartButton, NextButton, BackButton};
-	const char* image[] = {IMG(one_player), IMG(two_player), IMG(start), IMG(next), IMG(back)};
-	const char* image_inavtice[] = {IMG_INCTV(one_player), IMG_INCTV(two_player), IMG_INCTV(start), IMG_INCTV(next), IMG_INCTV(back)};
+	const char* image[] = {IMG(one_player), IMG(two_players), IMG(start), IMG(next), IMG(back)};
+	const char* image_inavtice[] = {IMG_INCTV(one_player), IMG_INCTV(two_players), IMG_INCTV(start), IMG_INCTV(next), IMG_INCTV(back)};
 	bool active[] = {true, false, true, true, true};
 	bool visible[] = {true, true, true, false, true};
 	//create buttons:
@@ -166,8 +165,8 @@ Button** create_difficulty_buttons(SDL_Renderer* renderer){
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 2,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 3,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 6,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 6};
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5,
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5};
 
 	ButtonType types[] = {NoobDiff, EasyDiff, ModerateDiff, HardDiff, NextButton, BackButton};
 	const char* image[] = {IMG(noob), IMG(easy), IMG(moderate), IMG(hard), IMG(next), IMG(back)};
@@ -201,12 +200,12 @@ Button** create_choose_color_buttons(SDL_Renderer* renderer){
 
 	int y_btn_places[] = {DEFAULT_GAP_WINDOW,
 			DEFAULT_GAP_WINDOW,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 6,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 6};
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5,
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5};
 
 	ButtonType types[] = {SetWhite, SetBlack, StartButton, BackButton};
-	const char* image[] = {IMG(one_player), IMG(two_player), IMG(start), IMG(back)};
-	const char* image_inavtice[] = {IMG_INCTV(one_player), IMG_INCTV(two_player), IMG_INCTV(start), IMG_INCTV(back)};
+	const char* image[] = {IMG(white), IMG(black), IMG(start), IMG(back)};
+	const char* image_inavtice[] = {IMG_INCTV(white), IMG_INCTV(black), IMG_INCTV(start), IMG_INCTV(back)};
 	bool active[] = {true, false, true, true};
 	bool visible[] = {true, true, true, true};
 	//create buttons:
@@ -250,13 +249,48 @@ void drawWindow(MenuWindow* src) {
 	SDL_RenderPresent(src->windowRenderer);
 }
 
-ButtonType handleEvenet_enterance(MenuWindow* src, SDL_Event* event){
-	if(src == NULL || event==NULL)
-		return NoButton;
-	if (event->type == SDL_MOUSEBUTTONUP){
-		ButtonType type = which_button_clicked(event, src->buttons, src->num_buttons);
-		return type;
+menu_window_type handleEvenet_enterance(MenuWindow* wndw){
+	if(wndw == NULL)
+		return None;
+	SDL_Event event;
+	while(1){
+		SDL_WaitEvent(&event);
+		if (event.type == SDL_QUIT)
+			return None;
+		else if (event.type == SDL_MOUSEBUTTONUP){
+			ButtonType type_click = which_button_clicked(&event, wndw->buttons, wndw->num_buttons);
+			switch(type_click){
+			case NoButton:
+				break;
+			case ExitButton:
+				return None;
+			case LoadButton:
+				return LoadGame;
+			case StartButton:
+				return ModeGame;
+			}
+		}
+		drawWindow(wndw);
 	}
-	else
-		return NoButton;
+}
+
+menu_window_type handleEvenet_loadgame(MenuWindow* wndw){
+	if(wndw == NULL)
+		return None;
+	bool is_slot_
+	SDL_Event event;
+	while(1){
+		SDL_WaitEvent(&event);
+		if (event.type == SDL_QUIT)
+			return None;
+		else if (event.type == SDL_MOUSEBUTTONUP){
+			ButtonType type_click = which_button_clicked(&event, wndw->buttons, wndw->num_buttons);
+			if(type_click == NoButton)
+				continue;
+			else if(type_click == BackButton)
+				return Enterance;
+			else if(type_click == LoadButton && wndw->buttons->)
+		}
+		drawWindow(wndw);
+	}
 }
