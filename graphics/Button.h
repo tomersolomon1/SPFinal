@@ -66,7 +66,6 @@ typedef struct button_t {
 
 ButtonType which_button_clicked(SDL_Event* event, Button **buttons, int buttons_number);
 
-//You need a create function:
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 		const char *active_image, const char *inactive_image, ButtonType type, bool active, bool visibility);
 

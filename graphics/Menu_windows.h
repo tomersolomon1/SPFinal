@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
-#define IMG(x) "./graphics/images/"#x".bmp"
-#define IMG_INCTV(x) "./graphics/images/"#x"_inactive.bmp"
 
 
 typedef enum menu_window_type_t{

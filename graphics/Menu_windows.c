@@ -5,6 +5,8 @@
  *      Author: sapir
  */
 #include "Menu_windows.h"
+#include "SPCommon.h"
+
 const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game Mode","Chess: Difficulty","Chess: Choose Color"};
 int num_buttons[] = {3,7,5,7,4};
 
