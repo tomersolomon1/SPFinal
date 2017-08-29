@@ -258,33 +258,6 @@ Button* get_button_by_type(MenuWindow* wndw, ButtonType type){
 	return NoButton;
 }
 
-menu_window_type handleEvenet_enterance(MenuWindow* wndw, Button* btn){
-	if(btn->type == NewGameButton){
-		return ModeGame;
-	}
-	else if(btn->type == ExitButton){
-		return ExitGame;
-	}
-	else if(btn->type == LoadButton){
-		return LoadGame;
-	}
-	return wndw->type;
-}
-menu_window_type handleEvenet_load_game(MenuWindow* wndw, Button* btn, Gameboard** game){
-	if(btn->type == BackButton)
-		return Enterance;
-	return wndw->type;
-}
-menu_window_type handleEvenet_mode_game(MenuWindow* wndw, Button* btn, Gameboard** game){
-
-	return wndw->type;
-}
-menu_window_type handleEvenet_difficulty(MenuWindow* wndw, Button* btn, Gameboard** game){
-	return wndw->type;
-}
-menu_window_type handleEvenet_choose_color(MenuWindow* wndw, Button* btn, Gameboard** game){
-	return wndw->type;
-}
 
 menu_window_type handleEvenet(MenuWindow* wndw, Gameboard** game){
 	if(wndw == NULL)
@@ -322,3 +295,36 @@ menu_window_type handleEvenet(MenuWindow* wndw, Gameboard** game){
 	}
 }
 
+menu_window_type handleEvenet_enterance(MenuWindow* wndw, Button* btn){
+	if(btn->type == NewGameButton){
+		return ModeGame;
+	}
+	else if(btn->type == ExitButton){
+		return ExitGame;
+	}
+	else if(btn->type == LoadButton){
+		return LoadGame;
+	}
+	return wndw->type;
+}
+menu_window_type handleEvenet_load_game(MenuWindow* wndw, Button* btn, Gameboard** game){
+	if(btn->type == BackButton)
+		return Enterance;
+	return wndw->type;
+}
+menu_window_type handleEvenet_mode_game(MenuWindow* wndw, Button* btn, Gameboard** game){
+	if(btn->type == BackButton)
+		return Enterance;
+	return wndw->type;
+}
+menu_window_type handleEvenet_difficulty(MenuWindow* wndw, Button* btn, Gameboard** game){
+	if(btn->type == BackButton){
+		return ModeGame;
+	}
+	return wndw->type;
+}
+menu_window_type handleEvenet_choose_color(MenuWindow* wndw, Button* btn, Gameboard** game){
+	if(btn->type == BackButton)
+		return Difficulty;
+	return wndw->type;
+}
