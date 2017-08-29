@@ -64,6 +64,9 @@ typedef struct game_window_t {
 	SDL_Renderer* windowRenderer;
 	int num_buttons;
 	Button** buttons;
+	bool left_button_clicked;
+	int selected_piece_color;
+	int selected_piece_index;
 	BoardWidget *board_widget;
 } GameWindow;
 
@@ -71,27 +74,5 @@ GameWindow *create_game_window(Gameboard *board);
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
 void drawGameWindow(GameWindow* src);
 void handle_game_events(GameWindow *window, SDL_Event* event);
-
-/*
- * previous try
- * // white pieces
-	SDL_Texture *white_pieces[6];
-	SDL_Texture *WKing;
-	SDL_Texture *WQueen;
-	SDL_Texture *WRock;
-	SDL_Texture *WBishop;
-	SDL_Texture *WKnight;
-	SDL_Texture *WPawn;
-
-	// black pieces
-	SDL_Texture *black_pieces[6];
-	SDL_Texture *BKing;
-	SDL_Texture *BQueen;
-	SDL_Texture *BRock;
-	SDL_Texture *BBishop;
-	SDL_Texture *BKnight;
-	SDL_Texture *BPawn;
- *
- * */
 
 #endif /* GRAPHICS_GAMEWINDOW_H_ */
