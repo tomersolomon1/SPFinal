@@ -78,3 +78,15 @@ ButtonType which_button_clicked(SDL_Event* event, Button** buttons, int buttons_
 	}
 	return NoButton; /* the mouse-click wasn't inside any of the buttons */
 }
+
+Button* get_button_clicked(SDL_Event* event, Button** buttons, int buttons_number) {
+	for (int i = 0; i < buttons_number; i++) {
+		SDL_Point point;
+		point.x = event->button.x;
+		point.y = event->button.y;
+		if (SDL_PointInRect(&point, buttons[i]->location) && buttons[i]->visibility) {
+			return buttons[i];
+		}
+	}
+	return NULL; /* the mouse-click wasn't inside any of the buttons */
+}

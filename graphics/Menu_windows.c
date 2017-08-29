@@ -8,7 +8,7 @@
 #include "SPCommon.h"
 
 const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game Mode","Chess: Difficulty","Chess: Choose Color"};
-int num_buttons[] = {3,7,5,7,4};
+int num_buttons[] = {3,7,5,7,4,0,0};
 
 MenuWindow* create_menu_window(menu_window_type type){
 	MenuWindow* src = (MenuWindow*) malloc(sizeof(MenuWindow));
@@ -93,11 +93,11 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 2,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 3,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 4,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 7,
-			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 7};
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5,
+			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5};
 	ButtonType types[] = {GameSlot1, GameSlot2, GameSlot3, GameSlot4, GameSlot5, BackButton, LoadButton};
-	const char* image[] = {IMG(slot1), IMG(slot2), IMG(slot3), IMG(slot4), IMG(slot5), IMG(back), IMG(load)};
-	const char* image_inavtice[] = {IMG_INCTV(slot1), IMG_INCTV(slot2), IMG_INCTV(slot3), IMG_INCTV(slot4), IMG_INCTV(slot5), IMG_INCTV(back), IMG_INCTV(load)};
+	const char* image[] = {IMG(gameslot1), IMG(gameslot2), IMG(gameslot3), IMG(gameslot4), IMG(gameslot5), IMG(back), IMG(load)};
+	const char* image_inavtice[] = {IMG_INCTV(gameslot1), IMG_INCTV(gameslot2), IMG_INCTV(gameslot3), IMG_INCTV(gameslot4), IMG_INCTV(gameslot5), IMG_INCTV(back), IMG_INCTV(load)};
 	bool active[] = {true, false, false, false, false, true, false};
 	bool visible[] = {false, false, false, false, false, true, true};
 	//create buttons:
@@ -241,7 +241,7 @@ void drawWindow(MenuWindow* src) {
 		return;
 	}
 	//draw window:
-	SDL_SetRenderDrawColor(src->windowRenderer, 100, 255, 255, 255);
+	SDL_SetRenderDrawColor(src->windowRenderer, 200, 255, 255, 255);
 	SDL_RenderClear(src->windowRenderer);
 	for (int i = 0; i < src->num_buttons; i++) {
 		drawButton(src->buttons[i]);
@@ -249,48 +249,76 @@ void drawWindow(MenuWindow* src) {
 	SDL_RenderPresent(src->windowRenderer);
 }
 
-menu_window_type handleEvenet_enterance(MenuWindow* wndw){
+Button* get_button_by_type(MenuWindow* wndw, ButtonType type){
+	for(int i = 0; i < wndw->num_buttons; i++){
+		if(wndw->buttons[i]->type == type){
+			return wndw->buttons[i];
+		}
+	}
+	return NoButton;
+}
+
+menu_window_type handleEvenet_enterance(MenuWindow* wndw, Button* btn){
+	if(btn->type == NewGameButton){
+		return ModeGame;
+	}
+	else if(btn->type == ExitButton){
+		return ExitGame;
+	}
+	else if(btn->type == LoadButton){
+		return LoadGame;
+	}
+	return wndw->type;
+}
+menu_window_type handleEvenet_load_game(MenuWindow* wndw, Button* btn, Gameboard** game){
+	if(btn->type == BackButton)
+		return Enterance;
+	return wndw->type;
+}
+menu_window_type handleEvenet_mode_game(MenuWindow* wndw, Button* btn, Gameboard** game){
+
+	return wndw->type;
+}
+menu_window_type handleEvenet_difficulty(MenuWindow* wndw, Button* btn, Gameboard** game){
+	return wndw->type;
+}
+menu_window_type handleEvenet_choose_color(MenuWindow* wndw, Button* btn, Gameboard** game){
+	return wndw->type;
+}
+
+menu_window_type handleEvenet(MenuWindow* wndw, Gameboard** game){
 	if(wndw == NULL)
-		return None;
+		return ExitGame;
+	menu_window_type type = Enterance;
 	SDL_Event event;
 	while(1){
 		SDL_WaitEvent(&event);
 		if (event.type == SDL_QUIT)
-			return None;
+			return ExitGame;
 		else if (event.type == SDL_MOUSEBUTTONUP){
-			ButtonType type_click = which_button_clicked(&event, wndw->buttons, wndw->num_buttons);
-			switch(type_click){
-			case NoButton:
-				break;
-			case ExitButton:
-				return None;
-			case LoadButton:
-				return LoadGame;
-			case StartButton:
-				return ModeGame;
+			Button* btn = get_button_clicked(&event, wndw->buttons, wndw->num_buttons);
+			if (btn == NULL)
+				continue;
+			else{
+				if(wndw->type == Enterance)
+					type =  handleEvenet_enterance(wndw, btn);
+				else if(wndw->type == LoadGame)
+					type = handleEvenet_load_game(wndw, btn, game);
+				else if(wndw->type == ModeGame)
+					type = handleEvenet_mode_game(wndw, btn, game);
+				else if(wndw->type == Difficulty)
+					type = handleEvenet_difficulty(wndw, btn, game);
+				else if(wndw->type == ChooseColor)
+					type = handleEvenet_choose_color(wndw, btn, game);
+				if(type == wndw->type){
+					continue;
+				}
+				else{
+					return type;
+				}
 			}
 		}
 		drawWindow(wndw);
 	}
 }
 
-menu_window_type handleEvenet_loadgame(MenuWindow* wndw){
-	if(wndw == NULL)
-		return None;
-	bool is_slot_
-	SDL_Event event;
-	while(1){
-		SDL_WaitEvent(&event);
-		if (event.type == SDL_QUIT)
-			return None;
-		else if (event.type == SDL_MOUSEBUTTONUP){
-			ButtonType type_click = which_button_clicked(&event, wndw->buttons, wndw->num_buttons);
-			if(type_click == NoButton)
-				continue;
-			else if(type_click == BackButton)
-				return Enterance;
-			else if(type_click == LoadButton && wndw->buttons->)
-		}
-		drawWindow(wndw);
-	}
-}
