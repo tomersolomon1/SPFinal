@@ -53,7 +53,7 @@ MenuWindow* create_menu_window(menu_window_type type){
 	return src;
 }
 
-Button** create_enterance_buttons(SDL_Renderer* renderer){
+Button** create_enterance_buttons(SDL_Renderer* renderer) {
 	Button** buttons = malloc(sizeof(Button*) * 3);
 	if(buttons == NULL) return NULL;
 	int horiz_center = (DEFAULT_MENU_WINDOW_WIDTH - DEFAULT_BTN_WIDTH) / 2;

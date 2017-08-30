@@ -16,6 +16,7 @@
 #define DEFAULT_GAP_WINDOW 100
 #include <stdbool.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 //.y = position_buttons + DEFAULT_BTN_GAP*(i++)
@@ -64,15 +65,17 @@ typedef struct button_t {
 	bool visibility;
 } Button;
 
-ButtonType which_button_clicked(SDL_Event* event, Button **buttons, int buttons_number);
-Button* get_button_clicked(SDL_Event* event, Button** buttons, int buttons_number);
+ButtonType which_button_clicked(SDL_Event *event, Button **buttons, int buttons_number);
+Button *get_button_clicked(SDL_Event* event, Button** buttons, int buttons_number);
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 		const char *active_image, const char *inactive_image, ButtonType type, bool active, bool visibility);
+Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_number, int x_btn_places[],
+		int y_btn_places[],	const char* image[], const char* image_inavtice[], bool active[], bool visible[]);
 
 // this function is in charge of destroying all the data Associated with a button
-void destroyButton(Button*);
+void destroyButton(Button *);
 
-void drawButton(Button*);
+void drawButton(Button *);
 
 
 #endif /* GRAPHICS_BUTTON_H_ */

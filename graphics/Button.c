@@ -45,6 +45,28 @@ Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 	return button;
 }
 
+/* helper function, for creating list of buttons
+ * return:
+ * 		on success - array of pointer to buttons
+ * 		on failure - NULL
+ */
+Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_number, int x_btn_places[],
+		int y_btn_places[],	const char* image[], const char* image_inavtice[], bool active[], bool visible[]) {
+	Button** buttons = (Button **) malloc(sizeof(Button*) * buttons_number);
+	assert(buttons != NULL);
+	for (int i = 0; i < 7; i++) {
+		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
+		buttons[i] = createButton(renderer, &Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
+		if(buttons[i] == NULL){
+			for(int j = 0; j < i; j++)
+				destroyButton(buttons[j]);
+			free(buttons);
+			return NULL;
+		}
+	}
+	return buttons;
+}
+
 
 void destroyButton(Button* button) {
 	if (button == NULL ) {
