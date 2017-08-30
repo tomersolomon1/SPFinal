@@ -148,15 +148,20 @@ bool graphical_handle_single_move(GameWindow *window, int srow, int scol, int dr
 	set_step(board, srow, scol, drow, dcol);
 	draw_board(window->board_widget, NULL, -1, -1); /* drawing the board, no piece is selected */
 	int game_over = is_game_over(board);
+	char mssg[50];
 	if (game_over == 0 || game_over == 1 || game_over == 2) { /* the game is over */
-		char mssg[50];
+
 		if (game_over == 2) { /* it's a tie */
 			strcpy(mssg, "It's a tie!");
 		} else { /* somebody won the game */
 			sprintf(mssg, "Checkmate! %s player wins the game", colors[game_over]);
 		}
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", mssg, NULL);
+		printf("notice from graphical handler: the game is over");
 		return true;
+	} else if (is_under_check(board)) {
+		sprintf(mssg, "Check: %s King is threatend!", colors[board->turn]);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Check!", mssg, NULL);
 	}
 	return false;
 }
@@ -210,13 +215,16 @@ void handle_game_events(GameWindow *window, SDL_Event* event) {
 					int y_board = 7 - (8*y / window->board_widget->location->h);
 					Piece *piece = window->board_widget->board->all_pieces[window->selected_piece_color][window->selected_piece_index];
 					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->board_widget->board, piece->row, piece->col, y_board, x_board);
-					if (mssg == CHESS_BOARD_SUCCESS) {
-						graphical_handle_move(window, piece->row, piece->col, y_board, x_board);
-						//set_step(window->board_widget->board, piece->row, piece->col, y_board, x_board);
-					}
 					window->selected_piece_color = -1;
 					window->selected_piece_index = -1;
-					//draw_board(window->board_widget, event, window->selected_piece_color, window->selected_piece_index);
+					if (mssg == CHESS_BOARD_SUCCESS) {
+						if (graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) { /* the game is over */
+							printf("game overrrrrrr\n");
+							return;
+						}
+					} else {
+						draw_board(window->board_widget, event, window->selected_piece_color, window->selected_piece_index);
+					}
 				}
 			}
 			break;
