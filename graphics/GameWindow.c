@@ -52,11 +52,11 @@ Button **create_game_buttons(SDL_Renderer* window_renderer) {
 	int y_btn_places[] = {0, DEFAULT_GAME_BUTTON_HEIGHT + DEFAULT_GAME_BUTTON_VERTICAL_GAP,
 			2*DEFAULT_GAME_BUTTON_HEIGHT + 2*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
 			3*DEFAULT_GAME_BUTTON_HEIGHT + 3*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
-			4*DEFAULT_GAME_BUTTON_HEIGHT + 4*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			5*DEFAULT_GAME_BUTTON_HEIGHT + 4*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
 			6*DEFAULT_GAME_BUTTON_HEIGHT + 5*DEFAULT_GAME_BUTTON_VERTICAL_GAP,};
 
 	ButtonType types[] = {RestartButton, SaveButton, LoadButton, UndoButton, MenuButton, ExitButton};
-	const char* image[] = {IMG(start), IMG(start), IMG(start), IMG(start), IMG(start), IMG(start)};
+	const char* image[] = {IMG(start), IMG(start), IMG(load), IMG(start), IMG(start), IMG(exit)};
 	const char* image_inavtice[] = {IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white)};
 	bool active[] = {true, true, true, false, true, true};
 	bool visible[] = {true, true, true, true, true, true};
@@ -147,8 +147,10 @@ void drawGameWindow(GameWindow* src, SDL_Event* event, int selected_piece_color,
 void recognize_square(GameWindow *window, int x, int y) {
 	SDL_Point point = {.x = x, .y = y };
 	if(SDL_PointInRect(&point ,window->board_widget->location)) { // inside the board
-		int x_board = (8*point.x / window->board_widget->location->w);
-		int y_board = 8 - (8*point.y / window->board_widget->location->h);
+		int relative_x = x - window->board_widget->location->x;
+		int relative_y = y - window->board_widget->location->y;
+		int x_board = (8*relative_x / window->board_widget->location->w);
+		int y_board = 8 - (8*relative_y / window->board_widget->location->h);
 		printf("hit on board:%s%d\n", ABC2[x_board], y_board);
 	} else {
 		printf("outside the window!\n");
@@ -214,20 +216,25 @@ void handle_game_events(GameWindow *window, SDL_Event* event) {
 	}
 	switch(event->type) {
 		case SDL_MOUSEBUTTONDOWN:
-			int relative_x = event->button.x - window->board_widget->location->x;
-			int relative_y = event->button.y - window->board_widget->location->y;
 			if (mouse_in_rec(event->button.x, event->button.y, window->board_widget->location)
 					&& (event->button.button == SDL_BUTTON_LEFT)) {
-
+				int relative_x = event->button.x - window->board_widget->location->x;
+				int relative_y = event->button.y - window->board_widget->location->y;
 				int x_board = (8*relative_x / window->board_widget->location->w);
 				int y_board = 7 - (8*relative_y / window->board_widget->location->h);
-				recognize_square(window, relative_x, relative_y); // for debug
+				recognize_square(window, event->button.x, event->button.y); // for debug
 				Piece *piece = window->board_widget->board->board[y_board][x_board];
-				if (piece->type != Empty) { /* this piece will be selected now */
+				if (piece->type != Empty && piece->colur == window->board_widget->board->turn) { /* this piece will be selected now */
 					window->selected_piece_color = piece->colur;
 					window->selected_piece_index = piece->indexat;
 					window->picked_piece  = true;
 					printf("selcted parameters: (%d, %d)\n", window->selected_piece_color, window->selected_piece_index);
+					fflush(stdout);
+				}
+			} else if (event->button.button == SDL_BUTTON_LEFT) { /* maybe we clicked some button? */
+				Button *clicked_button = get_button_clicked(event, window->buttons, window->num_buttons);
+				if (clicked_button != NULL) {
+					printf("button: %d\n", clicked_button->type);
 					fflush(stdout);
 				}
 			}
@@ -236,8 +243,10 @@ void handle_game_events(GameWindow *window, SDL_Event* event) {
 			if (event->button.button == SDL_BUTTON_LEFT && window->picked_piece) { /* the selected piece was dropped */
 				window->picked_piece  = false;
 				if (mouse_in_rec(event->button.x, event->button.y, window->board_widget->location)) {
-					int x_board = (8*event->button.x / window->board_widget->location->w);
-					int y_board = 7 - (8*event->button.y / window->board_widget->location->h);
+					int relative_x = event->button.x - window->board_widget->location->x;
+					int relative_y = event->button.y - window->board_widget->location->y;
+					int x_board = (8*relative_x / window->board_widget->location->w);
+					int y_board = 7 - (8*relative_y / window->board_widget->location->h);
 					Piece *piece = window->board_widget->board->all_pieces[window->selected_piece_color][window->selected_piece_index];
 					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->board_widget->board, piece->row, piece->col, y_board, x_board);
 					window->selected_piece_color = -1;
@@ -248,7 +257,7 @@ void handle_game_events(GameWindow *window, SDL_Event* event) {
 							return;
 						}
 					} else {
-						drawGameWindow(window, event, window->selected_piece_color, window->selected_piece_index);
+						drawGameWindow(window, event, window->selected_piece_color, window->selected_piece_index); /* not -1, -1?????*/
 					}
 				}
 			}
