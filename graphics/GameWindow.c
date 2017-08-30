@@ -32,9 +32,10 @@ GameWindow *create_game_window(Gameboard *board) {
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	game_window->window = window;
 	game_window->windowRenderer = renderer;
-	game_window->num_buttons = 0; // to be changed
-	game_window->buttons = NULL;
-	SDL_Rect board_rec = {.x = 0, .y = 0, .h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
+	game_window->num_buttons = 6;
+	game_window->buttons = create_game_buttons(renderer);
+	assert(game_window->buttons != NULL);
+	SDL_Rect board_rec = {.x = DEFAULT_GAME_BUTTON_PANEL_WIDTH, .y = 0, .h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
 	game_window->board_widget = create_widget_board(renderer, board, &board_rec);
 	game_window->picked_piece = false;
 	game_window->selected_piece_color = -1;
@@ -43,7 +44,27 @@ GameWindow *create_game_window(Gameboard *board) {
 }
 
 Button **create_game_buttons(SDL_Renderer* window_renderer) {
-	return NULL;
+	//set all parameters:
+	int x_btn_places[] = {DEFAULT_GAME_BUTTON_HORIZONTAL_GAP, DEFAULT_GAME_BUTTON_HORIZONTAL_GAP,
+			DEFAULT_GAME_BUTTON_HORIZONTAL_GAP, DEFAULT_GAME_BUTTON_HORIZONTAL_GAP,
+			DEFAULT_GAME_BUTTON_HORIZONTAL_GAP, DEFAULT_GAME_BUTTON_HORIZONTAL_GAP};
+
+	int y_btn_places[] = {0, DEFAULT_GAME_BUTTON_HEIGHT + DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			2*DEFAULT_GAME_BUTTON_HEIGHT + 2*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			3*DEFAULT_GAME_BUTTON_HEIGHT + 3*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			4*DEFAULT_GAME_BUTTON_HEIGHT + 4*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			6*DEFAULT_GAME_BUTTON_HEIGHT + 5*DEFAULT_GAME_BUTTON_VERTICAL_GAP,};
+
+	ButtonType types[] = {RestartButton, SaveButton, LoadButton, UndoButton, MenuButton, ExitButton};
+	const char* image[] = {IMG(start), IMG(start), IMG(start), IMG(start), IMG(start), IMG(start)};
+	const char* image_inavtice[] = {IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white)};
+	bool active[] = {true, true, true, false, true, true};
+	bool visible[] = {true, true, true, true, true, true};
+	Button **buttons = create_buttons(window_renderer, types, 6, x_btn_places,
+			y_btn_places, image, image_inavtice, active, visible, DEFAULT_GAME_BUTTON_HEIGHT, DEFAULT_GAME_BUTTON_WIDTH);
+	printf("created all buttons\n");
+	fflush(stdout);
+	return buttons;
 }
 
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location) {
@@ -109,14 +130,17 @@ void draw_board(BoardWidget *board_widget, SDL_Event* event, int selected_piece_
 	SDL_RenderPresent(board_widget->renderer);
 }
 
-void drawGameWindow(GameWindow* src) {
+void drawGameWindow(GameWindow* src, SDL_Event* event, int selected_piece_color, int selected_piece_index) {
 	if (src == NULL ) {
 		return;
 	}
 	// draw window:
 	SDL_SetRenderDrawColor(src->windowRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(src->windowRenderer);
-	draw_board(src->board_widget, NULL, -1, -1); /* no piece was selected */
+	draw_board(src->board_widget, event, selected_piece_color, selected_piece_index); /* no piece was selected */
+	for (int i = 0; i < src->num_buttons; i++) {
+		drawButton(src->buttons[i]);
+	}
 	SDL_RenderPresent(src->windowRenderer);
 }
 
@@ -150,7 +174,7 @@ bool mouse_in_rec(int x, int y, SDL_Rect *rect) {
 bool graphical_handle_single_move(GameWindow *window, int srow, int scol, int drow, int dcol) {
 	Gameboard *board = window->board_widget->board;
 	set_step(board, srow, scol, drow, dcol);
-	draw_board(window->board_widget, NULL, -1, -1); /* drawing the board, no piece is selected */
+	drawGameWindow(window, NULL, -1, -1); /* drawing the board, no piece is selected */
 	int game_over = is_game_over(board);
 	char mssg[50];
 	if (game_over == 0 || game_over == 1 || game_over == 2) { /* the game is over */
@@ -190,11 +214,14 @@ void handle_game_events(GameWindow *window, SDL_Event* event) {
 	}
 	switch(event->type) {
 		case SDL_MOUSEBUTTONDOWN:
+			int relative_x = event->button.x - window->board_widget->location->x;
+			int relative_y = event->button.y - window->board_widget->location->y;
 			if (mouse_in_rec(event->button.x, event->button.y, window->board_widget->location)
 					&& (event->button.button == SDL_BUTTON_LEFT)) {
-				int x_board = (8*event->button.x / window->board_widget->location->w);
-				int y_board = 7 - (8*event->button.y / window->board_widget->location->h);
-				recognize_square(window, event->button.x, event->button.y); // for debug
+
+				int x_board = (8*relative_x / window->board_widget->location->w);
+				int y_board = 7 - (8*relative_y / window->board_widget->location->h);
+				recognize_square(window, relative_x, relative_y); // for debug
 				Piece *piece = window->board_widget->board->board[y_board][x_board];
 				if (piece->type != Empty) { /* this piece will be selected now */
 					window->selected_piece_color = piece->colur;
@@ -221,14 +248,14 @@ void handle_game_events(GameWindow *window, SDL_Event* event) {
 							return;
 						}
 					} else {
-						draw_board(window->board_widget, event, window->selected_piece_color, window->selected_piece_index);
+						drawGameWindow(window, event, window->selected_piece_color, window->selected_piece_index);
 					}
 				}
 			}
 			break;
 		case SDL_MOUSEMOTION:
 			if(mouse_in_rec(event->motion.x, event->motion.y, window->board_widget->location) && window->picked_piece) {
-				draw_board(window->board_widget, event, window->selected_piece_color, window->selected_piece_index);
+				drawGameWindow(window, event, window->selected_piece_color, window->selected_piece_index);
 			}
 			break;
 	}

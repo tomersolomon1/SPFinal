@@ -52,7 +52,13 @@ typedef enum {
 
 	/* set color buttons */
 	SetBlack,
-	SetWhite
+	SetWhite,
+
+	/* game buttons */
+	RestartButton,
+	SaveButton,
+	UndoButton,
+	MenuButton
 } ButtonType;
 
 typedef struct button_t {
@@ -70,8 +76,7 @@ Button *get_button_clicked(SDL_Event* event, Button** buttons, int buttons_numbe
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 		const char *active_image, const char *inactive_image, ButtonType type, bool active, bool visibility);
 Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_number, int x_btn_places[],
-		int y_btn_places[],	const char* image[], const char* image_inavtice[], bool active[], bool visible[]);
-
+		int y_btn_places[],	const char* image[], const char* image_inavtice[], bool active[], bool visible[], int btn_height, int btn_width);
 // this function is in charge of destroying all the data Associated with a button
 void destroyButton(Button *);
 

@@ -20,7 +20,7 @@ void check_game_window() {
 		return;
 	}
 	SDL_Event event;
-	drawGameWindow(game_window);
+	drawGameWindow(game_window, NULL, -1, -1);
 	while(1){
 		SDL_WaitEvent(&event);
 		if(event.type == SDL_QUIT){

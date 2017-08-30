@@ -18,19 +18,19 @@
 #define CHESS_IMAGE(x) IMG(ChessPieces/x)
 
 
-#define DEFAULT_GAME_WINDOW_WIDTH 600
-#define DEFAULT_GAME_WINDOW_HEIGHT 600
+#define DEFAULT_GAME_WINDOW_WIDTH 700
+#define DEFAULT_GAME_WINDOW_HEIGHT 700
 
 // buttons panel dimensions
-#define DEFAULT_GAME_BUTTON_PANEL_WIDTH (DEFAULT_GAME_WINDOW_WIDTH / 8)
+#define DEFAULT_GAME_BUTTON_PANEL_WIDTH (DEFAULT_GAME_WINDOW_WIDTH / 4)
 #define DEFAULT_GAME_BUTTON_PANEL_HEIGHT DEFAULT_GAME_WINDOW_HEIGHT
 
 // button related measures
-#define DEFAULT_GAME_BUTTON_WIDTH (DEFAULT_GAME_BUTTON_PANEL_WIDTH / 2)
+#define DEFAULT_GAME_BUTTON_WIDTH (5*DEFAULT_GAME_BUTTON_PANEL_WIDTH / 6)
 #define DEFAULT_GAME_BUTTON_HEIGHT (DEFAULT_GAME_WINDOW_HEIGHT / 10)
 #define GAME_WINDOW_NUMBER_OF_BUTTONS 8 /* including the empty buttons */
 #define DEFAULT_GAME_BUTTON_VERTICAL_GAP ((DEFAULT_GAME_WINDOW_HEIGHT - (GAME_WINDOW_NUMBER_OF_BUTTONS * DEFAULT_GAME_BUTTON_HEIGHT)) / 8)
-#define DEFAULT_GAME_BUTTON_HORIZONTAL_GAP (DEFAULT_GAME_BUTTON_PANEL_WIDTH / 10)
+#define DEFAULT_GAME_BUTTON_HORIZONTAL_GAP (DEFAULT_GAME_BUTTON_PANEL_WIDTH / 20)
 
 // board panel dimensions
 #define BOARD_PANEL_WIDTH (DEFAULT_GAME_WINDOW_WIDTH - DEFAULT_GAME_BUTTON_PANEL_WIDTH)
@@ -73,7 +73,8 @@ typedef struct game_window_t {
 
 GameWindow *create_game_window(Gameboard *board);
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
-void drawGameWindow(GameWindow* src);
+void drawGameWindow(GameWindow* src, SDL_Event* event, int selected_piece_color, int selected_piece_index);
 void handle_game_events(GameWindow *window, SDL_Event* event);
+Button **create_game_buttons(SDL_Renderer* window_renderer);
 
 #endif /* GRAPHICS_GAMEWINDOW_H_ */
