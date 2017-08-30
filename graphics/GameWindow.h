@@ -11,6 +11,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include "../GameBoard.h"
+#include "../MiniMax.h"
 #include "Button.h"
 #include "SPCommon.h"
 
