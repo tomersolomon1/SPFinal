@@ -10,8 +10,8 @@
 const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game Mode","Chess: Difficulty","Chess: Choose Color"};
 int num_buttons[] = {3,7,5,7,4,0,0};
 
-MenuWindow* create_menu_window(menu_window_type type){
-	MenuWindow* src = (MenuWindow*) malloc(sizeof(MenuWindow));
+Window* create_menu_window(menu_window_type type){
+	Window* src = (Window*) malloc(sizeof(Window));
 	src->type = type;
 	SDL_Window* window = SDL_CreateWindow(window_name[type], SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, DEFAULT_MENU_WINDOW_WIDTH, DEFAULT_MENU_WINDOW_HIGHT, SDL_WINDOW_OPENGL);
@@ -222,7 +222,7 @@ Button** create_choose_color_buttons(SDL_Renderer* renderer){
 	return buttons;
 }
 
-void destroyMenuWindow(MenuWindow* src) {
+void destroyWindow(Window* src) {
 	if (src == NULL ) {
 		return;
 	}
@@ -236,7 +236,7 @@ void destroyMenuWindow(MenuWindow* src) {
 	free(src);
 }
 
-void drawWindow(MenuWindow* src) {
+void drawWindow(Window* src) {
 	if (src == NULL ) {
 		return;
 	}
@@ -249,7 +249,7 @@ void drawWindow(MenuWindow* src) {
 	SDL_RenderPresent(src->windowRenderer);
 }
 
-Button* get_button_by_type(MenuWindow* wndw, ButtonType type){
+Button* get_button_by_type(Window* wndw, ButtonType type){
 	for(int i = 0; i < wndw->num_buttons; i++){
 		if(wndw->buttons[i]->type == type){
 			return wndw->buttons[i];
@@ -259,7 +259,7 @@ Button* get_button_by_type(MenuWindow* wndw, ButtonType type){
 }
 
 
-menu_window_type handleEvenet(MenuWindow* wndw, Gameboard** game){
+menu_window_type handleEvenet(Window* wndw, Gameboard** game){
 	if(wndw == NULL)
 		return ExitGame;
 	menu_window_type type = Enterance;
@@ -295,7 +295,7 @@ menu_window_type handleEvenet(MenuWindow* wndw, Gameboard** game){
 	}
 }
 
-menu_window_type handleEvenet_enterance(MenuWindow* wndw, Button* btn){
+menu_window_type handleEvenet_enterance(Window* wndw, Button* btn){
 	if(btn->type == NewGameButton){
 		return ModeGame;
 	}
@@ -307,23 +307,23 @@ menu_window_type handleEvenet_enterance(MenuWindow* wndw, Button* btn){
 	}
 	return wndw->type;
 }
-menu_window_type handleEvenet_load_game(MenuWindow* wndw, Button* btn, Gameboard** game){
+menu_window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Enterance;
 	return wndw->type;
 }
-menu_window_type handleEvenet_mode_game(MenuWindow* wndw, Button* btn, Gameboard** game){
+menu_window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Enterance;
 	return wndw->type;
 }
-menu_window_type handleEvenet_difficulty(MenuWindow* wndw, Button* btn, Gameboard** game){
+menu_window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton){
 		return ModeGame;
 	}
 	return wndw->type;
 }
-menu_window_type handleEvenet_choose_color(MenuWindow* wndw, Button* btn, Gameboard** game){
+menu_window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Difficulty;
 	return wndw->type;

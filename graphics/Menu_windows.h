@@ -24,27 +24,28 @@ typedef enum menu_window_type_t{
 	ExitGame
 } menu_window_type;
 
-typedef struct menu_window_t{
+typedef struct window_t{
 	menu_window_type type;
 	SDL_Window* window;
 	SDL_Renderer* windowRenderer;
 	int num_buttons;
 	Button** buttons;
-} MenuWindow;
+	void* data;
+} Window;
 
-MenuWindow* create_menu_window(menu_window_type type);
+Window* create_menu_window(menu_window_type type);
 Button** create_enterance_buttons(SDL_Renderer* renderer);
 Button** create_load_game_buttons(SDL_Renderer* renderer);
 Button** create_game_mode_buttons(SDL_Renderer* renderer);
 Button** create_difficulty_buttons(SDL_Renderer* renderer);
 Button** create_choose_color_buttons(SDL_Renderer* renderer);
-void destroyMenuWindow(MenuWindow* src);
-void drawWindow(MenuWindow* src);
-Button* get_button_by_type(MenuWindow* wndw, ButtonType type);
-menu_window_type handleEvenet(MenuWindow* wndw, Gameboard** game);
-menu_window_type handleEvenet_enterance(MenuWindow* wndw, Button* btn);
-menu_window_type handleEvenet_load_game(MenuWindow* wndw, Button* btn, Gameboard** game);
-menu_window_type handleEvenet_mode_game(MenuWindow* wndw, Button* btn, Gameboard** game);
-menu_window_type handleEvenet_difficulty(MenuWindow* wndw, Button* btn, Gameboard** game);
-menu_window_type handleEvenet_choose_color(MenuWindow* wndw, Button* btn, Gameboard** game);
+void destroyWindow(Window* src);
+void drawWindow(Window* src);
+Button* get_button_by_type(Window* wndw, ButtonType type);
+menu_window_type handleEvenet(Window* wndw, Gameboard** game);
+menu_window_type handleEvenet_enterance(Window* wndw, Button* btn);
+menu_window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game);
+menu_window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game);
+menu_window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game);
+menu_window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** game);
 #endif /* GRAPHICS_MENU_WINDOWS_H_ */

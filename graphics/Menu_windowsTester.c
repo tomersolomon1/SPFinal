@@ -12,12 +12,12 @@ void check_menu_window(){
 	menu_window_type type_window = Enterance;
 	Gameboard* game = NULL;
 	while(1){
-		MenuWindow* window = create_menu_window(type_window);
+		Window* window = create_menu_window(type_window);
 		if(window == NULL){
 			return;
 		}
 		type_window = handleEvenet(window, &game);
-		destroyMenuWindow(window);
+		destroyWindow(window);
 		if(type_window == ExitGame)
 			break;
 	}
