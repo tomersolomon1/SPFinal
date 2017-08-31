@@ -219,7 +219,7 @@ void save_game() {
 	/* to be filled later on */
 }
 
-Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game) {
+Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game, Button *clicked_button) {
 	//SDL_Point point;
 	if (event == NULL || window == NULL ) {
 		return ExitGame;
