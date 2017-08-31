@@ -56,13 +56,7 @@ Window *create_game_window(Gameboard *board) {
 	game_window->num_buttons = 6;
 	game_window->buttons = create_game_buttons(renderer);
 	assert(game_window->buttons != NULL);
-	GameData *data = (GameData *) malloc(sizeof(GameData));
-	assert(data != NULL);
-	SDL_Rect board_rec = {.x = DEFAULT_GAME_BUTTON_PANEL_WIDTH, .y = 0, .h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
-	data->board_widget = create_widget_board(renderer, board, &board_rec);
-	data->picked_piece = false;
-	data->selected_piece_color = -1;
-	data->selected_piece_index = -1;
+	game_window->data = create_game_data(renderer, board);
 	return game_window;
 }
 
@@ -198,7 +192,7 @@ bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, 
 			sprintf(mssg, "Checkmate! %s player wins the game", colors[game_over]);
 		}
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", mssg, NULL);
-		printf("notice from graphical handler: the game is over");
+		printf("notice from graphical handler: the game is over\n");
 		return true;
 	} else if (is_under_check(board)) {
 		sprintf(mssg, "Check: %s King is threatend!", colors[board->turn]);
@@ -220,7 +214,7 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 	return false; /* the game is not over yet */
 }
 
-void save_game() {
+void save_game_from_gui() {
 	/* to be filled later on */
 }
 
@@ -236,7 +230,7 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 				window->data->board_widget->board = *game;
 				return Game;
 			case SaveButton:
-				save_game();
+				save_game_from_gui();
 				return Game;
 			case LoadButton:
 				printf("are you sure?????????????\n"); /* to be updated */

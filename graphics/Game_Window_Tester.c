@@ -30,6 +30,7 @@ void check_game_window() {
 		}  else {
 			Button *btn = get_button_clicked(&event, game_window->buttons, game_window->num_buttons);
 			handle_game_events(game_window, &event, &game_board, btn);
+			drawGameWindow(game_window, &event);
 		}
 
 	}
