@@ -31,9 +31,17 @@ typedef struct window_t{
 	int num_buttons;
 	Button** buttons;
 	void* data;
+	void (*destroyData)(void*);
 } Window;
 
-Window* create_menu_window(menu_window_type type);
+typedef struct game_params_t{
+	int amount_players;
+	int difficulty_leve;
+	int color;
+	int gameslot;
+}Game_params;
+
+Window* create_window(menu_window_type type);
 Button** create_enterance_buttons(SDL_Renderer* renderer);
 Button** create_load_game_buttons(SDL_Renderer* renderer);
 Button** create_game_mode_buttons(SDL_Renderer* renderer);
