@@ -14,8 +14,6 @@
 #include "../GameBoard.h"
 #include "SPCommon.h"
 
-#include "GameWindow.h"
-
 typedef enum window_type_t{
 	Enterance,
 	LoadGame,

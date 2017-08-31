@@ -14,7 +14,7 @@
 #include "../MiniMax.h"
 #include "Button.h"
 #include "SPCommon.h"
-#include "Window.h"
+#include "Windows.h"
 
 #define CHESS_IMAGE(x) IMG(ChessPieces/x)
 
