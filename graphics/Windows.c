@@ -34,21 +34,6 @@ Window*  create_window(Window_type type, Gameboard* game){
 		src->data = create_game_data(game);
 	}
 	src->buttons = (*creators[type])(renderer);
-//	if(type == Enterance){
-//		src->buttons = create_enterance_buttons(renderer);
-//	}
-//	else if(type == LoadGame){
-//		src->buttons = create_load_game_buttons(renderer);
-//	}
-//	else if(type == ModeGame){
-//		src->buttons = create_game_mode_buttons(renderer);
-//	}
-//	else if(type == Difficulty){
-//		src->buttons = create_difficulty_buttons(renderer);
-//	}
-//	else if(type == ChooseColor){
-//		src->buttons = create_choose_color_buttons(renderer);
-//	}
 	if(src->buttons == NULL){
 		free(src);
 		SDL_DestroyWindow(window);
@@ -252,7 +237,7 @@ void drawWindow(Window* src, SDL_Event* event) {
 	SDL_SetRenderDrawColor(src->windowRenderer, 200, 255, 255, 255);
 	SDL_RenderClear(src->windowRenderer);
 	if(src->type == Game){
-		draw_board(src, event);
+		draw_board(src->data, event);
 	}
 	for (int i = 0; i < src->num_buttons; i++) {
 		drawButton(src->buttons[i]);
@@ -326,11 +311,14 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 		SDL_WaitEvent(&event);
 		if (event.type == SDL_QUIT)
 			return ExitGame;
-		else if (event.type == SDL_MOUSEBUTTONUP){
+		else if (event.type == SDL_MOUSEBUTTONUP && event->button.button == SDL_BUTTON_LEFT){
 			Button* btn = get_button_clicked(&event, wndw->buttons, wndw->num_buttons);
-			if (btn == NULL)
-				continue;
+			if(wndw->type == Game){
+				type = handle_game_events(wndw, &event, btn);
+			}
 			else{
+				if(btn == NULL)
+					continue;
 				if(wndw->type == Enterance)
 					type =  handleEvenet_enterance(wndw, btn);
 				else if(wndw->type == LoadGame)
@@ -341,12 +329,12 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 					type = handleEvenet_difficulty(wndw, btn, game);
 				else if(wndw->type == ChooseColor)
 					type = handleEvenet_choose_color(wndw, btn, game);
-				if(type == wndw->type){
-					continue;
-				}
-				else{
-					return type;
-				}
+			}
+			if(type == wndw->type){
+				continue;
+			}
+			else{
+				return type;
 			}
 		}
 		drawWindow(wndw);
@@ -372,6 +360,7 @@ Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
 Window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Enterance;
+	if(btn->type == )
 	return wndw->type;
 }
 Window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game){
