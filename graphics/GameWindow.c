@@ -85,8 +85,6 @@ Button **create_game_buttons(SDL_Renderer* window_renderer) {
 	bool visible[] = {true, true, true, true, true, true};
 	Button **buttons = create_buttons(window_renderer, types, 6, x_btn_places,
 			y_btn_places, image, image_inavtice, active, visible, DEFAULT_GAME_BUTTON_HEIGHT, DEFAULT_GAME_BUTTON_WIDTH);
-	printf("created all buttons\n");
-	fflush(stdout);
 	return buttons;
 }
 
