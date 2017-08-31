@@ -12,7 +12,7 @@ int num_buttons[] = {3,7,5,7,4,6,0};
 buttons_creator creators[] = {create_enterance_buttons, create_load_game_buttons, create_game_mode_buttons,
 				create_difficulty_buttons, create_choose_color_buttons, create_game_buttons};
 
-Window* create_window(window_type type, Gameboard* game){
+Window* create_window(Window_type type, Gameboard* game){
 	Window* src = (Window*) malloc(sizeof(Window));
 	src->type = type;
 	SDL_Window* window = SDL_CreateWindow(window_name[type], SDL_WINDOWPOS_CENTERED,
@@ -284,10 +284,10 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 	}
 }
 
-window_type handleEvenet(Window* wndw, Gameboard** game){
+Window_type handleEvenet(Window* wndw, Gameboard** game){
 	if(wndw == NULL)
 		return ExitGame;
-	window_type type = Enterance;
+	Window_type type = Enterance;
 	SDL_Event event;
 	set_buttons_by_game_params(wndw, game);
 	while(1){
@@ -321,7 +321,7 @@ window_type handleEvenet(Window* wndw, Gameboard** game){
 	}
 }
 
-window_type handleEvenet_enterance(Window* wndw, Button* btn){
+Window_type handleEvenet_enterance(Window* wndw, Button* btn){
 	if(btn->type == NewGameButton){
 		return ModeGame;
 	}
@@ -333,23 +333,23 @@ window_type handleEvenet_enterance(Window* wndw, Button* btn){
 	}
 	return wndw->type;
 }
-window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
+Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Enterance;
 	return wndw->type;
 }
-window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game){
+Window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Enterance;
 	return wndw->type;
 }
-window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game){
+Window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton){
 		return ModeGame;
 	}
 	return wndw->type;
 }
-window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** game){
+Window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Difficulty;
 	return wndw->type;

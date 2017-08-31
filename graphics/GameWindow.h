@@ -14,6 +14,7 @@
 #include "../MiniMax.h"
 #include "Button.h"
 #include "SPCommon.h"
+#include "Window.h"
 
 #define CHESS_IMAGE(x) IMG(ChessPieces/x)
 
@@ -57,7 +58,7 @@ typedef struct game_window_t {
 	BoardWidget *board_widget;
 } GameWindow;
 
-GameWindow *create_game_window(Gameboard *board);
+GameData *create_game_data(Gameboard *board);
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
 void drawGameWindow(GameWindow* src, SDL_Event* event, int selected_piece_color, int selected_piece_index);
 void handle_game_events(GameWindow *window, SDL_Event* event);
