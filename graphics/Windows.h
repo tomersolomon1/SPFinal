@@ -13,7 +13,7 @@
 #include <SDL2/SDL_video.h>
 #include "../GameBoard.h"
 #include "SPCommon.h"
-#include "Window.h"
+
 #include "GameWindow.h"
 
 typedef enum window_type_t{

@@ -125,9 +125,9 @@ Gameboard *copy_board(Gameboard* old) {
 }
 
 void reset_board(Gameboard** gameboard){
-	int game_mode = *gameboard->game_mode;
-	int difficulty = *gameboard->difficulty;
-	int user_color = *gameboard->user_color;
+	int game_mode = (*gameboard)->game_mode;
+	int difficulty = (*gameboard)->difficulty;
+	int user_color = (*gameboard)->user_color;
 	destroy_board(*gameboard);
 	*gameboard = create_board(game_mode, difficulty, user_color);
 }
