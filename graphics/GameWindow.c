@@ -187,7 +187,7 @@ void drawGameWindow(Window* src, SDL_Event* event) {
 bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol) {
 	Gameboard *board = window->data->board_widget->board;
 	set_step(board, srow, scol, drow, dcol);
-	drawGameWindow(window, NULL, -1, -1); /* drawing the board, no piece is selected */
+	drawGameWindow(window, NULL); /* drawing the board, no piece is selected */
 	int game_over = is_game_over(board);
 	char mssg[50];
 	if (game_over == 0 || game_over == 1 || game_over == 2) { /* the game is over */
@@ -233,7 +233,7 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 		switch(clicked_button->type) {
 			case RestartButton:
 				reset_board(game);
-				window->data->board_widget->board = game;
+				window->data->board_widget->board = *game;
 				return Game;
 			case SaveButton:
 				save_game();
@@ -250,6 +250,8 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 				return Game;
 			case MenuButton:
 				return Enterance;
+			default: /* something went wrong */
+				return ExitGame;
 		}
 	} else {
 		switch(event->type) {

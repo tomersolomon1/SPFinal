@@ -14,7 +14,7 @@
 #include "../MiniMax.h"
 #include "Button.h"
 #include "SPCommon.h"
-#include "Windows.h"
+#include "Window.h"
 
 #define CHESS_IMAGE(x) IMG(ChessPieces/x)
 
@@ -46,9 +46,11 @@
 #define VERTICAL_CENTERING 2
 #define HORIZONTAL_CENTERING 4
 
+Window *create_game_window(Gameboard *board);
 GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board);
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
 void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
+void drawGameWindow(Window* src, SDL_Event* event);
 Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board, Button *clicked_button);
 Button **create_game_buttons(SDL_Renderer* window_renderer);
 void destroyData(BoardWidget* data);
