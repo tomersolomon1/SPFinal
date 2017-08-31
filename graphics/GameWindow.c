@@ -90,10 +90,21 @@ Button **create_game_buttons(SDL_Renderer* window_renderer) {
 	return buttons;
 }
 
+GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
+	GameData *data = (GameData *) malloc(sizeof(GameData));
+	assert(data != NULL);
+	SDL_Rect board_rec = {.x = DEFAULT_GAME_BUTTON_PANEL_WIDTH, .y = 0, .h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
+	data->board_widget = create_widget_board(renderer, board, &board_rec);
+	data->picked_piece = false;
+	data->selected_piece_color = -1;
+	data->selected_piece_index = -1;
+	return data;
+}
+
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location) {
 	BoardWidget *board_widget = (BoardWidget *) malloc(sizeof(BoardWidget));
 	board_widget->location = spCopyRect(location);
-	board_widget->renderer = window_renderer;
+	//board_widget->renderer = window_renderer;
 	board_widget->board = board;
 	SDL_Surface *board_grid = SDL_LoadBMP(IMG(ChessBoard)); // don't forget to check the board later
 	board_widget->board_grid = SDL_CreateTextureFromSurface(window_renderer, board_grid);
@@ -121,14 +132,12 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 		}
 	}
 	printf(CHESS_IMAGE(WQueen));
-	printf("\n");
-	printf("created all surfaces!\n");
 	return board_widget;
 }
 
-void draw_board(GameData *data, SDL_Event* event) {
-	SDL_RenderClear(data->board_widget->renderer);
-	SDL_RenderCopy(data->board_widget->renderer, data->board_widget->board_grid, NULL, data->board_widget->location);
+void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, data->board_widget->board_grid, NULL, data->board_widget->location);
 	int row_rec_dim = data->board_widget->location->h / 9;
 	int col_rec_dim = data->board_widget->location->w / 9;
 	int row_dim = data->board_widget->location->h / 8;
@@ -142,7 +151,7 @@ void draw_board(GameData *data, SDL_Event* event) {
 			if (piece->alive && (color != selected_piece_color || i != selected_piece_index)) { /* this piece is alive and not selected, thus need to be drawn in his current place */
 				piece_rec.x = data->board_widget->location->x + HORIZONTAL_CENTERING + piece->col*col_dim;
 				piece_rec.y = data->board_widget->location->y + VERTICAL_CENTERING + (7 - piece->row)*row_dim;
-				SDL_RenderCopy(data->board_widget->renderer, data->board_widget->piece_textures[piece->colur][piece->type], NULL, &piece_rec);
+				SDL_RenderCopy(renderer, data->board_widget->piece_textures[piece->colur][piece->type], NULL, &piece_rec);
 			}
 		}
 	}
@@ -150,9 +159,9 @@ void draw_board(GameData *data, SDL_Event* event) {
 		piece_rec.x = event->motion.x;
 		piece_rec.y = event->motion.y;
 		Piece *piece = data->board_widget->board->all_pieces[selected_piece_color][selected_piece_index];
-		SDL_RenderCopy(data->board_widget->renderer, data->board_widget->piece_textures[selected_piece_color][piece->type], NULL, &piece_rec);
+		SDL_RenderCopy(renderer, data->board_widget->piece_textures[selected_piece_color][piece->type], NULL, &piece_rec);
 	}
-	SDL_RenderPresent(data->board_widget->renderer);
+	SDL_RenderPresent(renderer);
 }
 
 void drawGameWindow(Window* src, SDL_Event* event, int selected_piece_color, int selected_piece_index) {
@@ -168,8 +177,6 @@ void drawGameWindow(Window* src, SDL_Event* event, int selected_piece_color, int
 	}
 	SDL_RenderPresent(src->windowRenderer);
 }
-
-
 
 /*
  * assuming the move is legal

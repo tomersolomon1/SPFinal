@@ -58,9 +58,9 @@ typedef struct game_window_t {
 	BoardWidget *board_widget;
 } GameWindow;
 
-GameData *create_game_data(Gameboard *board);
+GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board);
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
-void draw_board(GameData *data, SDL_Event* event);
+void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
 Window_type handle_game_events(GameWindow *window, SDL_Event* event, Button *clicked_button);
 Button **create_game_buttons(SDL_Renderer* window_renderer);
 void destroyData(BoardWidget* data);

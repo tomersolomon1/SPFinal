@@ -29,7 +29,6 @@ typedef enum window_type_t{
 typedef struct board_widget {
 	Gameboard *board;
 	SDL_Rect  *location;
-	SDL_Renderer *renderer;
 
 	// board grid
 	SDL_Texture *board_grid;
