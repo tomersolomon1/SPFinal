@@ -213,10 +213,10 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 	return false; /* the game is not over yet */
 }
 
-void handle_game_events(Window *window, SDL_Event* event) {
+Window_type handle_game_events(Window *window, SDL_Event* event) {
 	//SDL_Point point;
 	if (event == NULL || window == NULL ) {
-		return;
+		return ExitGame;
 	}
 	switch(event->type) {
 		case SDL_MOUSEBUTTONDOWN:
@@ -235,7 +235,14 @@ void handle_game_events(Window *window, SDL_Event* event) {
 				}
 			} else if (event->button.button == SDL_BUTTON_LEFT) { /* maybe we clicked some button? */
 				Button *clicked_button = get_button_clicked(event, window->buttons, window->num_buttons);
-				if (clicked_button != NULL) {
+				if (clicked_button != NULL) { /* some button was clicked */
+					switch(clicked_button->type) {
+						case RestartButton:
+							printf("restart!\n");
+							break;
+						case ExitButton:
+							return ExitGame;
+					}
 				}
 			}
 			break;
@@ -251,6 +258,7 @@ void handle_game_events(Window *window, SDL_Event* event) {
 					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board);
 					window->data->selected_piece_color = -1;
 					window->data->selected_piece_index = -1;
+					window->data->picked_piece  = false;
 					if (mssg == CHESS_BOARD_SUCCESS) {
 						if (graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) { /* the game is over */
 							return;
