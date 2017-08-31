@@ -9,8 +9,8 @@
 #include "../GameBoard.h"
 
 void check_menu_window(){
-	menu_window_type type_window = Enterance;
-	Gameboard* game = NULL;
+	window_type type_window = Enterance;
+	Gameboard* game = create_board(1,1,1);
 	while(1){
 		Window* window = create_window(type_window);
 		if(window == NULL){

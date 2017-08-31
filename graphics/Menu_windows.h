@@ -16,19 +16,9 @@
 #include "GameWindow.h"
 
 
-typedef enum menu_window_type_t{
-	Enterance,
-	LoadGame,
-	ModeGame,
-	Difficulty,
-	ChooseColor,
-	Game,
-	ExitGame
-} menu_window_type;
-
 typedef Button** (*buttons_creator)(SDL_Renderer*);
 
-Window* create_window(menu_window_type type);
+Window* create_window(window_type type);
 Button** create_enterance_buttons(SDL_Renderer* renderer);
 Button** create_load_game_buttons(SDL_Renderer* renderer);
 Button** create_game_mode_buttons(SDL_Renderer* renderer);
@@ -37,10 +27,10 @@ Button** create_choose_color_buttons(SDL_Renderer* renderer);
 void destroyWindow(Window* src);
 void drawWindow(Window* src);
 Button* get_button_by_type(Window* wndw, ButtonType type);
-menu_window_type handleEvenet(Window* wndw, Gameboard** game);
-menu_window_type handleEvenet_enterance(Window* wndw, Button* btn);
-menu_window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game);
-menu_window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game);
-menu_window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game);
-menu_window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** game);
+window_type handleEvenet(Window* wndw, Gameboard** game);
+window_type handleEvenet_enterance(Window* wndw, Button* btn);
+window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game);
+window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game);
+window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game);
+window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** game);
 #endif /* GRAPHICS_MENU_WINDOWS_H_ */

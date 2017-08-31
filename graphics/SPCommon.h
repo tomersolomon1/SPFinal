@@ -13,6 +13,17 @@
 #define IMG(x) "./graphics/images/"#x".bmp"
 #define IMG_INCTV(x) "./graphics/images/"#x"_inactive.bmp"
 
+typedef enum window_type_t{
+	Enterance,
+	LoadGame,
+	ModeGame,
+	Difficulty,
+	ChooseColor,
+	Game,
+	ExitGame
+} window_type;
+
+
 typedef struct board_widget {
 	Gameboard *board;
 	SDL_Rect  *location;
@@ -32,8 +43,9 @@ typedef struct game_data_t {
 	int selected_piece_index;
 } GameData;
 
+
 typedef struct window_t{
-	menu_window_type type;
+	window_type type;
 	SDL_Window* window;
 	SDL_Renderer* windowRenderer;
 	int num_buttons;
