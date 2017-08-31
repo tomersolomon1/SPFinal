@@ -124,6 +124,14 @@ Gameboard *copy_board(Gameboard* old) {
 	return new;
 }
 
+void reset_board(Gameboard** gameboard){
+	int game_mode = *gameboard->game_mode;
+	int difficulty = *gameboard->difficulty;
+	int user_color = *gameboard->user_color;
+	destroy_board(*gameboard);
+	*gameboard = create_board(game_mode, difficulty, user_color);
+}
+
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
 	CHESS_BOARD_MESSAGE cbm = is_valid_step(gameboard, srow, scol, drow, dcol);
 	if(cbm != CHESS_BOARD_SUCCESS){

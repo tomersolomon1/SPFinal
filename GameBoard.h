@@ -46,6 +46,9 @@ void destroy_board(Gameboard *gameboard);
 /* copy board */
 Gameboard *copy_board(Gameboard* old);
 
+/* reset board with same parameters like *gameboard */
+void reset_board(Gameboard** gameboard);
+
 /*make a step
  * gets source and destination coordinates as 0-7 numbers
  * returns CHESS_BOARD_SUCCESS if legal move
