@@ -9,8 +9,10 @@
 
 const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game Mode","Chess: Difficulty","Chess: Choose Color"};
 int num_buttons[] = {3,7,5,7,4,6,0};
+buttons_creator creators[] = {create_enterance_buttons, create_load_game_buttons, create_game_mode_buttons,
+				create_difficulty_buttons, create_choose_color_buttons, create_game_buttons};
 
-Window* create_window(menu_window_type type){
+Window* create_window(menu_window_type type ){
 	Window* src = (Window*) malloc(sizeof(Window));
 	src->type = type;
 	SDL_Window* window = SDL_CreateWindow(window_name[type], SDL_WINDOWPOS_CENTERED,
@@ -26,31 +28,32 @@ Window* create_window(menu_window_type type){
 		return NULL;
 	}
 	src->num_buttons = num_buttons[type];
-	//src->buttons = functions[type](renderer);
-	if(type == Enterance){
-		src->buttons = create_enterance_buttons(renderer);
+	src->data = NULL;
+	if(type == Game){
+
 	}
-	else if(type == LoadGame){
-		src->buttons = create_load_game_buttons(renderer);
-	}
-	else if(type == ModeGame){
-		src->buttons = create_game_mode_buttons(renderer);
-	}
-	else if(type == Difficulty){
-		src->buttons = create_difficulty_buttons(renderer);
-	}
-	else if(type == ChooseColor){
-		src->buttons = create_choose_color_buttons(renderer);
-	}
+	src->buttons = (*creators[type])(renderer);
+//	if(type == Enterance){
+//		src->buttons = create_enterance_buttons(renderer);
+//	}
+//	else if(type == LoadGame){
+//		src->buttons = create_load_game_buttons(renderer);
+//	}
+//	else if(type == ModeGame){
+//		src->buttons = create_game_mode_buttons(renderer);
+//	}
+//	else if(type == Difficulty){
+//		src->buttons = create_difficulty_buttons(renderer);
+//	}
+//	else if(type == ChooseColor){
+//		src->buttons = create_choose_color_buttons(renderer);
+//	}
 	if(src->buttons == NULL){
 		free(src);
 		SDL_DestroyWindow(window);
 		SDL_DestroyRenderer(renderer);
 		return NULL;
 	}
-
-	src->data->
-	src->destroyData = NULL;
 	return src;
 }
 
@@ -231,7 +234,9 @@ void destroyWindow(Window* src) {
 	for (; i < src->num_buttons; i++) {
 		destroyButton(src->buttons[i]);
 	}
-	src->destroyData(src->data);
+	if(src->type == Game){
+		//destroyData(src->data);
+	}
 	SDL_DestroyRenderer(src->windowRenderer);
 	SDL_DestroyWindow(src->window);
 	free(src->buttons);

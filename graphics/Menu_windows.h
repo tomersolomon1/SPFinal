@@ -12,7 +12,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include "../GameBoard.h"
-
+#include "GameWindow.h"
 
 typedef enum menu_window_type_t{
 	Enterance,
@@ -30,16 +30,10 @@ typedef struct window_t{
 	SDL_Renderer* windowRenderer;
 	int num_buttons;
 	Button** buttons;
-	void* data;
-	void (*destroyData)(void*);
+	BoardWidget* data;
 } Window;
 
-typedef struct game_params_t{
-	int amount_players;
-	int difficulty_leve;
-	int color;
-	int gameslot;
-}Game_params;
+typedef Button** (*buttons_creator)(SDL_Renderer*);
 
 Window* create_window(menu_window_type type);
 Button** create_enterance_buttons(SDL_Renderer* renderer);

@@ -76,5 +76,5 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 void drawGameWindow(GameWindow* src, SDL_Event* event, int selected_piece_color, int selected_piece_index);
 void handle_game_events(GameWindow *window, SDL_Event* event);
 Button **create_game_buttons(SDL_Renderer* window_renderer);
-
+void destroyData(BoardWidget* data);
 #endif /* GRAPHICS_GAMEWINDOW_H_ */

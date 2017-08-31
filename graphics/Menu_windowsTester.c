@@ -21,4 +21,5 @@ void check_menu_window(){
 		if(type_window == ExitGame)
 			break;
 	}
+	destroy_board(game);
 }
