@@ -126,31 +126,33 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 	return board_widget;
 }
 
-void draw_board(BoardWidget *board_widget, SDL_Event* event, int selected_piece_color, int selected_piece_index) {
-	SDL_RenderClear(board_widget->renderer);
-	SDL_RenderCopy(board_widget->renderer, board_widget->board_grid, NULL, board_widget->location);
-	int row_rec_dim = board_widget->location->h / 9;
-	int col_rec_dim = board_widget->location->w / 9;
-	int row_dim = board_widget->location->h / 8;
-	int col_dim = board_widget->location->w / 8;
+void draw_board(GameData *data, SDL_Event* event) {
+	SDL_RenderClear(data->board_widget->renderer);
+	SDL_RenderCopy(data->board_widget->renderer, data->board_widget->board_grid, NULL, data->board_widget->location);
+	int row_rec_dim = data->board_widget->location->h / 9;
+	int col_rec_dim = data->board_widget->location->w / 9;
+	int row_dim = data->board_widget->location->h / 8;
+	int col_dim = data->board_widget->location->w / 8;
+	int selected_piece_color = data->selected_piece_color;
+	int selected_piece_index = data->selected_piece_index;
 	SDL_Rect piece_rec = {.x = 0, .y = 0, .h = row_rec_dim, .w = col_rec_dim }; // default values
 	for (int color = 0; color < 2; color++) {
 		for (int i = 0; i < 16; i++) {
-			Piece *piece = board_widget->board->all_pieces[color][i];
+			Piece *piece = data->board_widget->board->all_pieces[color][i];
 			if (piece->alive && (color != selected_piece_color || i != selected_piece_index)) { /* this piece is alive and not selected, thus need to be drawn in his current place */
-				piece_rec.x = board_widget->location->x + HORIZONTAL_CENTERING + piece->col*col_dim;
-				piece_rec.y = board_widget->location->y + VERTICAL_CENTERING + (7 - piece->row)*row_dim;
-				SDL_RenderCopy(board_widget->renderer, board_widget->piece_textures[piece->colur][piece->type], NULL, &piece_rec);
+				piece_rec.x = data->board_widget->location->x + HORIZONTAL_CENTERING + piece->col*col_dim;
+				piece_rec.y = data->board_widget->location->y + VERTICAL_CENTERING + (7 - piece->row)*row_dim;
+				SDL_RenderCopy(data->board_widget->renderer, data->board_widget->piece_textures[piece->colur][piece->type], NULL, &piece_rec);
 			}
 		}
 	}
 	if (selected_piece_color != -1 && event != NULL) { // some piece was selected, and it moves around with the mouse
 		piece_rec.x = event->motion.x;
 		piece_rec.y = event->motion.y;
-		Piece *piece = board_widget->board->all_pieces[selected_piece_color][selected_piece_index];
-		SDL_RenderCopy(board_widget->renderer, board_widget->piece_textures[selected_piece_color][piece->type], NULL, &piece_rec);
+		Piece *piece = data->board_widget->board->all_pieces[selected_piece_color][selected_piece_index];
+		SDL_RenderCopy(data->board_widget->renderer, data->board_widget->piece_textures[selected_piece_color][piece->type], NULL, &piece_rec);
 	}
-	SDL_RenderPresent(board_widget->renderer);
+	SDL_RenderPresent(data->board_widget->renderer);
 }
 
 void drawGameWindow(Window* src, SDL_Event* event, int selected_piece_color, int selected_piece_index) {
@@ -213,7 +215,11 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 	return false; /* the game is not over yet */
 }
 
-Window_type handle_game_events(Window *window, SDL_Event* event) {
+void save_game() {
+	/* to be filled later on */
+}
+
+Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game) {
 	//SDL_Point point;
 	if (event == NULL || window == NULL ) {
 		return ExitGame;
@@ -233,19 +239,34 @@ Window_type handle_game_events(Window *window, SDL_Event* event) {
 					window->data->selected_piece_index = piece->indexat;
 					window->data->picked_piece  = true;
 				}
+				return Game;
 			} else if (event->button.button == SDL_BUTTON_LEFT) { /* maybe we clicked some button? */
 				Button *clicked_button = get_button_clicked(event, window->buttons, window->num_buttons);
 				if (clicked_button != NULL) { /* some button was clicked */
 					switch(clicked_button->type) {
 						case RestartButton:
-							printf("restart!\n");
-							break;
+							reset_board(game);
+							window->data->board_widget->board = game;
+							return Game;
+						case SaveButton:
+							save_game();
+							return Game;
+						case LoadButton:
+							printf("are you sure?????????????\n"); /* to be updated */
+							return LoadGame;
 						case ExitButton:
 							return ExitGame;
+						case UndoButton:
+							if (clicked_button->active) {
+								double_undo(window->data->board_widget->board);
+							}
+							return Game;
+						case MenuButton:
+							return Enterance;
 					}
 				}
 			}
-			break;
+			return Game;;
 		case SDL_MOUSEBUTTONUP:
 			if (event->button.button == SDL_BUTTON_LEFT && window->data->picked_piece) { /* the selected piece was dropped */
 				window->data->picked_piece  = false;
@@ -258,22 +279,19 @@ Window_type handle_game_events(Window *window, SDL_Event* event) {
 					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board);
 					window->data->selected_piece_color = -1;
 					window->data->selected_piece_index = -1;
-					window->data->picked_piece  = false;
-					if (mssg == CHESS_BOARD_SUCCESS) {
-						if (graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) { /* the game is over */
-							return;
-						}
-					} else {
-						drawGameWindow(window, event, window->data->selected_piece_color, window->data->selected_piece_index); /* not -1, -1?????*/
+					if (mssg == CHESS_BOARD_SUCCESS && graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) {
+						return ExitGame;
 					}
 				}
 			}
-			break;
+			return Game;;
 		case SDL_MOUSEMOTION:
-			if(mouse_in_rec(event->motion.x, event->motion.y, window->data->board_widget->location) && window->data->picked_piece) {
-				drawGameWindow(window, event, window->data->selected_piece_color, window->data->selected_piece_index);
+			if(!window->data->picked_piece || !mouse_in_rec(event->motion.x, event->motion.y, window->data->board_widget->location)) {
+				window->data->picked_piece = false;
 			}
-			break;
+			return Game;
+		default:
+			return Game;
 	}
 }
 

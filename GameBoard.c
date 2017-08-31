@@ -421,6 +421,19 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard) {
 	return CHESS_BOARD_SUCCESS;
 }
 
+/* performing double undo if possible */
+CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard) {
+	if(gameboard == NULL){
+		return CHESS_BOARD_INVALID_ARGUMENT;
+	}
+	if (ArrayListSize(gameboard->history) < 2) {
+		return CHESS_BOARD_NO_HISTORY;
+	}
+	undo_step(gameboard);
+	undo_step(gameboard);
+	return CHESS_BOARD_SUCCESS;
+}
+
 void undo_step_hazraha(Gameboard *gameboard, Step *step){
 	int row = step->drow;
 	int king_dcol = step->dcol;

@@ -97,8 +97,14 @@ Piece *get_piece_in_place(Gameboard *gameboard, int row, int col);
 /* undo step
  * returns CHESS_BOARD_INVALID_ARGUMENT if game is null
  * returns CHESS_BOARD_NO_HISTORY if there's no history
- * returns CHESS_BOARD_SUCCESS if succeed*/
+ * returns CHESS_BOARD_SUCCESS if succeed */
 CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard);
+
+/* double_undo - performing double undo if possible
+ * returns CHESS_BOARD_INVALID_ARGUMENT if game is null
+ * returns CHESS_BOARD_NO_HISTORY if there isn't enough history
+ * returns CHESS_BOARD_SUCCESS otherwise */
+CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard);
 
 //helping function for undo_step, doing undo to hazraha step
 void undo_step_hazraha(Gameboard *gameboard, Step* step);
