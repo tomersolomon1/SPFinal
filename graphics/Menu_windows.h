@@ -27,7 +27,7 @@ Button** create_game_mode_buttons(SDL_Renderer* renderer);
 Button** create_difficulty_buttons(SDL_Renderer* renderer);
 Button** create_choose_color_buttons(SDL_Renderer* renderer);
 void destroyWindow(Window* src);
-void drawWindow(Window* src);
+void drawWindow(Window* src, SDL_Event* event);
 Button* get_button_by_type(Window* wndw, ButtonType type);
 Window_type handleEvenet(Window* wndw, Gameboard** game);
 Window_type handleEvenet_enterance(Window* wndw, Button* btn);
