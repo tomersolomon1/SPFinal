@@ -46,22 +46,10 @@
 #define VERTICAL_CENTERING 2
 #define HORIZONTAL_CENTERING 4
 
-typedef struct game_window_t {
-	//menu_window_type type;
-	SDL_Window* window;
-	SDL_Renderer* windowRenderer;
-	int num_buttons;
-	Button** buttons;
-	bool picked_piece;
-	int selected_piece_color;
-	int selected_piece_index;
-	BoardWidget *board_widget;
-} GameWindow;
-
 GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board);
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
 void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
-Window_type handle_game_events(GameWindow *window, SDL_Event* event, Button *clicked_button);
+Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board, Button *clicked_button);
 Button **create_game_buttons(SDL_Renderer* window_renderer);
 void destroyData(BoardWidget* data);
 #endif /* GRAPHICS_GAMEWINDOW_H_ */

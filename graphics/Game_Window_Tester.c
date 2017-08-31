@@ -14,19 +14,20 @@ void check_game_window() {
 		return;
 	}
 	Gameboard *game_board = create_board(1, 1, 1);
-	GameWindow *game_window = create_game_window(game_board);
+	Window *game_window = create_game_window(game_board);
 	if(game_window == NULL){
 		printf("unable to create window\n");
 		return;
 	}
 	SDL_Event event;
-	drawGameWindow(game_window, NULL, -1, -1);
+	drawGameWindow(game_window, NULL);
 	while(1){
 		SDL_WaitEvent(&event);
 		if(event.type == SDL_QUIT){
 			break;
 		}  else {
-			handle_game_events(game_window, &event);
+			Button *btn = get_button_clicked(&event, game_window->buttons, game_window->num_buttons);
+			handle_game_events(game_window, &event, &game_board, btn);
 		}
 
 	}
