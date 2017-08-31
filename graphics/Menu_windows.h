@@ -12,7 +12,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include "../GameBoard.h"
+#include "SPCommon.h"
 #include "GameWindow.h"
+
 
 typedef enum menu_window_type_t{
 	Enterance,
@@ -23,15 +25,6 @@ typedef enum menu_window_type_t{
 	Game,
 	ExitGame
 } menu_window_type;
-
-typedef struct window_t{
-	menu_window_type type;
-	SDL_Window* window;
-	SDL_Renderer* windowRenderer;
-	int num_buttons;
-	Button** buttons;
-	BoardWidget* data;
-} Window;
 
 typedef Button** (*buttons_creator)(SDL_Renderer*);
 

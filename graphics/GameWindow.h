@@ -45,20 +45,6 @@
 #define VERTICAL_CENTERING 2
 #define HORIZONTAL_CENTERING 4
 
-
-typedef struct board_widget {
-	Gameboard *board;
-	SDL_Rect  *location;
-	SDL_Renderer *renderer;
-
-	// board grid
-	SDL_Texture *board_grid;
-
-	// pieces
-	SDL_Texture *piece_textures[2][6]; // black = 0, and white = 1, each one of them has 6 different type of pieces
-
-} BoardWidget;
-
 typedef struct game_window_t {
 	//menu_window_type type;
 	SDL_Window* window;
