@@ -12,7 +12,7 @@ void check_menu_window(){
 	window_type type_window = Enterance;
 	Gameboard* game = create_board(1,1,1);
 	while(1){
-		Window* window = create_window(type_window);
+		Window* window = create_window(type_window, game);
 		if(window == NULL){
 			return;
 		}

@@ -18,7 +18,8 @@
 
 typedef Button** (*buttons_creator)(SDL_Renderer*);
 
-Window* create_window(window_type type);
+Window* create_window(window_type type, Gameboard* game);
+void set_buttons_by_game_params(Window* wndw, Gameboard** game);
 Button** create_enterance_buttons(SDL_Renderer* renderer);
 Button** create_load_game_buttons(SDL_Renderer* renderer);
 Button** create_game_mode_buttons(SDL_Renderer* renderer);

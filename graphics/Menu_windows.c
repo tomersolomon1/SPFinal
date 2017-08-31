@@ -12,7 +12,7 @@ int num_buttons[] = {3,7,5,7,4,6,0};
 buttons_creator creators[] = {create_enterance_buttons, create_load_game_buttons, create_game_mode_buttons,
 				create_difficulty_buttons, create_choose_color_buttons, create_game_buttons};
 
-Window* create_window(window_type type ){
+Window* create_window(window_type type, Gameboard* game){
 	Window* src = (Window*) malloc(sizeof(Window));
 	src->type = type;
 	SDL_Window* window = SDL_CreateWindow(window_name[type], SDL_WINDOWPOS_CENTERED,
@@ -30,7 +30,7 @@ Window* create_window(window_type type ){
 	src->num_buttons = num_buttons[type];
 	src->data = NULL;
 	if(type == Game){
-
+		src->data = create_game_data(game);
 	}
 	src->buttons = (*creators[type])(renderer);
 //	if(type == Enterance){
@@ -243,16 +243,20 @@ void destroyWindow(Window* src) {
 	free(src);
 }
 
-void drawWindow(Window* src) {
+void drawWindow(Window* src, SDL_Event* event) {
 	if (src == NULL ) {
 		return;
 	}
 	//draw window:
 	SDL_SetRenderDrawColor(src->windowRenderer, 200, 255, 255, 255);
 	SDL_RenderClear(src->windowRenderer);
+	if(src->type == Game){
+		draw_board(src, event);
+	}
 	for (int i = 0; i < src->num_buttons; i++) {
 		drawButton(src->buttons[i]);
 	}
+
 	SDL_RenderPresent(src->windowRenderer);
 }
 
@@ -269,8 +273,13 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 	if(wndw->type == ModeGame){
 		Button* one_player = get_button_by_type(wndw, one_player);
 		Button* two_player = get_button_by_type(wndw, two_player);
-		if(game->game_mode == 1){
-
+		if(*game->game_mode == 1){
+			one_player->active = true;
+			two_player->active = false;
+		}
+		else if(*game->game_mode == 2){
+			one_player->active = false;
+			two_player->active = true;
 		}
 	}
 }
@@ -280,6 +289,7 @@ window_type handleEvenet(Window* wndw, Gameboard** game){
 		return ExitGame;
 	window_type type = Enterance;
 	SDL_Event event;
+	set_buttons_by_game_params(wndw, game);
 	while(1){
 		SDL_WaitEvent(&event);
 		if (event.type == SDL_QUIT)
@@ -323,7 +333,6 @@ window_type handleEvenet_enterance(Window* wndw, Button* btn){
 	}
 	return wndw->type;
 }
-
 window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Enterance;
