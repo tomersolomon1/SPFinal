@@ -252,7 +252,7 @@ void drawWindow(Window* src, SDL_Event* event) {
 	SDL_SetRenderDrawColor(src->windowRenderer, 200, 255, 255, 255);
 	SDL_RenderClear(src->windowRenderer);
 	if(src->type == Game){
-		draw_board(src->data, event);
+		draw_board(src);
 	}
 	for (int i = 0; i < src->num_buttons; i++) {
 		drawButton(src->buttons[i]);
@@ -319,7 +319,7 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 				}
 			}
 		}
-		drawWindow(wndw, event);
+		drawWindow(wndw);
 	}
 }
 
