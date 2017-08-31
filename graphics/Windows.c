@@ -4,7 +4,8 @@
  *  Created on: Aug 27, 2017
  *      Author: sapir
  */
-#include "Menu_windows.h"
+#include "Windows.h"
+
 #include "SPCommon.h"
 
 const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game Mode","Chess: Difficulty","Chess: Choose Color"};
@@ -271,17 +272,18 @@ Button* get_button_by_type(Window* wndw, ButtonType type){
 
 void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 	if(wndw->type == ModeGame){
-		Button* one_player = get_button_by_type(wndw, one_player);
-		Button* two_player = get_button_by_type(wndw, two_player);
-		if(*game->game_mode == 1){
+		Button* one_player = get_button_by_type(wndw, OnePlayer);
+		Button* two_player = get_button_by_type(wndw, TwoPlayer);
+		if((*game)->game_mode == 1){
 			one_player->active = true;
 			two_player->active = false;
 		}
-		else if(*game->game_mode == 2){
+		else if((*game)->game_mode == 2){
 			one_player->active = false;
 			two_player->active = true;
 		}
 	}
+
 }
 
 Window_type handleEvenet(Window* wndw, Gameboard** game){

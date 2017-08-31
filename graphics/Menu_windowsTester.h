@@ -7,7 +7,7 @@
 
 #ifndef MENU_WINDOWSTESTER_H_
 #define MENU_WINDOWSTESTER_H_
-#include "Menu_windows.h"
+#include "Windows.h"
 
 void check_menu_window();
 
