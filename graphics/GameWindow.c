@@ -7,7 +7,9 @@
 
 #include <stdlib.h>
 #include "GameWindow.h"
+#include "SPCommon.h"
 #include "../ConsoleMode.h"
+#include "../Files.h"
 
 char *ABC2[] = { "A", "B", "C", "D","E","F", "G","H" };
 const char *white_pieces_images[] = {CHESS_IMAGE(WPawn), CHESS_IMAGE(WKnight), CHESS_IMAGE(WBishop),
@@ -134,24 +136,22 @@ void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
 	int col_rec_dim = data->board_widget->location->w / 9;
 	int row_dim = data->board_widget->location->h / 8;
 	int col_dim = data->board_widget->location->w / 8;
-	int selected_piece_color = data->selected_piece_color;
-	int selected_piece_index = data->selected_piece_index;
 	SDL_Rect piece_rec = {.x = 0, .y = 0, .h = row_rec_dim, .w = col_rec_dim }; // default values
 	for (int color = 0; color < 2; color++) {
 		for (int i = 0; i < 16; i++) {
 			Piece *piece = data->board_widget->board->all_pieces[color][i];
-			if (piece->alive && (color != selected_piece_color || i != selected_piece_index)) { /* this piece is alive and not selected, thus need to be drawn in his current place */
+			if (piece->alive && (color != data->selected_piece_color || i != data->selected_piece_index || !data->picked_piece)) { /* this piece is alive and not selected, thus need to be drawn in his current place */
 				piece_rec.x = data->board_widget->location->x + HORIZONTAL_CENTERING + piece->col*col_dim;
 				piece_rec.y = data->board_widget->location->y + VERTICAL_CENTERING + (7 - piece->row)*row_dim;
 				SDL_RenderCopy(renderer, data->board_widget->piece_textures[piece->colur][piece->type], NULL, &piece_rec);
 			}
 		}
 	}
-	if (selected_piece_color != -1 && event != NULL) { // some piece was selected, and it moves around with the mouse
+	if (data->picked_piece && event != NULL) { // some piece was selected, and it moves around with the mouse
 		piece_rec.x = event->motion.x;
 		piece_rec.y = event->motion.y;
-		Piece *piece = data->board_widget->board->all_pieces[selected_piece_color][selected_piece_index];
-		SDL_RenderCopy(renderer, data->board_widget->piece_textures[selected_piece_color][piece->type], NULL, &piece_rec);
+		Piece *piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
+		SDL_RenderCopy(renderer, data->board_widget->piece_textures[data->selected_piece_color][piece->type], NULL, &piece_rec);
 	}
 	SDL_RenderPresent(renderer);
 }
@@ -214,8 +214,12 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 	return false; /* the game is not over yet */
 }
 
-void save_game_from_gui() {
-	/* to be filled later on */
+void save_game_from_gui(Gameboard *game) {
+	promote_saves();
+	FILE *file = fopen(saved_files[0], "w");
+	assert(file != NULL);
+	save_xml(file, game);
+	fclose(file);
 }
 
 Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game, Button *clicked_button) {
@@ -230,7 +234,7 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 				window->data->board_widget->board = *game;
 				return Game;
 			case SaveButton:
-				save_game_from_gui();
+				save_game_from_gui(*game);
 				return Game;
 			case LoadButton:
 				printf("are you sure?????????????\n"); /* to be updated */
@@ -275,8 +279,6 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 						int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
 						Piece *piece = window->data->board_widget->board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
 						CHESS_BOARD_MESSAGE mssg = is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board);
-						window->data->selected_piece_color = -1;
-						window->data->selected_piece_index = -1;
 						if (mssg == CHESS_BOARD_SUCCESS && graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) {
 							return ExitGame;
 						}

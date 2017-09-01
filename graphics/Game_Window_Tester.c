@@ -28,7 +28,10 @@ void check_game_window() {
 		if(event.type == SDL_QUIT){
 			break;
 		}  else {
-			Button *btn = get_button_clicked(&event, game_window->buttons, game_window->num_buttons);
+			Button *btn = NULL;
+			if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+				btn = get_button_clicked(&event, game_window->buttons, game_window->num_buttons);
+			}
 			handle_game_events(game_window, &event, &game_board, btn);
 			drawGameWindow(game_window, &event);
 		}
