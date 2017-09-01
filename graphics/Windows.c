@@ -311,13 +311,13 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 		SDL_WaitEvent(&event);
 		if (event.type == SDL_QUIT)
 			return ExitGame;
-		else if (event.type == SDL_MOUSEBUTTONUP && event->button.button == SDL_BUTTON_LEFT){
+		else if (event.type == SDL_MOUSEBUTTONUP){
 			Button* btn = get_button_clicked(&event, wndw->buttons, wndw->num_buttons);
 			if(wndw->type == Game){
 				type = handle_game_events(wndw, &event, btn);
 			}
 			else{
-				if(btn == NULL)
+				if(btn == NULL || (event->button.button == SDL_BUTTON_LEFT))
 					continue;
 				if(wndw->type == Enterance)
 					type =  handleEvenet_enterance(wndw, btn);
@@ -337,7 +337,7 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 				return type;
 			}
 		}
-		drawWindow(wndw);
+		drawWindow(wndw, &event);
 	}
 }
 Window_type handleEvenet_enterance(Window* wndw, Button* btn){
@@ -360,17 +360,98 @@ Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
 Window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Enterance;
-	if(btn->type == )
+	Button* two_player = get_button_by_type(wndw, TwoPlayer);
+	Button* one_player = get_button_by_type(wndw, OnePlayer);
+	Button* start = get_button_by_type(wndw, StartButton);
+	Button* next = get_button_by_type(wndw, NextButton);
+	if(btn->type == OnePlayer){
+		one_player->active = true;
+		two_player->active = false;
+		start->visibility = false;
+		next->visibility = true;
+	}
+	else if(btn->type == TwoPlayer){
+		one_player->active = false;
+		two_player->active = true;
+		start->visibility = true;
+		next->visibility = false;
+	}
+	else if(btn->type == StartButton){
+		(*game)->game_mode = 2;
+		return Game;
+	}
+	else if(btn->type == NextButton){
+		(*game)->game_mode = 1;
+		return Difficulty;
+	}
 	return wndw->type;
 }
 Window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton){
 		return ModeGame;
 	}
+	Button* next = get_button_by_type(wndw, NextButton);
+	Button* noob = get_button_by_type(wndw, EasyDiff);
+	Button* easy = get_button_by_type(wndw, NoobDiff);
+	Button* moder = get_button_by_type(wndw, ModerateDiff);
+	Button* hard = get_button_by_type(wndw, HardDiff);
+	if(btn->type == NextButton){
+		if(noob->active)
+			(*game)->difficulty = 1;
+		if(easy->active)
+			(*game)->difficulty = 2;
+		if(moder->active)
+			(*game)->difficulty = 3;
+		if(hard->active)
+			(*game)->difficulty = 4;
+		return ChooseColor;
+	}
+	else if(btn->type == NoobDiff){
+		noob->active = true;
+		easy->active = false;
+		moder->active = false;
+		hard->active = false;
+	}
+	else if(btn->type == EasyDiff){
+		noob->active = false;
+		easy->active = true;
+		moder->active = false;
+		hard->active = false;
+	}
+	else if(btn->type == ModerateDiff){
+		noob->active = false;
+		easy->active = false;
+		moder->active = true;
+		hard->active = false;
+	}
+	else if(btn->type == HardDiff){
+		noob->active = false;
+		easy->active = false;
+		moder->active = false;
+		hard->active = true;
+	}
 	return wndw->type;
 }
 Window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** game){
 	if(btn->type == BackButton)
 		return Difficulty;
+	Button* wite = get_button_by_type(wndw, SetWhite);
+	Button* blck = get_button_by_type(wndw, SetBlack);
+	Button* start = get_button_by_type(wndw, StartButton);
+	if(btn->type == SetWhite){
+		wite->active = true;
+		blck->active = false;
+	}
+	else if(btn->type == SetBlack){
+		wite->active = false;
+		blck->active = true;
+	}
+	else if(btn->type == start){
+		if(wite->active)
+			(*game)->user_color = white;
+		else
+			(*game)->user_color = black;
+		return Game;
+	}
 	return wndw->type;
 }
