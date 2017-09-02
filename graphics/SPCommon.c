@@ -6,8 +6,12 @@
 #include "SPCommon.h"
 #include <stdlib.h>
 
-const char *saved_files[] = {"../graphics/saved_games/save0.xml", "../graphics/saved_games/save1.xml", "../graphics/saved_games/save2.xml",
-		"../graphics/saved_games/save3.xml", "../graphics/saved_games/save4.xml" };
+const char *saved_files[] = {
+		"./graphics/saved_games/save0.xml",
+		"./graphics/saved_games/save1.xml",
+		"./graphics/saved_games/save2.xml",
+		"./graphics/saved_games/save3.xml",
+		"./graphics/saved_games/save4.xml" };
 
 /* count how many saved-files exist, the first save file that doesn't exist ends the counting */
 int count_saves() {

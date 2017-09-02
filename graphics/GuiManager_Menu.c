@@ -39,7 +39,7 @@ Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
 		get_button_by_type(wndw, LoadButton)->active = true;
 	}
 	else if(btn->type == LoadButton){
-		FILE *f;
+		FILE *f = NULL;
 		if(slot1->active)
 			f = fopen(saved_files[0], "r");
 		else if(slot2->active)
