@@ -77,8 +77,8 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 		}
 	}
 	else if(wndw->type == Difficulty){
-		Button* noob = get_button_by_type(wndw, EasyDiff);
-		Button* easy = get_button_by_type(wndw, NoobDiff);
+		Button* noob = get_button_by_type(wndw, NoobDiff);
+		Button* easy = get_button_by_type(wndw, EasyDiff);
 		Button* moder = get_button_by_type(wndw, ModerateDiff);
 		Button* expr = get_button_by_type(wndw, HardDiff);
 		noob->active = false;
