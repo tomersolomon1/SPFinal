@@ -107,15 +107,7 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 		}
 	}
 	else if(wndw->type == Difficulty){
-		int amount_files = count_saves();
-		int i = 0;
-		for(; i < amount_files; i++){
-			get_button_by_type(wndw, GameSlot1 + i)->visibility = true;
-		}
-		for(; i < 5; i++){
-			get_button_by_type(wndw, GameSlot1 + i)->visibility = false;
-		}
-		get_button_by_type(wndw, GameSlot1)->active = true;
+
 	}
 
 }
