@@ -33,13 +33,16 @@ void destroy_game_textures(BoardWidget *board_widget) {
 	}
 }
 
+/*
+ * somebody else is incharge of destroying the gameboard itself
+ */
 void destory_data(GameData *data) {
 	if (data == NULL) {
 		return;
 	}
 	// freeing the textures
 	destroy_game_textures(data->board_widget);
-	destroy_board(data->board_widget->board);
+
 	free(data->board_widget->location);
 	free(data->board_widget);
 	free(data);
@@ -51,11 +54,11 @@ Button **create_game_buttons(SDL_Renderer* window_renderer) {
 			DEFAULT_GAME_BUTTON_HORIZONTAL_GAP, DEFAULT_GAME_BUTTON_HORIZONTAL_GAP,
 			DEFAULT_GAME_BUTTON_HORIZONTAL_GAP, DEFAULT_GAME_BUTTON_HORIZONTAL_GAP};
 
-	int y_btn_places[] = {0, DEFAULT_GAME_BUTTON_HEIGHT + DEFAULT_GAME_BUTTON_VERTICAL_GAP,
-			2*DEFAULT_GAME_BUTTON_HEIGHT + 2*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
-			3*DEFAULT_GAME_BUTTON_HEIGHT + 3*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
-			5*DEFAULT_GAME_BUTTON_HEIGHT + 4*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
-			6*DEFAULT_GAME_BUTTON_HEIGHT + 5*DEFAULT_GAME_BUTTON_VERTICAL_GAP,};
+	int y_btn_places[] = {DEFAULT_GAME_BUTTON_VERTICAL_GAP, DEFAULT_GAME_BUTTON_HEIGHT + 2*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			2*DEFAULT_GAME_BUTTON_HEIGHT + 3*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			3*DEFAULT_GAME_BUTTON_HEIGHT + 4*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			5*DEFAULT_GAME_BUTTON_HEIGHT + 5*DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			6*DEFAULT_GAME_BUTTON_HEIGHT + 6*DEFAULT_GAME_BUTTON_VERTICAL_GAP,};
 
 	ButtonType types[] = {RestartButton, SaveButton, LoadButton, UndoButton, MenuButton, ExitButton};
 	const char* image[] = {IMG(start), IMG(start), IMG(load), IMG(start), IMG(start), IMG(exit)};
@@ -70,7 +73,8 @@ Button **create_game_buttons(SDL_Renderer* window_renderer) {
 GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
 	GameData *data = (GameData *) malloc(sizeof(GameData));
 	assert(data != NULL);
-	SDL_Rect board_rec = {.x = DEFAULT_GAME_BUTTON_PANEL_WIDTH, .y = 0, .h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
+	SDL_Rect board_rec = {.x = DEFAULT_GAME_BUTTON_PANEL_WIDTH, .y = DEFAULT_GAME_BUTTON_VERTICAL_GAP,
+			.h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
 	data->board_widget = create_widget_board(renderer, board, &board_rec);
 	data->picked_piece = false;
 	data->selected_piece_color = -1;
@@ -233,6 +237,8 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 							}
 							return Game;
 						case MenuButton:
+							destroy_board(*game);
+							*game = create_board(1,1,1); /* reseting the settings */
 							return Enterance;
 						case ExitButton:
 							return ExitGame;
@@ -253,7 +259,7 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 					Piece *piece = window->data->board_widget->board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
 					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board);
 					if (mssg == CHESS_BOARD_SUCCESS && graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) {
-						return ExitGame;
+						return Game;
 					}
 				}
 			}
