@@ -11,7 +11,7 @@
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
-char *ABC2[] = { "A", "B", "C", "D","E","F", "G","H" };
+
 const char *white_pieces_images[] = {CHESS_IMAGE(WPawn), CHESS_IMAGE(WKnight), CHESS_IMAGE(WBishop),
 		CHESS_IMAGE(WRock),	CHESS_IMAGE(WQueen), CHESS_IMAGE(WKing)};
 const char *black_pieces_images[] = {CHESS_IMAGE(BPawn), CHESS_IMAGE(BKnight), CHESS_IMAGE(BBishop),
@@ -228,7 +228,6 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 					int relative_y = event->button.y - window->data->board_widget->location->y;
 					int x_board = (8*relative_x / window->data->board_widget->location->w);
 					int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
-					recognize_square(window, event->button.x, event->button.y); // for debug
 					Piece *piece = window->data->board_widget->board->board[y_board][x_board];
 					if (piece->type != Empty && piece->colur == window->data->board_widget->board->turn) { /* this piece will be selected now */
 						window->data->selected_piece_color = piece->colur;
@@ -265,7 +264,7 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 	return Game;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
+// ------------------------------- for debugging only --------------------------------------
 // for debugging purposes
 void drawGameWindow(Window* src, SDL_Event* event) {
 	if (src == NULL ) {
@@ -282,6 +281,7 @@ void drawGameWindow(Window* src, SDL_Event* event) {
 }
 
 /* debugging function */
+char *ABC2[] = { "A", "B", "C", "D","E","F", "G","H" };
 void recognize_square(Window *window, int x, int y) {
 	SDL_Point point = {.x = x, .y = y };
 	if(SDL_PointInRect(&point ,window->data->board_widget->location)) { // inside the board

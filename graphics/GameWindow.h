@@ -46,17 +46,23 @@
 #define VERTICAL_CENTERING 2
 #define HORIZONTAL_CENTERING 4
 
-Window *create_game_window(Gameboard *board);
-GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board);
-BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
-void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
-void drawGameWindow(Window* src, SDL_Event* event);
-Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board, Button *clicked_button);
-Button **create_game_buttons(SDL_Renderer* window_renderer);
+// destroy functions
+void destroy_game_textures(BoardWidget *board_widget);
 void destory_data(GameData *data);
 
+// create functions
+GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board);
+BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
+Button **create_game_buttons(SDL_Renderer* window_renderer);
 
-//////////////////
+// handle event && draw functions
+void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
+Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board, Button *clicked_button);
+
+
+////////////////// debug functions
+Window *create_game_window(Gameboard *board);
+void drawGameWindow(Window* src, SDL_Event* event);
 void recognize_square(Window *window, int x, int y);
 
 #endif /* GRAPHICS_GAMEWINDOW_H_ */
