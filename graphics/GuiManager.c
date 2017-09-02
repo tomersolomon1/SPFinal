@@ -33,25 +33,23 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 		SDL_WaitEvent(&event);
 		if (event.type == SDL_QUIT)
 			return ExitGame;
-		else if (event.type == SDL_MOUSEBUTTONUP){
+		else if (wndw->type == Game) {
+			type = handle_game_events(wndw, &event, game);
+		}
+		else if (event.type == SDL_MOUSEBUTTONUP) {
 			Button* btn = get_button_clicked(&event, wndw->buttons, wndw->num_buttons);
-			if(wndw->type == Game){
-				type = handle_game_events(wndw, &event, game, btn);
-			}
-			else{
-				if(btn == NULL || (event.button.button != SDL_BUTTON_LEFT))
-					continue;
-				if(wndw->type == Enterance)
-					type =  handleEvenet_enterance(wndw, btn);
-				else if(wndw->type == LoadGame)
-					type = handleEvenet_load_game(wndw, btn, game);
-				else if(wndw->type == ModeGame)
-					type = handleEvenet_mode_game(wndw, btn, game);
-				else if(wndw->type == Difficulty)
-					type = handleEvenet_difficulty(wndw, btn, game);
-				else if(wndw->type == ChooseColor)
-					type = handleEvenet_choose_color(wndw, btn, game);
-			}
+			if(btn == NULL || (event.button.button != SDL_BUTTON_LEFT))
+				continue;
+			if(wndw->type == Enterance)
+				type =  handleEvenet_enterance(wndw, btn);
+			else if(wndw->type == LoadGame)
+				type = handleEvenet_load_game(wndw, btn, game);
+			else if(wndw->type == ModeGame)
+				type = handleEvenet_mode_game(wndw, btn, game);
+			else if(wndw->type == Difficulty)
+				type = handleEvenet_difficulty(wndw, btn, game);
+			else if(wndw->type == ChooseColor)
+				type = handleEvenet_choose_color(wndw, btn, game);
 			if(type == wndw->type){
 				continue;
 			}

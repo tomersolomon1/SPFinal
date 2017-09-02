@@ -18,7 +18,7 @@
 
 #define CHESS_IMAGE(x) IMG(ChessPieces/x)
 
-
+/* to be changed later onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn */
 #define DEFAULT_GAME_WINDOW_WIDTH 700
 #define DEFAULT_GAME_WINDOW_HEIGHT 700
 
@@ -32,6 +32,7 @@
 #define GAME_WINDOW_NUMBER_OF_BUTTONS 8 /* including the empty buttons */
 #define DEFAULT_GAME_BUTTON_VERTICAL_GAP ((DEFAULT_GAME_WINDOW_HEIGHT - (GAME_WINDOW_NUMBER_OF_BUTTONS * DEFAULT_GAME_BUTTON_HEIGHT)) / 8)
 #define DEFAULT_GAME_BUTTON_HORIZONTAL_GAP (DEFAULT_GAME_BUTTON_PANEL_WIDTH / 20)
+#define UndoButtonIndex 3
 
 // board panel dimensions
 #define BOARD_PANEL_WIDTH (DEFAULT_GAME_WINDOW_WIDTH - DEFAULT_GAME_BUTTON_PANEL_WIDTH)
@@ -57,7 +58,7 @@ Button **create_game_buttons(SDL_Renderer* window_renderer);
 
 // handle event && draw functions
 void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
-Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board, Button *clicked_button);
+Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board);
 
 
 ////////////////// debug functions

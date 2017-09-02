@@ -190,76 +190,92 @@ void save_game_from_gui(Gameboard *game) {
 	fclose(file);
 }
 
-Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game, Button *clicked_button) {
+Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game) {
 	//SDL_Point point;
 	if (event == NULL || window == NULL ) {
 		return ExitGame;
 	}
-	if (clicked_button != NULL) { /* some button was clicked */
-		switch(clicked_button->type) {
-			case RestartButton:
-				reset_board(game);
-				window->data->board_widget->board = *game;
-				return Game;
-			case SaveButton:
-				save_game_from_gui(*game);
-				return Game;
-			case LoadButton:
-				printf("are you sure?????????????\n"); /* to be updated */
-				return LoadGame;
-			case ExitButton:
-				return ExitGame;
-			case UndoButton:
-				if (clicked_button->active) {
-					double_undo(window->data->board_widget->board);
+	switch(event->type) {
+		case SDL_MOUSEBUTTONDOWN:
+			if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)
+					&& (event->button.button == SDL_BUTTON_LEFT)) {
+				int relative_x = event->button.x - window->data->board_widget->location->x;
+				int relative_y = event->button.y - window->data->board_widget->location->y;
+				int x_board = (8*relative_x / window->data->board_widget->location->w);
+				int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
+				Piece *piece = window->data->board_widget->board->board[y_board][x_board];
+				if (piece->type != Empty && piece->colur == window->data->board_widget->board->turn) { /* this piece will be selected now */
+					window->data->selected_piece_color = piece->colur;
+					window->data->selected_piece_index = piece->indexat;
+					window->data->picked_piece  = true;
 				}
-				return Game;
-			case MenuButton:
-				return Enterance;
-			default: /* something went wrong */
-				return ExitGame;
-		}
-	} else {
-		switch(event->type) {
-			case SDL_MOUSEBUTTONDOWN:
-				if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)
-						&& (event->button.button == SDL_BUTTON_LEFT)) {
+			}
+			else { /* the click wasn't inside the board, or it wasn't a LEFT button */
+				Button* clicked_button = get_button_clicked(event, window->buttons, window->num_buttons);
+				if (clicked_button != NULL) { /* some button was clicked */
+					switch(clicked_button->type) {
+						case RestartButton:
+							reset_board(game);
+							printf("reset\n");
+							fflush(stdout);
+							window->data->board_widget->board = *game;
+							return Game;
+						case SaveButton:
+							save_game_from_gui(*game);
+							return Game;
+						case LoadButton:
+							printf("are you sure?????????????\n"); /* to be updated */
+							return LoadGame;
+						case UndoButton:
+							if (clicked_button->active) {
+								double_undo(window->data->board_widget->board);
+								if (ArrayListSize(window->data->board_widget->board->history) < 2) {
+									window->buttons[UndoButtonIndex]->active = false;
+								}
+							}
+							return Game;
+						case MenuButton:
+							printf("entrance\n");
+							fflush(stdout);
+							return Enterance;
+						case ExitButton:
+							printf("exit btn\n");
+							fflush(stdout);
+							return ExitGame;
+						default: /* something went wrong */
+							printf("exit game\n");
+							fflush(stdout);
+							return ExitGame;
+					}
+				}
+			}
+			return Game; /* if no case was applied */
+		case SDL_MOUSEBUTTONUP:
+			if (event->button.button == SDL_BUTTON_LEFT && window->data->picked_piece) { /* the selected piece was dropped */
+				window->data->picked_piece  = false;
+				if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)) {
 					int relative_x = event->button.x - window->data->board_widget->location->x;
 					int relative_y = event->button.y - window->data->board_widget->location->y;
 					int x_board = (8*relative_x / window->data->board_widget->location->w);
 					int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
-					Piece *piece = window->data->board_widget->board->board[y_board][x_board];
-					if (piece->type != Empty && piece->colur == window->data->board_widget->board->turn) { /* this piece will be selected now */
-						window->data->selected_piece_color = piece->colur;
-						window->data->selected_piece_index = piece->indexat;
-						window->data->picked_piece  = true;
+					Piece *piece = window->data->board_widget->board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
+					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board);
+					if (mssg == CHESS_BOARD_SUCCESS && graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) {
+						return ExitGame;
 					}
 				}
-				return Game;
-			case SDL_MOUSEBUTTONUP:
-				if (event->button.button == SDL_BUTTON_LEFT && window->data->picked_piece) { /* the selected piece was dropped */
-					window->data->picked_piece  = false;
-					if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)) {
-						int relative_x = event->button.x - window->data->board_widget->location->x;
-						int relative_y = event->button.y - window->data->board_widget->location->y;
-						int x_board = (8*relative_x / window->data->board_widget->location->w);
-						int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
-						Piece *piece = window->data->board_widget->board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
-						CHESS_BOARD_MESSAGE mssg = is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board);
-						if (mssg == CHESS_BOARD_SUCCESS && graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) {
-							return ExitGame;
-						}
-					}
-				}
-				return Game;;
-			case SDL_MOUSEMOTION:
-				if(!window->data->picked_piece || !mouse_in_rec(event->motion.x, event->motion.y, window->data->board_widget->location)) {
-					window->data->picked_piece = false;
-				}
-				return Game;
-			default:
-				return Game;
-		}
+			}
+			if (ArrayListSize(window->data->board_widget->board->history) > 1 && window->data->board_widget->board->game_mode == 1) {
+				window->buttons[UndoButtonIndex]->active = true;
+			}
+			return Game;;
+		case SDL_MOUSEMOTION:
+			if(!window->data->picked_piece || !mouse_in_rec(event->motion.x, event->motion.y, window->data->board_widget->location)) {
+				window->data->picked_piece = false;
+			}
+			return Game;
+		default:
+			return Game;
 	}
 	return Game;
 }
