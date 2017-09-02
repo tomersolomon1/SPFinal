@@ -53,5 +53,5 @@ void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
 void drawGameWindow(Window* src, SDL_Event* event);
 Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board, Button *clicked_button);
 Button **create_game_buttons(SDL_Renderer* window_renderer);
-void destroyData(BoardWidget* data);
+void destory_data(GameData *data);
 #endif /* GRAPHICS_GAMEWINDOW_H_ */

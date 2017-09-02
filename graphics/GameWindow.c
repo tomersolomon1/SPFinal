@@ -17,10 +17,24 @@ const char *white_pieces_images[] = {CHESS_IMAGE(WPawn), CHESS_IMAGE(WKnight), C
 const char *black_pieces_images[] = {CHESS_IMAGE(BPawn), CHESS_IMAGE(BKnight), CHESS_IMAGE(BBishop),
 		CHESS_IMAGE(BRock),	CHESS_IMAGE(BQueen), CHESS_IMAGE(BKing)};
 
-void destroy_all_textures() {
-	// to be filled later
+void destory_data(GameData *data) {
+	if (data == NULL) {
+		return;
+	}
+	// freeing all the pieces texture
+	for (int color = 0; color < 2; color++) {
+		for (int i = 0; i < 6; i++) {
+			SDL_DestroyTexture(data->board_widget->piece_textures[color][i]);
+		}
+	}
+	SDL_DestroyTexture(data->board_widget->board_grid);
+	destroy_board(data->board_widget->board);
+	free(data->board_widget->location);
+	free(data->board_widget);
+	free(data);
 }
 
+/* debuging function */
 void recognize_square(Window *window, int x, int y) {
 	SDL_Point point = {.x = x, .y = y };
 	if(SDL_PointInRect(&point ,window->data->board_widget->location)) { // inside the board
