@@ -14,7 +14,7 @@
 #include "../MiniMax.h"
 #include "Button.h"
 #include "SPCommon.h"
-#include "Windows.h"
+#include "WindowDataStruct.h"
 
 #define CHESS_IMAGE(x) IMG(ChessPieces/x)
 
@@ -54,4 +54,9 @@ void drawGameWindow(Window* src, SDL_Event* event);
 Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board, Button *clicked_button);
 Button **create_game_buttons(SDL_Renderer* window_renderer);
 void destory_data(GameData *data);
+
+
+//////////////////
+void recognize_square(Window *window, int x, int y);
+
 #endif /* GRAPHICS_GAMEWINDOW_H_ */

@@ -36,7 +36,7 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 		else if (event.type == SDL_MOUSEBUTTONUP){
 			Button* btn = get_button_clicked(&event, wndw->buttons, wndw->num_buttons);
 			if(wndw->type == Game){
-				type = handle_game_events(wndw, &event, btn);
+				type = handle_game_events(wndw, &event, game, btn);
 			}
 			else{
 				if(btn == NULL || (event.button.button != SDL_BUTTON_LEFT))

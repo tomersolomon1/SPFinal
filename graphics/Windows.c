@@ -7,6 +7,7 @@
 
 #include "Windows.h"
 
+
 const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game Mode","Chess: Difficulty","Chess: Choose Color"};
 int num_buttons[] = {3,7,5,7,4,6,0};
 //buttons_creator creators[] = {create_enterance_buttons, create_load_game_buttons, create_game_mode_buttons,
@@ -32,7 +33,7 @@ Window*  create_window(Window_type type, Gameboard* game){
 	src->num_buttons = num_buttons[type];
 	src->data = NULL;
 	if(type == Game){
-		src->data = create_game_data(game);
+		src->data = create_game_data(renderer, game);
 	}
 	src->buttons = (*creators[type])(renderer);
 	if(src->buttons == NULL){
@@ -69,7 +70,7 @@ void drawWindow(Window* src, SDL_Event* event) {
 	SDL_SetRenderDrawColor(src->windowRenderer, 200, 255, 255, 255);
 	SDL_RenderClear(src->windowRenderer);
 	if(src->type == Game){
-		draw_board(src->data, event);
+		draw_board(src->data, src->windowRenderer, event);
 	}
 	for (int i = 0; i < src->num_buttons; i++) {
 		drawButton(src->buttons[i]);
