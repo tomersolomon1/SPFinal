@@ -75,8 +75,9 @@ void destroy_step(Step *step){
 void print_step(Step *step){
 	printf("[%d%c]->[%d%c]", step->srow+1, 'A'+step->scol, step->drow+1, 'A' +step->dcol);
 	fflush(stdout);
-	printf(" eat %c |", step->prevPiece->sign);
+	printf(" eat:%c", step->prevPiece->sign);
 	fflush(stdout);
+	printf(" threatened:%c | ", (step->is_threatened ? 'Y' : 'N'));
 }
 
 //Piece:

@@ -86,6 +86,12 @@ void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece);
 void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *amount_steps);
 /*helping function for set_all_valid_steps*/
 bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step *step);
+
+bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step);
+
+bool is_threatening_piece(Gameboard* gameboard, Piece *threatened);
+
+bool is_threatening_piece_per_vector(Gameboard* gameboard, Piece *threatened, Piece* attacking, Vector* v_attacking);
 //set hazraha setps:
 void set_hazraha_steps(Gameboard * gameboard);
 //helping function for set_hazraha_steps

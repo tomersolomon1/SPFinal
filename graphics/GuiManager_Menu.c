@@ -6,7 +6,7 @@
  */
 
 #include "GuiManager_Menu.h"
-#include "../saved games/"
+
 Window_type handleEvenet_enterance(Window* wndw, Button* btn){
 	if(btn->type == NewGameButton){
 		return ModeGame;
@@ -37,18 +37,18 @@ Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
 		slot5->active = false;
 		btn->active = true;
 	}
-	else if(btn->type == Load){
+	else if(btn->type == LoadButton){
 		FILE *f;
 		if(slot1->active)
-			FILE *f = fopen(saved_files[0], "r");
+			f = fopen(saved_files[0], "r");
 		else if(slot2->active)
-			FILE *f = fopen(saved_files[1], "r");
+			f = fopen(saved_files[1], "r");
 		else if(slot3->active)
-			FILE *f = fopen(saved_files[2], "r");
+			f = fopen(saved_files[2], "r");
 		else if(slot4->active)
-			FILE *f = fopen(saved_files[3], "r");
+			f = fopen(saved_files[3], "r");
 		else if(slot5->active)
-			FILE *f = fopen(saved_files[4], "r");
+			f = fopen(saved_files[4], "r");
 		assert(f != NULL);
 		destroy_board(*game);
 		*game = load_game(f);
