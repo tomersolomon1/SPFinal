@@ -10,8 +10,8 @@
 #include "ParserTester.h"
 #include "FilesTester.h"
 #include "ConsoleTester.h"
-#include "graphics/Menu_windowsTester.h"
 #include "graphics/Game_Window_Tester.h"
+#include "graphics/GuiManager.h"
 
 int main(int argc, char *argv[]){
 	if (argc == 2) {
