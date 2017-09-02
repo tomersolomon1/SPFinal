@@ -42,9 +42,9 @@ typedef struct step_t {
 	int scol; //source col
 	int drow; //dest row
 	int dcol; //dest col
-	struct piece_t *prevPiece;
-	bool is_srcPiece_was_moved;
-	bool is_threatened;
+	struct piece_t *prevPiece; //pointer to the piece that was killed in this move
+	bool is_srcPiece_was_moved; //remember if the piece that moved in this step was moved before
+	bool is_threatened;  //will the source piece be threatened by the other player if it goes with this step?
 } Step;
 
 typedef struct piece_t {
