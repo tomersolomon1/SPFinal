@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include "../GameBoard.h"
 #include <stdlib.h>
+#include "../Files.h"
+#include <assert.h>
 
 #define IMG(x) "./graphics/images/"#x".bmp"
 #define IMG_INCTV(x) "./graphics/images/"#x"_inactive.bmp"

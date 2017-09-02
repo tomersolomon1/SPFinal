@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-const char *saved_files[] = {"saved games/save0.txt", "saved games/save1.txt", "saved games/save2.txt",
-		"saved games/save3.txt", "saved games/save4.txt" };
+const char *saved_files[] = {"saved games/save0.xml", "saved games/save1.xml", "saved games/save2.xml",
+		"saved games/save3.xml", "saved games/save4.xml" };
 
 /* count how many saved-files exist, the first save file that doesn't exist ends the counting */
 int count_saves() {

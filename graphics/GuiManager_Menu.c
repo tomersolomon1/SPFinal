@@ -6,7 +6,7 @@
  */
 
 #include "GuiManager_Menu.h"
-
+#include "../saved games/"
 Window_type handleEvenet_enterance(Window* wndw, Button* btn){
 	if(btn->type == NewGameButton){
 		return ModeGame;
@@ -21,8 +21,40 @@ Window_type handleEvenet_enterance(Window* wndw, Button* btn){
 }
 
 Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
+	Button *slot1 = get_button_by_type(wndw, GameSlot1);
+	Button *slot2 = get_button_by_type(wndw, GameSlot2);
+	Button *slot3 = get_button_by_type(wndw, GameSlot3);
+	Button *slot4 = get_button_by_type(wndw, GameSlot4);
+	Button *slot5 = get_button_by_type(wndw, GameSlot5);
 	if(btn->type == BackButton)
 		return Enterance;
+	//clicked on one of the slots:
+	else if(GameSlot1 <= btn->type && btn->type <= GameSlot5){
+		slot1->active = false;
+		slot2->active = false;
+		slot3->active = false;
+		slot4->active = false;
+		slot5->active = false;
+		btn->active = true;
+	}
+	else if(btn->type == Load){
+		FILE *f;
+		if(slot1->active)
+			FILE *f = fopen(saved_files[0], "r");
+		else if(slot2->active)
+			FILE *f = fopen(saved_files[1], "r");
+		else if(slot3->active)
+			FILE *f = fopen(saved_files[2], "r");
+		else if(slot4->active)
+			FILE *f = fopen(saved_files[3], "r");
+		else if(slot5->active)
+			FILE *f = fopen(saved_files[4], "r");
+		assert(f != NULL);
+		destroy_board(*game);
+		*game = load_game(f);
+		fclose(f);
+		return Game;
+	}
 	return wndw->type;
 }
 
