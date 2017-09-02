@@ -18,8 +18,6 @@ Button** create_enterance_buttons(SDL_Renderer* renderer) {
 	ButtonType types[] = {NewGameButton, LoadButton, ExitButton};
 	const char* image[] = {IMG(start), IMG(load), IMG(exit)};
 	const char* image_inavtice[] = {IMG_INCTV(start), IMG_INCTV(load), IMG_INCTV(exit)};
-//	const char* image[] = {"./graphics/images/start.bmp", "./graphics/images/load.bmp", "./graphics/images/exit.bmp"};
-//	const char* image_inavtice[] = {"./graphics/images/start_inactive.bmp", "./graphics/images/load_inactive.bmp", "./graphics/images/exit_inactive.bmp"};
 
 	//create buttons:
 	for(int i = 0; i < 3; i++){
@@ -41,6 +39,7 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 	if(buttons == NULL) return NULL;
 	int horiz_center = (DEFAULT_MENU_WINDOW_WIDTH - DEFAULT_BTN_WIDTH) / 2;
 	int horiz_center_for_two = (DEFAULT_MENU_WINDOW_WIDTH - DEFAULT_BTN_WIDTH - DEFAULT_BTN_GAP_HORIZONTAL) / 2;
+
 	//set all parameters:
 	int x_btn_places[] = {horiz_center, horiz_center, horiz_center, horiz_center, horiz_center, horiz_center_for_two, horiz_center_for_two + DEFAULT_BTN_GAP_HORIZONTAL};
 	int y_btn_places[] = {DEFAULT_GAP_WINDOW,
@@ -55,6 +54,7 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 	const char* image_inavtice[] = {IMG_INCTV(gameslot1), IMG_INCTV(gameslot2), IMG_INCTV(gameslot3), IMG_INCTV(gameslot4), IMG_INCTV(gameslot5), IMG_INCTV(back), IMG_INCTV(load)};
 	bool active[] = {true, false, false, false, false, true, false};
 	bool visible[] = {false, false, false, false, false, true, true};
+
 	//create buttons:
 	for(int i = 0; i < 7; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
@@ -72,7 +72,6 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 Button** create_game_mode_buttons(SDL_Renderer* renderer){
 	Button** buttons = malloc(sizeof(Button*) * 5);
 	if(buttons == NULL) return NULL;
-	int horiz_center = (DEFAULT_MENU_WINDOW_WIDTH - DEFAULT_BTN_WIDTH) / 2;
 	int horiz_center_for_two = (DEFAULT_MENU_WINDOW_WIDTH - DEFAULT_BTN_WIDTH - DEFAULT_BTN_GAP_HORIZONTAL) / 2;
 	//set all parameters:
 	int x_btn_places[] = {horiz_center_for_two,
@@ -152,7 +151,6 @@ Button** create_difficulty_buttons(SDL_Renderer* renderer){
 Button** create_choose_color_buttons(SDL_Renderer* renderer){
 	Button** buttons = malloc(sizeof(Button*) * 4);
 	if(buttons == NULL) return NULL;
-	int horiz_center = (DEFAULT_MENU_WINDOW_WIDTH - DEFAULT_BTN_WIDTH) / 2;
 	int horiz_center_for_two = (DEFAULT_MENU_WINDOW_WIDTH - DEFAULT_BTN_WIDTH - DEFAULT_BTN_GAP_HORIZONTAL) / 2;
 	//set all parameters:
 	int x_btn_places[] = {horiz_center_for_two,
