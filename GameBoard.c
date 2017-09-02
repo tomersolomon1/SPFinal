@@ -206,56 +206,16 @@ bool is_under_check(Gameboard * gameboard){
 	return is_check(gameboard, abs(1 - gameboard->turn));
 }
 
-//is the player with color colur threating the other player?
+//is the player with color colur threatening the other player's king?
 bool is_check(Gameboard *gameboard, int colur) {
-	for(int i = 0; i < 16; i++){
-		Piece *piece = gameboard->all_pieces[colur][i];
-		if(piece->alive){
-			int amount_v = piece->amount_vectors; //check all vectors
-			while(amount_v > 0){
-				amount_v --;
-				if( is_check_per_vector(gameboard, piece, piece->vectors[amount_v]) ){
-					return true;
-				}
-			}
-		}
-	}
-	return false;
+	Piece* king_threatened = gameboard->all_pieces[abs(1-colur)][15];
+	return is_threatening_piece(gameboard, king_threatened);
 }
 
-bool is_check_per_vector(Gameboard *gameboard, Piece *piece, Vector *v){
-	int delta_row = v->delta_row;
-	int delta_col = v->delta_col;
-	int amount_going = v->vector_size;
-	bool can_eat = v->can_eat;
-	int row = piece->row;
-	int col = piece->col;
-	while(amount_going > 0){
-		amount_going --;
-		row = row + delta_row;
-		col = col + delta_col;
-		if(row < 0 || row > 7 || col < 0 || col > 7){ //out of board
-			return false;
-		}
-		else if(gameboard->board[row][col]->type == Empty){ // can go, empty
-			continue;
-		}
-		else if(can_eat && gameboard->board[row][col]->type == King &&
-				gameboard->board[row][col]->colur != piece->colur){ //eating opponent's king
-			return true;
-		}
-		else{ // seeing another piece
-			return false;
-		}
-	}
-	return false;
-}
-
-//
-//is the curr player threatening the other player's piece threatened?
+//is the (piece* threatened) threatened by the other player?
 bool is_threatening_piece(Gameboard* gameboard, Piece *threatened){
 	for(int i = 0; i < 16; i++){
-		Piece *attacking = gameboard->all_pieces[gameboard->user_color][i];
+		Piece *attacking = gameboard->all_pieces[abs(1 - threatened->colur)][i];
 		if(attacking->alive){
 			int amount_v = attacking->amount_vectors; //check all vectors
 			while(amount_v > 0){
@@ -392,7 +352,6 @@ bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step){
 	gameboard->board[piece->row][piece->col] = piece;
 	return answer;
 }
-
 
 void set_hazraha_steps(Gameboard * gameboard){
 	int turn = gameboard->turn;
