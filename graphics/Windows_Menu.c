@@ -128,6 +128,12 @@ Button** create_difficulty_buttons(SDL_Renderer* renderer){
 	const char* image_inavtice[] = {IMG_INCTV(noob), IMG_INCTV(easy), IMG_INCTV(moderate), IMG_INCTV(hard), IMG_INCTV(next), IMG_INCTV(back)};
 	bool active[] = {true, false, false, false, true, true};
 	bool visible[] = {true, true, true, true, true, true};
+	int amount_files = count_saves();
+	int i = 0;
+	for(; i < amount_files; i++)
+		visible[i] = true;
+	for(; i < 5; i++)
+		visible[i] = false;
 	//create buttons:
 	for(int i = 0; i < 6; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
@@ -139,6 +145,7 @@ Button** create_difficulty_buttons(SDL_Renderer* renderer){
 			return NULL;
 		}
 	}
+
 	return buttons;
 }
 

@@ -23,6 +23,46 @@ void check_menu_window(){
 	destroy_board(game);
 }
 
+Window_type handleEvenet(Window* wndw, Gameboard** game){
+	if(wndw == NULL)
+		return ExitGame;
+	Window_type type = Enterance;
+	SDL_Event event;
+	set_buttons_by_game_params(wndw, game);
+	while(1){
+		SDL_WaitEvent(&event);
+		if (event.type == SDL_QUIT)
+			return ExitGame;
+		else if (event.type == SDL_MOUSEBUTTONUP){
+			Button* btn = get_button_clicked(&event, wndw->buttons, wndw->num_buttons);
+			if(wndw->type == Game){
+				type = handle_game_events(wndw, &event, btn);
+			}
+			else{
+				if(btn == NULL || (event.button.button == SDL_BUTTON_LEFT))
+					continue;
+				if(wndw->type == Enterance)
+					type =  handleEvenet_enterance(wndw, btn);
+				else if(wndw->type == LoadGame)
+					type = handleEvenet_load_game(wndw, btn, game);
+				else if(wndw->type == ModeGame)
+					type = handleEvenet_mode_game(wndw, btn, game);
+				else if(wndw->type == Difficulty)
+					type = handleEvenet_difficulty(wndw, btn, game);
+				else if(wndw->type == ChooseColor)
+					type = handleEvenet_choose_color(wndw, btn, game);
+			}
+			if(type == wndw->type){
+				continue;
+			}
+			else{
+				return type;
+			}
+		}
+		drawWindow(wndw, &event);
+	}
+}
+
 void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 	if(wndw->type == ModeGame){
 		Button* one_player = get_button_by_type(wndw, OnePlayer);
@@ -66,45 +106,16 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 			blck->active = true;
 		}
 	}
-
-}
-
-Window_type handleEvenet(Window* wndw, Gameboard** game){
-	if(wndw == NULL)
-		return ExitGame;
-	Window_type type = Enterance;
-	SDL_Event event;
-	set_buttons_by_game_params(wndw, game);
-	while(1){
-		SDL_WaitEvent(&event);
-		if (event.type == SDL_QUIT)
-			return ExitGame;
-		else if (event.type == SDL_MOUSEBUTTONUP){
-			Button* btn = get_button_clicked(&event, wndw->buttons, wndw->num_buttons);
-			if(wndw->type == Game){
-				type = handle_game_events(wndw, &event, btn);
-			}
-			else{
-				if(btn == NULL || (event.button.button == SDL_BUTTON_LEFT))
-					continue;
-				if(wndw->type == Enterance)
-					type =  handleEvenet_enterance(wndw, btn);
-				else if(wndw->type == LoadGame)
-					type = handleEvenet_load_game(wndw, btn, game);
-				else if(wndw->type == ModeGame)
-					type = handleEvenet_mode_game(wndw, btn, game);
-				else if(wndw->type == Difficulty)
-					type = handleEvenet_difficulty(wndw, btn, game);
-				else if(wndw->type == ChooseColor)
-					type = handleEvenet_choose_color(wndw, btn, game);
-			}
-			if(type == wndw->type){
-				continue;
-			}
-			else{
-				return type;
-			}
+	else if(wndw->type == Difficulty){
+		int amount_files = count_saves();
+		int i = 0;
+		for(; i < amount_files; i++){
+			get_button_by_type(wndw, GameSlot1 + i)->visibility = true;
 		}
-		drawWindow(wndw, &event);
+		for(; i < 5; i++){
+			get_button_by_type(wndw, GameSlot1 + i)->visibility = false;
+		}
+		get_button_by_type(wndw, GameSlot1)->active = true;
 	}
+
 }
