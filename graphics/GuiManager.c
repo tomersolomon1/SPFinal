@@ -39,7 +39,7 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 				type = handle_game_events(wndw, &event, btn);
 			}
 			else{
-				if(btn == NULL || (event.button.button == SDL_BUTTON_LEFT))
+				if(btn == NULL || (event.button.button != SDL_BUTTON_LEFT))
 					continue;
 				if(wndw->type == Enterance)
 					type =  handleEvenet_enterance(wndw, btn);
