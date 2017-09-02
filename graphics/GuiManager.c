@@ -106,8 +106,4 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 			blck->active = true;
 		}
 	}
-	else if(wndw->type == Difficulty){
-
-	}
-
 }
