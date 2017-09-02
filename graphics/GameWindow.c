@@ -61,8 +61,8 @@ Button **create_game_buttons(SDL_Renderer* window_renderer) {
 			6*DEFAULT_GAME_BUTTON_HEIGHT + 6*DEFAULT_GAME_BUTTON_VERTICAL_GAP,};
 
 	ButtonType types[] = {RestartButton, SaveButton, LoadButton, UndoButton, MenuButton, ExitButton};
-	const char* image[] = {IMG(start), IMG(start), IMG(load), IMG(start), IMG(start), IMG(exit)};
-	const char* image_inavtice[] = {IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white)};
+	const char* image[] = {IMG(restart), IMG(save), IMG(load), IMG(undo), IMG(main_menu), IMG(exit)};
+	const char* image_inavtice[] = {IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(undo), IMG_INCTV(white), IMG_INCTV(white)};
 	bool active[] = {true, true, true, false, true, true};
 	bool visible[] = {true, true, true, true, true, true};
 	Button **buttons = create_buttons(window_renderer, types, 6, x_btn_places,
