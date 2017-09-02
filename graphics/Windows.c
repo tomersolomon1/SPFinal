@@ -64,7 +64,7 @@ void drawWindow(Window* src, SDL_Event* event) {
 		return;
 	}
 	//draw window:
-	SDL_SetRenderDrawColor(src->windowRenderer, 55, 10, 100, 120);
+	SDL_SetRenderDrawColor(src->windowRenderer, 255, 255, 255, 255);
 	SDL_RenderClear(src->windowRenderer);
 	if(src->type == Game){
 		draw_board(src->data, src->windowRenderer, event);

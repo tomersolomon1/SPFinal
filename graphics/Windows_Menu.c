@@ -16,8 +16,8 @@ Button** create_enterance_buttons(SDL_Renderer* renderer) {
 	int x_btn_places[] = {horiz_center, horiz_center, horiz_center};
 	int y_btn_places[] = {DEFAULT_GAP_WINDOW, DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL, DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 2};
 	ButtonType types[] = {NewGameButton, LoadButton, ExitButton};
-	const char* image[] = {IMG(start), IMG(load), IMG(exit)};
-	const char* image_inavtice[] = {IMG_INCTV(start), IMG_INCTV(load), IMG_INCTV(exit)};
+	const char* image[] = {IMG(new_game), IMG(load), IMG(exit)};
+	const char* image_inavtice[] = {IMG_INCTV(new_game), IMG_INCTV(load), IMG_INCTV(exit)};
 
 	//create buttons:
 	for(int i = 0; i < 3; i++){
