@@ -35,6 +35,9 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 			return ExitGame;
 		else if (wndw->type == Game) {
 			type = handle_game_events(wndw, &event, game);
+			if (type != Game) {
+				return type;
+			}
 		}
 		else if (event.type == SDL_MOUSEBUTTONUP) {
 			Button* btn = get_button_clicked(&event, wndw->buttons, wndw->num_buttons);
@@ -50,10 +53,7 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 				type = handleEvenet_difficulty(wndw, btn, game);
 			else if(wndw->type == ChooseColor)
 				type = handleEvenet_choose_color(wndw, btn, game);
-			if(type == wndw->type){
-				continue;
-			}
-			else{
+			if  (type != wndw->type){
 				return type;
 			}
 		}

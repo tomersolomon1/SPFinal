@@ -216,8 +216,6 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 					switch(clicked_button->type) {
 						case RestartButton:
 							reset_board(game);
-							printf("reset\n");
-							fflush(stdout);
 							window->data->board_widget->board = *game;
 							return Game;
 						case SaveButton:
@@ -235,16 +233,10 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 							}
 							return Game;
 						case MenuButton:
-							printf("entrance\n");
-							fflush(stdout);
 							return Enterance;
 						case ExitButton:
-							printf("exit btn\n");
-							fflush(stdout);
 							return ExitGame;
-						default: /* something went wrong */
-							printf("exit game\n");
-							fflush(stdout);
+						default: /* something went wrong somewhere */
 							return ExitGame;
 					}
 				}
