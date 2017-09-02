@@ -9,7 +9,7 @@
 
 
 const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game Mode","Chess: Difficulty","Chess: Choose Color"};
-int num_buttons[] = {3,7,5,7,4,6,0};
+int num_buttons[] = {3,7,5,6,4,6,0};
 buttons_creator creators[] = {create_enterance_buttons, create_load_game_buttons, create_game_mode_buttons,
 				create_difficulty_buttons, create_choose_color_buttons, create_game_buttons};
 Window*  create_window(Window_type type, Gameboard* game){

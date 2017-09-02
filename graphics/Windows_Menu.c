@@ -52,7 +52,7 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 	ButtonType types[] = {GameSlot1, GameSlot2, GameSlot3, GameSlot4, GameSlot5, BackButton, LoadButton};
 	const char* image[] = {IMG(gameslot1), IMG(gameslot2), IMG(gameslot3), IMG(gameslot4), IMG(gameslot5), IMG(back), IMG(load)};
 	const char* image_inavtice[] = {IMG_INCTV(gameslot1), IMG_INCTV(gameslot2), IMG_INCTV(gameslot3), IMG_INCTV(gameslot4), IMG_INCTV(gameslot5), IMG_INCTV(back), IMG_INCTV(load)};
-	bool active[] = {true, false, false, false, false, true, false};
+	bool active[] = {false, false, false, false, false, true, false};
 	bool visible[] = {false, false, false, false, false, true, true};
 	int amount_files = count_saves();
 	int i = 0;

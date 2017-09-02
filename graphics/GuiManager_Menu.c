@@ -36,6 +36,7 @@ Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
 		slot4->active = false;
 		slot5->active = false;
 		btn->active = true;
+		get_button_by_type(wndw, LoadButton)->active = true;
 	}
 	else if(btn->type == LoadButton){
 		FILE *f;
