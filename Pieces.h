@@ -44,6 +44,7 @@ typedef struct step_t {
 	int dcol; //dest col
 	struct piece_t *prevPiece;
 	bool is_srcPiece_was_moved;
+	bool is_threatened;
 } Step;
 
 typedef struct piece_t {
@@ -69,7 +70,7 @@ Vector *copy_vector(Vector *old);
 void destroy_vector(Vector *v);
 
 //Step
-Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved);
+Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved, bool is_threatened);
 Step *copy_step(Step *old);
 void destroy_step(Step *step);
 void print_step(Step *step);

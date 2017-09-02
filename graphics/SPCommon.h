@@ -10,6 +10,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 #include <unistd.h>
+#include "../GameBoard.h"
+#include <stdlib.h>
 
 #define IMG(x) "./graphics/images/"#x".bmp"
 #define IMG_INCTV(x) "./graphics/images/"#x"_inactive.bmp"

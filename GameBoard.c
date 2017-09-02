@@ -139,7 +139,7 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 	}
 	Piece *source_p = gameboard->board[srow][scol];
 	Piece *dest_p = gameboard->board[drow][dcol];
-	Step *step = create_step(srow, scol, drow, dcol, dest_p, source_p->has_moved);
+	Step *step = create_step(srow, scol, drow, dcol, dest_p, source_p->has_moved, true);
 	ArrayListPushFirst(gameboard->history, step);
 
 	if(source_p->type == King && abs(dcol - scol) > 1 && srow == drow){ // hazraha
@@ -290,7 +290,7 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 			break;
 		}
 		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
-			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece->has_moved);
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece->has_moved, true);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
@@ -298,7 +298,7 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 		}
 		else if(gameboard->board[row][col]->type != Empty &&
 				gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
-			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved);
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved, true);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
@@ -340,7 +340,7 @@ void set_hazraha_steps(Gameboard * gameboard){
 		rock = gameboard->all_pieces[turn][12+i];
 		if(is_hazraha_valid_per_rock(gameboard, king, rock)){
 			delta_col = (king->col < rock->col) ? 2 : -2;
-			Step * new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, false);
+			Step * new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, false, true);
 			king->steps[king->amount_steps] = new_step;
 			king->amount_steps++;
 		}

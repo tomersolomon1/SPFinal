@@ -39,7 +39,7 @@ void destroy_vector(Vector *v){
 
 //Step:
 
-Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved){
+Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved, bool is_threatened){
 	Step *newStep = (Step*) malloc(sizeof(Step));
 	assert(newStep != NULL);
 	newStep->srow = srow;
@@ -48,6 +48,7 @@ Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool
 	newStep->scol = scol;
 	newStep->prevPiece = prevPiece;
 	newStep->is_srcPiece_was_moved = is_srcPiece_was_moved;
+	newStep->is_threatened = is_threatened;
 	return newStep;
 }
 
@@ -61,6 +62,7 @@ Step *copy_step(Step *old){
 	new->dcol = old->dcol;
 	new->prevPiece = NULL;
 	new->is_srcPiece_was_moved = old->is_srcPiece_was_moved;
+	new->is_threatened = old->is_threatened;
 	return new;
 }
 
