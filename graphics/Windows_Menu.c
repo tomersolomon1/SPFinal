@@ -54,7 +54,12 @@ Button** create_load_game_buttons(SDL_Renderer* renderer){
 	const char* image_inavtice[] = {IMG_INCTV(gameslot1), IMG_INCTV(gameslot2), IMG_INCTV(gameslot3), IMG_INCTV(gameslot4), IMG_INCTV(gameslot5), IMG_INCTV(back), IMG_INCTV(load)};
 	bool active[] = {true, false, false, false, false, true, false};
 	bool visible[] = {false, false, false, false, false, true, true};
-
+	int amount_files = count_saves();
+	int i = 0;
+	for(; i < amount_files; i++)
+		visible[i] = true;
+	for(; i < 5; i++)
+		visible[i] = false;
 	//create buttons:
 	for(int i = 0; i < 7; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
@@ -90,7 +95,7 @@ Button** create_game_mode_buttons(SDL_Renderer* renderer){
 	const char* image[] = {IMG(one_player), IMG(two_players), IMG(start), IMG(next), IMG(back)};
 	const char* image_inavtice[] = {IMG_INCTV(one_player), IMG_INCTV(two_players), IMG_INCTV(start), IMG_INCTV(next), IMG_INCTV(back)};
 	bool active[] = {true, false, true, true, true};
-	bool visible[] = {true, true, true, false, true};
+	bool visible[] = {true, true, false, true, true};
 	//create buttons:
 	for(int i = 0; i < 5; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
@@ -127,12 +132,6 @@ Button** create_difficulty_buttons(SDL_Renderer* renderer){
 	const char* image_inavtice[] = {IMG_INCTV(noob), IMG_INCTV(easy), IMG_INCTV(moderate), IMG_INCTV(hard), IMG_INCTV(next), IMG_INCTV(back)};
 	bool active[] = {true, false, false, false, true, true};
 	bool visible[] = {true, true, true, true, true, true};
-	int amount_files = count_saves();
-	int i = 0;
-	for(; i < amount_files; i++)
-		visible[i] = true;
-	for(; i < 5; i++)
-		visible[i] = false;
 	//create buttons:
 	for(int i = 0; i < 6; i++){
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = DEFAULT_BTN_HIGHT, .w = DEFAULT_BTN_WIDTH};
