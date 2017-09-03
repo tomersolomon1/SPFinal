@@ -108,8 +108,6 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 	printf("start to create RGB surfaces\n");
 	fflush(stdout);
 	// create texture for highlighted squares
-	int row_dim = location->h / 8;
-	int col_dim = location->w / 8;
 	SDL_Surface *possible_move_surface   = SDL_LoadBMP(IMG(possible square));
 	//SDL_Surface *possible_move_surface   = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 	printf("created RGB surface1 \n");
@@ -137,8 +135,8 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 	printf("created RGB surfaces\n");
 	fflush(stdout);
 	board_widget->possible_move_texture = SDL_CreateTextureFromSurface(window_renderer, possible_move_surface);
-	board_widget->threatened_move_texture = SDL_CreateTextureFromSurface(window_renderer, possible_move_surface);
-	board_widget->capturing_move_texture = SDL_CreateTextureFromSurface(window_renderer, possible_move_surface);
+	board_widget->threatened_move_texture = SDL_CreateTextureFromSurface(window_renderer, threatened_move_surface);
+	board_widget->capturing_move_texture = SDL_CreateTextureFromSurface(window_renderer, capturing_move_surface);
 	if (board_widget->possible_move_texture == NULL || board_widget->threatened_move_texture == NULL || board_widget->capturing_move_texture == NULL) {
 		destroy_game_textures(board_widget);
 		return NULL;
@@ -182,10 +180,11 @@ int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim
 		int x_offset = data->board_widget->location->x + (step->dcol * col_dim);
 		int y_offset = data->board_widget->location->y + ((7-step->drow) * row_dim);
 		SDL_Rect step_rec = {.x = x_offset, .y = y_offset, .h = row_dim, .w = col_dim };
+		SDL_RenderDrawRect(renderer, &step_rec);
 		if (step->is_threatened) {
 			success = SDL_RenderCopy(renderer, data->board_widget->threatened_move_texture, NULL, &step_rec);
 		} else {
-			Piece *dest_occupier = data->board_widget->board->board[step->drow][step->drow];
+			Piece *dest_occupier = data->board_widget->board->board[step->drow][step->dcol];
 			if (dest_occupier->type == Empty) {
 				success = SDL_RenderCopy(renderer, data->board_widget->possible_move_texture, NULL, &step_rec);
 			} else { /* has to be capturing move */
