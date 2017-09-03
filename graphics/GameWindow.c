@@ -173,8 +173,6 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim, int col_dim) {
 	Piece *selected_piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
 	int success = 0; /* so far so good */
-	printf("highlight squares - the piece is at: (%d,%d)\n", selected_piece->col, selected_piece->row);
-	fflush(stdout);
 	for (int step_index = 0; step_index < selected_piece->amount_steps; step_index++) {
 		Step *step = selected_piece->steps[step_index];
 		int x_offset = data->board_widget->location->x + (step->dcol * col_dim);

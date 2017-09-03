@@ -23,5 +23,6 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 void save_game_from_gui(Gameboard *game);
 StayOrLeave suggest_save(Gameboard *game);
 
-
+// for setting the first move
+void gui_first_move(Gameboard *board);
 #endif /* GRAPHICS_GUIMANAGER_GAME_H_ */

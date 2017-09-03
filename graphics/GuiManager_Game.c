@@ -56,6 +56,18 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 	return false; /* the game is not over yet */
 }
 
+/* taking care of the first move of the game.
+ * in case we are in game-mode 1, and the user plays the black pieces, then playing the computer move
+ */
+void gui_first_move(Gameboard *board) {
+	if (board->game_mode == 1 && board->user_color == 0) {
+		Gameboard *copy = copy_board(board);
+		Move move = find_best_move(copy, copy->difficulty);
+		destroy_board(copy);
+		set_step(board, move.srow, move.scol, move.drow, move.dcol);
+	}
+}
+
 void save_game_from_gui(Gameboard *game) {
 	promote_saves();
 	FILE *file = fopen(saved_files[0], "w");
@@ -157,6 +169,8 @@ Window_type handle_game_buttons(Window *window, Button* clicked_button, Gameboar
 }
 
 Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game) {
+	//printf("color1: %d, color2: %d\n", (*game)->user_color, window->data->board_widget->board->user_color);
+	fflush(stdout);
 	if (event == NULL || window == NULL ) {
 		return ExitGame;
 	}
@@ -168,7 +182,7 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 				int x_board = (8*relative_x / window->data->board_widget->location->w);
 				int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
 				Piece *piece = window->data->board_widget->board->board[y_board][x_board];
-				if (piece->type != Empty && piece->colur == window->data->board_widget->board->turn) { /* the user clicked on one of his pieces */
+				if (piece->type != Empty && piece->colur == window->data->board_widget->board->user_color) { /* the user clicked on one of his pieces */
 					window->data->selected_piece_color = piece->colur;
 					window->data->selected_piece_index = piece->indexat;
 					if (event->button.button == SDL_BUTTON_LEFT) { /* selected the piece for moving */
@@ -176,8 +190,6 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 					} else if (event->button.button == SDL_BUTTON_RIGHT && ((*game)->game_mode == 1)
 							&& ((*game)->difficulty == 1 || (*game)->difficulty == 2)) {
 						window->data->highlight_moves = true;
-						printf("recognizing right click\n");
-						fflush(stdout);
 					}
 
 				}
