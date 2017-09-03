@@ -38,6 +38,7 @@ typedef struct game_data_t {
 	int selected_piece_color;
 	int selected_piece_index;
 	bool picked_piece;
+	bool saved_game;
 } GameData;
 
 typedef struct window_t {

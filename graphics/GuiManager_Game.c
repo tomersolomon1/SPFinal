@@ -8,6 +8,7 @@
 #include "GameWindow.h"
 #include "SPCommon.h"
 #include "WindowDataStruct.h"
+#include "GuiManager_Game.h"
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
@@ -63,8 +64,99 @@ void save_game_from_gui(Gameboard *game) {
 	fclose(file);
 }
 
+/* ask the user if he wants to save the game before leaving */
+StayOrLeave suggest_save(Gameboard *game) {
+	const SDL_MessageBoxButtonData buttons[] = {
+	        { 0, 0, "no" },
+	        { SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "yes" },
+	        { SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 2, "cancel" },
+	    };
+	const SDL_MessageBoxColorScheme colorScheme = {
+		{ /* .colors (.r, .g, .b) */
+			/* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+			{ 255,   0,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_TEXT] */
+			{   0, 255,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+			{ 255, 255,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+			{   0,   0, 255 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+			{ 255,   0, 255 }
+		}
+	};
+	const SDL_MessageBoxData messageboxdata = {
+		SDL_MESSAGEBOX_INFORMATION, /* .flags */
+		NULL, /* .window */
+		"Save The Game?", /* .title */
+		"do you want to save the game before leaving?", /* .message */
+		SDL_arraysize(buttons), /* .numbuttons */
+		buttons, /* .buttons */
+		&colorScheme /* .colorScheme */
+	};
+	int buttonid;
+	if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+		SDL_Log("error displaying message box");
+		return Error; /* error */
+	}
+	if (buttonid == -1 || buttonid == 2) { /* i'll treat 'no selection' as cancel */
+		return Stay;
+	} else if (buttonid == 1) { /* 'yes' option, so we need to save */
+		save_game_from_gui(game); /* notice we don't need to update window->data->saved_game, since we are leaving the game-window anyway */
+	}
+	return Leave; /* we leave without saving */
+}
+
+Window_type handle_game_buttons(Window *window, Button* clicked_button, Gameboard **game) {
+	StayOrLeave op;
+	switch(clicked_button->type) {
+		case RestartButton:
+			reset_board(game);
+			window->data->board_widget->board = *game;
+			return Game;
+		case SaveButton:
+			save_game_from_gui(*game);
+			window->data->saved_game = true;
+			return Game;
+		case LoadButton:
+			return LoadGame;
+		case UndoButton:
+			if (clicked_button->active) {
+				double_undo(window->data->board_widget->board);
+				if (ArrayListSize(window->data->board_widget->board->history) < 2) {
+					window->buttons[UndoButtonIndex]->active = false;
+				}
+			}
+			return Game;
+		case MenuButton:
+			op = suggest_save(*game);
+			if (op == Error) {
+				/* what should we do? */
+			} else if (op == Stay) {
+				return Game;
+			} else {
+				destroy_board(*game);
+				*game = create_board(1,1,1); /* reseting the settings */
+				return Enterance;
+			}
+			break;
+		case ExitButton:
+			op = suggest_save(*game);
+			if (op == Error) {
+				/* what should we do? */
+			} else if (op == Stay) {
+				return Game;
+			} else {
+				return ExitGame;
+			}
+			break;
+		default: /* we need to have default, otherwise it arises warnings */
+			return ExitGame;
+	}
+	return Game;
+}
+
 Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game) {
-	//SDL_Point point;
 	if (event == NULL || window == NULL ) {
 		return ExitGame;
 	}
@@ -86,34 +178,7 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 			else { /* the click wasn't inside the board, or it wasn't a LEFT button */
 				Button* clicked_button = get_button_clicked(event, window->buttons, window->num_buttons);
 				if (clicked_button != NULL) { /* some button was clicked */
-					switch(clicked_button->type) {
-						case RestartButton:
-							reset_board(game);
-							window->data->board_widget->board = *game;
-							return Game;
-						case SaveButton:
-							save_game_from_gui(*game);
-							return Game;
-						case LoadButton:
-							printf("are you sure?????????????\n"); /* to be updated */
-							return LoadGame;
-						case UndoButton:
-							if (clicked_button->active) {
-								double_undo(window->data->board_widget->board);
-								if (ArrayListSize(window->data->board_widget->board->history) < 2) {
-									window->buttons[UndoButtonIndex]->active = false;
-								}
-							}
-							return Game;
-						case MenuButton:
-							destroy_board(*game);
-							*game = create_board(1,1,1); /* reseting the settings */
-							return Enterance;
-						case ExitButton:
-							return ExitGame;
-						default: /* something went wrong somewhere */
-							return ExitGame;
-					}
+					return handle_game_buttons(window, clicked_button, game);
 				}
 			}
 			return Game; /* if no case was applied */
@@ -127,7 +192,9 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 					int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
 					Piece *piece = window->data->board_widget->board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
 					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board);
-					if (mssg == CHESS_BOARD_SUCCESS && graphical_handle_move(window, piece->row, piece->col, y_board, x_board)) {
+					if (mssg == CHESS_BOARD_SUCCESS) {
+						graphical_handle_move(window, piece->row, piece->col, y_board, x_board);
+						window->data->saved_game = false;
 						return Game;
 					}
 				}

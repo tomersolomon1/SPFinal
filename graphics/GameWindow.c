@@ -72,6 +72,7 @@ GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
 	data->picked_piece = false;
 	data->selected_piece_color = -1;
 	data->selected_piece_index = -1;
+	data->saved_game = false;
 	return data;
 }
 
