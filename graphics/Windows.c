@@ -13,6 +13,7 @@ buttons_creator creators[] = {create_enterance_buttons, create_load_game_buttons
 				create_difficulty_buttons, create_choose_color_buttons, create_game_buttons};
 Window*  create_window(Window_type type, Gameboard* game){
 	Window* src = (Window*) malloc(sizeof(Window));
+	assert(src != NULL);
 	src->type = type;
 	SDL_Window* window = SDL_CreateWindow(window_name[type], SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, DEFAULT_MENU_WINDOW_WIDTH, DEFAULT_MENU_WINDOW_HIGHT, SDL_WINDOW_OPENGL);
@@ -20,10 +21,10 @@ Window*  create_window(Window_type type, Gameboard* game){
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	src->windowRenderer = renderer;
 
-	if(src == NULL || window == NULL || renderer == NULL){
+	if(window == NULL || renderer == NULL){
 		free(src);
-		free(window);
-		free(renderer);
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
 		return NULL;
 	}
 	src->num_buttons = num_buttons[type];
