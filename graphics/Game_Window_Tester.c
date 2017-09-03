@@ -9,6 +9,7 @@
 #include "../GameBoard.h"
 #include "Windows.h"
 #include "GameWindow.h"
+#include "GuiManager_Game.h"
 
 void check_game_window() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) { // SDL2 INIT

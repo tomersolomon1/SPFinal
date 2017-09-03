@@ -9,6 +9,7 @@
 #define MENU_WINDOWSTESTER_H_
 #include "Windows.h"
 #include "GuiManager_Menu.h"
+#include "GuiManager_Game.h"
 
 void check_menu_window();
 void set_buttons_by_game_params(Window* wndw, Gameboard** game);

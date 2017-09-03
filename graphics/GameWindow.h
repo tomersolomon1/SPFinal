@@ -18,9 +18,9 @@
 
 #define CHESS_IMAGE(x) IMG(ChessPieces/x)
 
-/* to be changed later onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn */
+/* to be changed later onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn */
 #define DEFAULT_GAME_WINDOW_WIDTH 700
-#define DEFAULT_GAME_WINDOW_HEIGHT 700
+#define DEFAULT_GAME_WINDOW_HEIGHT 600
 
 // buttons panel dimensions
 #define DEFAULT_GAME_BUTTON_PANEL_WIDTH (DEFAULT_GAME_WINDOW_WIDTH / 4)
@@ -56,10 +56,8 @@ GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board);
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location);
 Button **create_game_buttons(SDL_Renderer* window_renderer);
 
-// handle event && draw functions
+// draw board
 void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
-Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board);
-
 
 ////////////////// debug functions
 Window *create_game_window(Gameboard *board);

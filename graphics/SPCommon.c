@@ -34,7 +34,7 @@ void promote_saves() {
 	}
 }
 
-//Helper function
+// Helper functions
 SDL_Rect* spCopyRect(SDL_Rect* src){
 	if(src == NULL){
 		return NULL;
@@ -50,5 +50,10 @@ SDL_Rect* spCopyRect(SDL_Rect* src){
 	return res;
 }
 
+/* helper function, to be converted to macro later */
+bool mouse_in_rec(int x, int y, SDL_Rect *rect) {
+	SDL_Point point = {.x = x, .y = y };
+	return SDL_PointInRect(&point, rect);
 
+}
 
