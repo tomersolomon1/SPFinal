@@ -76,7 +76,7 @@ void save_game_from_gui(Gameboard *game) {
 	fclose(file);
 }
 
-/* ask the user if he wants to save the game before leaving   */
+/* ask the user if he wants to save the game before leaving    */
 StayOrLeave suggest_save(Gameboard *game) {
 	const SDL_MessageBoxButtonData buttons[] = {
 	        { 0, 0, "no" },
