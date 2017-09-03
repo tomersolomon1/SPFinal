@@ -9,13 +9,15 @@
 
 void check_menu_window(){
 	Window_type type_window = Enterance;
+	Window_type old_type_window = Enterance;
 	Gameboard* game = create_board(1,1,1);
 	while(1){
 		Window* window = create_window(type_window, game);
 		if(window == NULL){
 			return;
 		}
-		type_window = handleEvenet(window, &game);
+		type_window = handleEvenet(window, &game, old_type_window);
+		old_type_window = window->type;
 		destroyWindow(window);
 		if(type_window == ExitGame)
 			break;
@@ -23,7 +25,7 @@ void check_menu_window(){
 	destroy_board(game);
 }
 
-Window_type handleEvenet(Window* wndw, Gameboard** game){
+Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_window){
 	if(wndw == NULL)
 		return ExitGame;
 	Window_type type = Enterance;
@@ -46,7 +48,7 @@ Window_type handleEvenet(Window* wndw, Gameboard** game){
 			if(wndw->type == Enterance)
 				type =  handleEvenet_enterance(wndw, btn);
 			else if(wndw->type == LoadGame)
-				type = handleEvenet_load_game(wndw, btn, game);
+				type = handleEvenet_load_game(wndw, btn, game, old_type_window);
 			else if(wndw->type == ModeGame)
 				type = handleEvenet_mode_game(wndw, btn, game);
 			else if(wndw->type == Difficulty)

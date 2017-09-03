@@ -10,7 +10,7 @@
 #include "Windows.h"
 
 Window_type handleEvenet_enterance(Window* wndw, Button* btn);
-Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game);
+Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game, Window_type old_type_window);
 Window_type handleEvenet_mode_game(Window* wndw, Button* btn, Gameboard** game);
 Window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game);
 Window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** game);

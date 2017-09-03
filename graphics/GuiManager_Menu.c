@@ -20,14 +20,14 @@ Window_type handleEvenet_enterance(Window* wndw, Button* btn){
 	return wndw->type;
 }
 
-Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game){
+Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game, Window_type old_type_window){
 	Button *slot1 = get_button_by_type(wndw, GameSlot1);
 	Button *slot2 = get_button_by_type(wndw, GameSlot2);
 	Button *slot3 = get_button_by_type(wndw, GameSlot3);
 	Button *slot4 = get_button_by_type(wndw, GameSlot4);
 	Button *slot5 = get_button_by_type(wndw, GameSlot5);
 	if(btn->type == BackButton)
-		return Enterance;
+		return old_type_window;
 	//clicked on one of the slots:
 	else if(GameSlot1 <= btn->type && btn->type <= GameSlot5){
 		slot1->active = false;

@@ -13,6 +13,6 @@
 
 void check_menu_window();
 void set_buttons_by_game_params(Window* wndw, Gameboard** game);
-Window_type handleEvenet(Window* wndw, Gameboard** game);
+Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_window);
 
 #endif /* MENU_WINDOWSTESTER_H_ */
