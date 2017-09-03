@@ -11,7 +11,7 @@ const char* window_name[] = {"Chess: Main Menu","Chess: Load Game","Chess: Game 
 int num_buttons[] = {3,7,5,6,4,6,0};
 buttons_creator creators[] = {create_enterance_buttons, create_load_game_buttons, create_game_mode_buttons,
 				create_difficulty_buttons, create_choose_color_buttons, create_game_buttons};
-Window*  create_window(Window_type type, Gameboard* game){
+Window* create_window(Window_type type, Gameboard* game){
 	Window* src = (Window*) malloc(sizeof(Window));
 	assert(src != NULL);
 	src->type = type;
@@ -31,6 +31,11 @@ Window*  create_window(Window_type type, Gameboard* game){
 	src->data = NULL;
 	if(type == Game){
 		src->data = create_game_data(renderer, game);
+		if(src->data == NULL){
+			free(src);
+			SDL_DestroyWindow(window);
+			SDL_DestroyRenderer(renderer);
+		}
 	}
 	src->buttons = (*creators[type])(renderer);
 	if(src->buttons == NULL){
