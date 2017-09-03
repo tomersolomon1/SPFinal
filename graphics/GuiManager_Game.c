@@ -23,11 +23,10 @@
 bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol) {
 	Gameboard *board = window->data->board_widget->board;
 	set_step(board, srow, scol, drow, dcol);
-	drawGameWindow(window, NULL); /* drawing the board, no piece is selected */
+	draw_board(window->data, window->windowRenderer, NULL); /* check the clear-renderer */
 	int game_over = is_game_over(board);
 	char mssg[50];
 	if (game_over == 0 || game_over == 1 || game_over == 2) { /* the game is over */
-
 		if (game_over == 2) { /* it's a tie */
 			strcpy(mssg, "It's a tie!");
 		} else { /* somebody won the game */
@@ -131,7 +130,7 @@ Window_type handle_game_buttons(Window *window, Button* clicked_button, Gameboar
 		case MenuButton:
 			op = suggest_save(*game);
 			if (op == Error) {
-				/* what should we do? */
+				/* what should we do?????????????????????????????? */
 			} else if (op == Stay) {
 				return Game;
 			} else {
@@ -143,7 +142,7 @@ Window_type handle_game_buttons(Window *window, Button* clicked_button, Gameboar
 		case ExitButton:
 			op = suggest_save(*game);
 			if (op == Error) {
-				/* what should we do? */
+				/* what should we do????????????????????????? */
 			} else if (op == Stay) {
 				return Game;
 			} else {
@@ -195,7 +194,6 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 					if (mssg == CHESS_BOARD_SUCCESS) {
 						graphical_handle_move(window, piece->row, piece->col, y_board, x_board);
 						window->data->saved_game = false;
-						return Game;
 					}
 				}
 			}
