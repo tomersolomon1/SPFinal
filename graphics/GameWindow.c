@@ -19,9 +19,20 @@ const char *black_pieces_images[] = {CHESS_IMAGE(BPawn), CHESS_IMAGE(BKnight), C
 
 void destroy_game_textures(BoardWidget *board_widget) {
 	SDL_DestroyTexture(board_widget->board_grid);
+	if (board_widget->possible_move_texture != NULL) {
+		SDL_DestroyTexture(board_widget->possible_move_texture);
+	}
+	if (board_widget->threatened_move_texture != NULL) {
+		SDL_DestroyTexture(board_widget->threatened_move_texture);
+	}
+	if (board_widget->capturing_move_texture != NULL) {
+		SDL_DestroyTexture(board_widget->capturing_move_texture);
+	}
 	for (int color = 0; color < 2; color++) {
 		for (int i = 0; i < 6; i++) {
-			SDL_DestroyTexture(board_widget->piece_textures[color][i]);
+			if(board_widget->piece_textures[color][i] != NULL) {
+				SDL_DestroyTexture(board_widget->piece_textures[color][i]);
+			}
 		}
 	}
 }
@@ -69,10 +80,15 @@ GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
 	SDL_Rect board_rec = {.x = DEFAULT_GAME_BUTTON_PANEL_WIDTH, .y = DEFAULT_GAME_BUTTON_VERTICAL_GAP,
 			.h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
 	data->board_widget = create_widget_board(renderer, board, &board_rec);
+	if (data->board_widget == NULL) {
+		free(data);
+		return NULL;
+	}
 	data->picked_piece = false;
 	data->selected_piece_color = -1;
 	data->selected_piece_index = -1;
 	data->saved_game = false;
+	data->highlight_moves = false;
 	return data;
 }
 
@@ -80,11 +96,55 @@ GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location) {
 	BoardWidget *board_widget = (BoardWidget *) malloc(sizeof(BoardWidget));
 	board_widget->location = spCopyRect(location);
-	//board_widget->renderer = window_renderer;
 	board_widget->board = board;
+
+	// create texture for the board
 	SDL_Surface *board_grid = SDL_LoadBMP(IMG(ChessBoard)); // don't forget to check the board later
 	board_widget->board_grid = SDL_CreateTextureFromSurface(window_renderer, board_grid);
+	if (board_grid == NULL || board_widget->board_grid == NULL) {
+		return NULL;
+	}
 	SDL_FreeSurface(board_grid);
+	printf("start to create RGB surfaces\n");
+	fflush(stdout);
+	// create texture for highlighted squares
+	int row_dim = location->h / 8;
+	int col_dim = location->w / 8;
+	SDL_Surface *possible_move_surface   = SDL_LoadBMP(IMG(possible square));
+	//SDL_Surface *possible_move_surface   = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	printf("created RGB surface1 \n");
+	fflush(stdout);
+	SDL_Surface *threatened_move_surface   = SDL_LoadBMP(IMG(threatened square));
+	//SDL_Surface *threatened_move_surface = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	//SDL_Surface *threatened_move_surface = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x000000ff);
+	printf("created RGB surface2 \n");
+	fflush(stdout);
+	SDL_Surface *capturing_move_surface   = SDL_LoadBMP(IMG(capturing square));
+	//SDL_Surface *capturing_move_surface  = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	//SDL_Surface *capturing_move_surface  = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0x0000ff00, 0x000000ff, 0xff000000, 0x000000ff);
+	printf("created RGB surface3 \n");
+	fflush(stdout);
+	if (possible_move_surface == NULL || threatened_move_surface == NULL || capturing_move_surface == NULL) {
+		printf("RGB surfaces are NULL 1!\n");
+		fflush(stdout);
+		SDL_FreeSurface(possible_move_surface);
+		SDL_FreeSurface(threatened_move_surface);
+		SDL_FreeSurface(capturing_move_surface);
+		printf("RGB surfaces are NULL 2!\n");
+		fflush(stdout);
+		return NULL;
+	}
+	printf("created RGB surfaces\n");
+	fflush(stdout);
+	board_widget->possible_move_texture = SDL_CreateTextureFromSurface(window_renderer, possible_move_surface);
+	board_widget->threatened_move_texture = SDL_CreateTextureFromSurface(window_renderer, possible_move_surface);
+	board_widget->capturing_move_texture = SDL_CreateTextureFromSurface(window_renderer, possible_move_surface);
+	if (board_widget->possible_move_texture == NULL || board_widget->threatened_move_texture == NULL || board_widget->capturing_move_texture == NULL) {
+		destroy_game_textures(board_widget);
+		return NULL;
+	}
+	printf("created RGB textures\n");
+	fflush(stdout);
 	// create texture for the pieces
 	for (int i = 0; i < 6; i++) {
 		SDL_Surface *white_piece_surface = SDL_LoadBMP(white_pieces_images[i]);
@@ -106,7 +166,37 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 			return NULL;
 		}
 	}
+	printf("created surfaces && textures\n");
+	fflush(stdout);
 	return board_widget;
+}
+
+/* returns 0 on success, -1 otherwise */
+int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim, int col_dim) {
+	Piece *selected_piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
+	int success = 0; /* so far so good */
+	printf("highlight squares - the piece is at: (%d,%d)\n", selected_piece->col, selected_piece->row);
+	fflush(stdout);
+	for (int step_index = 0; step_index < selected_piece->amount_steps; step_index++) {
+		Step *step = selected_piece->steps[step_index];
+		int x_offset = data->board_widget->location->x + (step->dcol * col_dim);
+		int y_offset = data->board_widget->location->y + ((7-step->drow) * row_dim);
+		SDL_Rect step_rec = {.x = x_offset, .y = y_offset, .h = row_dim, .w = col_dim };
+		if (step->is_threatened) {
+			success = SDL_RenderCopy(renderer, data->board_widget->threatened_move_texture, NULL, &step_rec);
+		} else {
+			Piece *dest_occupier = data->board_widget->board->board[step->drow][step->drow];
+			if (dest_occupier->type == Empty) {
+				success = SDL_RenderCopy(renderer, data->board_widget->possible_move_texture, NULL, &step_rec);
+			} else { /* has to be capturing move */
+				success = SDL_RenderCopy(renderer, data->board_widget->capturing_move_texture, NULL, &step_rec);
+			}
+		}
+		if (success != 0) {
+			return success;
+		}
+	}
+	return 0;
 }
 
 void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
@@ -116,6 +206,10 @@ void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
 	int col_rec_dim = data->board_widget->location->w / 9;
 	int row_dim = data->board_widget->location->h / 8;
 	int col_dim = data->board_widget->location->w / 8;
+	if (data->highlight_moves) {
+		highlight_moves_feature(data, renderer, row_dim, col_dim);
+		data->highlight_moves = false;
+	}
 	SDL_Rect piece_rec = {.x = 0, .y = 0, .h = row_rec_dim, .w = col_rec_dim }; // default values
 	for (int color = 0; color < 2; color++) {
 		for (int i = 0; i < 16; i++) {

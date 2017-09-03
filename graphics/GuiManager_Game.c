@@ -162,20 +162,27 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 	}
 	switch(event->type) {
 		case SDL_MOUSEBUTTONDOWN:
-			if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)
-					&& (event->button.button == SDL_BUTTON_LEFT)) {
+			if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)) {
 				int relative_x = event->button.x - window->data->board_widget->location->x;
 				int relative_y = event->button.y - window->data->board_widget->location->y;
 				int x_board = (8*relative_x / window->data->board_widget->location->w);
 				int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
 				Piece *piece = window->data->board_widget->board->board[y_board][x_board];
-				if (piece->type != Empty && piece->colur == window->data->board_widget->board->turn) { /* this piece will be selected now */
+				if (piece->type != Empty && piece->colur == window->data->board_widget->board->turn) { /* the user clicked on one of his pieces */
 					window->data->selected_piece_color = piece->colur;
 					window->data->selected_piece_index = piece->indexat;
-					window->data->picked_piece  = true;
+					if (event->button.button == SDL_BUTTON_LEFT) { /* selected the piece for moving */
+						window->data->picked_piece  = true;
+					} else if (event->button.button == SDL_BUTTON_RIGHT && ((*game)->game_mode == 1)
+							&& ((*game)->difficulty == 1 || (*game)->difficulty == 2)) {
+						window->data->highlight_moves = true;
+						printf("recognizing right click\n");
+						fflush(stdout);
+					}
+
 				}
 			}
-			else { /* the click wasn't inside the board, or it wasn't a LEFT button */
+			else if (event->button.button == SDL_BUTTON_LEFT) { /* the click wasn't inside the board, and it's a left click  */
 				Button* clicked_button = get_button_clicked(event, window->buttons, window->num_buttons);
 				if (clicked_button != NULL) { /* some button was clicked */
 					return handle_game_buttons(window, clicked_button, game);

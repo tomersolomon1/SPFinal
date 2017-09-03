@@ -28,6 +28,11 @@ typedef struct board_widget {
 	// board grid
 	SDL_Texture *board_grid;
 
+	// highlighted squares
+	SDL_Texture *possible_move_texture;
+	SDL_Texture *threatened_move_texture;
+	SDL_Texture *capturing_move_texture;
+
 	// pieces
 	SDL_Texture *piece_textures[2][6]; // black = 0, and white = 1, each one of them has 6 different type of pieces
 
@@ -39,6 +44,7 @@ typedef struct game_data_t {
 	int selected_piece_index;
 	bool picked_piece;
 	bool saved_game;
+	bool highlight_moves;
 } GameData;
 
 typedef struct window_t {
