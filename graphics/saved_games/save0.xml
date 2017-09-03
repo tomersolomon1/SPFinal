@@ -5,14 +5,14 @@
 	<difficulty>1</difficulty>
 	<user_color>1</user_color>
 	<board>
-		<row_8>RNBQKBNR</row_8>
-		<row_7>MMMMMMMM</row_7>
-		<row_6>________</row_6>
-		<row_5>________</row_5>
-		<row_4>________</row_4>
+		<row_8>_NBQKBNR</row_8>
+		<row_7>___MMMMM</row_7>
+		<row_6>_MM_____</row_6>
+		<row_5>_b______</row_5>
+		<row_4>__nmm___</row_4>
 		<row_3>________</row_3>
-		<row_2>mmmmmmmm</row_2>
-		<row_1>rnbqkbnr</row_1>
+		<row_2>m_m__mmm</row_2>
+		<row_1>r_bqk_nr</row_1>
 	</board>
 </game>
 <general>
@@ -20,6 +20,6 @@
 	<piece_1_12_moved>0</piece_1_12_moved>
 	<piece_1_13_moved>0</piece_1_13_moved>
 	<piece_0_15_moved>0</piece_0_15_moved>
-	<piece_0_12_moved>0</piece_0_12_moved>
+	<piece_0_12_moved>1</piece_0_12_moved>
 	<piece_0_13_moved>0</piece_0_13_moved>
 </general>
