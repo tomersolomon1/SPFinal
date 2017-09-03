@@ -56,11 +56,11 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 	return false; /* the game is not over yet */
 }
 
-/* taking care of the first move of the game.
+/* taking care of the first move of the game, when we start the gui
  * in case we are in game-mode 1, and the user plays the black pieces, then playing the computer move
  */
 void gui_first_move(Gameboard *board) {
-	if (board->game_mode == 1 && board->user_color == 0) {
+	if (board->game_mode == 1 && board->turn == abs(1-board->user_color)) {
 		Gameboard *copy = copy_board(board);
 		Move move = find_best_move(copy, copy->difficulty);
 		destroy_board(copy);
@@ -182,7 +182,9 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 				int x_board = (8*relative_x / window->data->board_widget->location->w);
 				int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
 				Piece *piece = window->data->board_widget->board->board[y_board][x_board];
-				if (piece->type != Empty && piece->colur == window->data->board_widget->board->user_color) { /* the user clicked on one of his pieces */
+				if (piece->type != Empty &&  /* the user clicked on one of his pieces */
+					((piece->colur == window->data->board_widget->board->user_color && window->data->board_widget->board->game_mode == 1)
+					|| (piece->colur == window->data->board_widget->board->turn && window->data->board_widget->board->game_mode == 2))) {
 					window->data->selected_piece_color = piece->colur;
 					window->data->selected_piece_index = piece->indexat;
 					if (event->button.button == SDL_BUTTON_LEFT) { /* selected the piece for moving */
