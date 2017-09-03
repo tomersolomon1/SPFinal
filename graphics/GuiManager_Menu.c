@@ -93,8 +93,8 @@ Window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game)
 	if(btn->type == BackButton){
 		return ModeGame;
 	}
-	Button* noob = get_button_by_type(wndw, EasyDiff);
-	Button* easy = get_button_by_type(wndw, NoobDiff);
+	Button* noob = get_button_by_type(wndw, NoobDiff);
+	Button* easy = get_button_by_type(wndw, EasyDiff);
 	Button* moder = get_button_by_type(wndw, ModerateDiff);
 	Button* hard = get_button_by_type(wndw, HardDiff);
 	if(btn->type == NextButton){

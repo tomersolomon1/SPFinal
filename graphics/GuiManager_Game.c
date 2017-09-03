@@ -9,6 +9,7 @@
 #include "SPCommon.h"
 #include "WindowDataStruct.h"
 #include "GuiManager_Game.h"
+#include "Windows.h"
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
@@ -23,7 +24,8 @@
 bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol) {
 	Gameboard *board = window->data->board_widget->board;
 	set_step(board, srow, scol, drow, dcol);
-	draw_board(window->data, window->windowRenderer, NULL); /* check the clear-renderer */
+	//draw_board(window->data, window->windowRenderer, NULL); /* check the clear-renderer */
+	drawWindow(window, NULL);
 	int game_over = is_game_over(board);
 	char mssg[50];
 	if (game_over == 0 || game_over == 1 || game_over == 2) { /* the game is over */
@@ -33,7 +35,6 @@ bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, 
 			sprintf(mssg, "Checkmate! %s player wins the game", colors[game_over]);
 		}
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", mssg, NULL);
-		printf("notice from graphical handler: the game is over\n");
 		return true;
 	} else if (is_under_check(board)) {
 		sprintf(mssg, "Check: %s King is threatend!", colors[board->turn]);

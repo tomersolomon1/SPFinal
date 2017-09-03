@@ -110,7 +110,7 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 }
 
 void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
-	SDL_RenderClear(renderer);
+	//SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, data->board_widget->board_grid, NULL, data->board_widget->location);
 	int row_rec_dim = data->board_widget->location->h / 9;
 	int col_rec_dim = data->board_widget->location->w / 9;
@@ -133,7 +133,6 @@ void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
 		Piece *piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
 		SDL_RenderCopy(renderer, data->board_widget->piece_textures[data->selected_piece_color][piece->type], NULL, &piece_rec);
 	}
-	SDL_RenderPresent(renderer);
 }
 
 

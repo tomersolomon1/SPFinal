@@ -71,7 +71,6 @@ void drawWindow(Window* src, SDL_Event* event) {
 	for (int i = 0; i < src->num_buttons; i++) {
 		drawButton(src->buttons[i]);
 	}
-
 	SDL_RenderPresent(src->windowRenderer);
 }
 
