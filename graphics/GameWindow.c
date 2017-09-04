@@ -105,35 +105,15 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 		return NULL;
 	}
 	SDL_FreeSurface(board_grid);
-	printf("start to create RGB surfaces\n");
-	fflush(stdout);
-	// create texture for highlighted squares
 	SDL_Surface *possible_move_surface   = SDL_LoadBMP(IMG(possible square));
-	//SDL_Surface *possible_move_surface   = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
-	printf("created RGB surface1 \n");
-	fflush(stdout);
 	SDL_Surface *threatened_move_surface   = SDL_LoadBMP(IMG(threatened square));
-	//SDL_Surface *threatened_move_surface = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
-	//SDL_Surface *threatened_move_surface = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x000000ff);
-	printf("created RGB surface2 \n");
-	fflush(stdout);
 	SDL_Surface *capturing_move_surface   = SDL_LoadBMP(IMG(capturing square));
-	//SDL_Surface *capturing_move_surface  = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
-	//SDL_Surface *capturing_move_surface  = SDL_CreateRGBSurface(0, col_dim, row_dim, 32, 0x0000ff00, 0x000000ff, 0xff000000, 0x000000ff);
-	printf("created RGB surface3 \n");
-	fflush(stdout);
 	if (possible_move_surface == NULL || threatened_move_surface == NULL || capturing_move_surface == NULL) {
-		printf("RGB surfaces are NULL 1!\n");
-		fflush(stdout);
 		SDL_FreeSurface(possible_move_surface);
 		SDL_FreeSurface(threatened_move_surface);
 		SDL_FreeSurface(capturing_move_surface);
-		printf("RGB surfaces are NULL 2!\n");
-		fflush(stdout);
 		return NULL;
 	}
-	printf("created RGB surfaces\n");
-	fflush(stdout);
 	board_widget->possible_move_texture = SDL_CreateTextureFromSurface(window_renderer, possible_move_surface);
 	board_widget->threatened_move_texture = SDL_CreateTextureFromSurface(window_renderer, threatened_move_surface);
 	board_widget->capturing_move_texture = SDL_CreateTextureFromSurface(window_renderer, capturing_move_surface);
@@ -164,8 +144,6 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 			return NULL;
 		}
 	}
-	printf("created surfaces && textures\n");
-	fflush(stdout);
 	return board_widget;
 }
 

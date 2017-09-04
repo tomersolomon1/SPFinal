@@ -169,8 +169,6 @@ Window_type handle_game_buttons(Window *window, Button* clicked_button, Gameboar
 }
 
 Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **game) {
-	//printf("color1: %d, color2: %d\n", (*game)->user_color, window->data->board_widget->board->user_color);
-	fflush(stdout);
 	if (event == NULL || window == NULL ) {
 		return ExitGame;
 	}
