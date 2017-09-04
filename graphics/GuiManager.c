@@ -7,15 +7,14 @@
 
 #include "GuiManager.h"
 
-void check_menu_window(){
+void run_gui(){
 	Window_type type_window = Enterance;
 	Window_type old_type_window = Enterance;
-	Gameboard* game = create_board(1,1,1);
+	Gameboard* game = create_board(GAME_DEFAULT_MODE, GAME_DEFAULT_DIFFICULTY, GAME_DEFAULT_COLOR);
 	while(1){
 		Window* window = create_window(type_window, game);
-		if(window == NULL){
+		if(window == NULL)
 			return;
-		}
 		type_window = handleEvenet(window, &game, old_type_window);
 		old_type_window = window->type;
 		destroyWindow(window);
