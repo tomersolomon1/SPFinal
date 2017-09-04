@@ -37,13 +37,19 @@ typedef struct Vector_t{
 	bool can_go_to_empty_spot; //can the piece move in that direction if its empty?
 } Vector;
 
+typedef enum{
+	Was_not_moved,
+	Was_moved,
+	Was_promoted
+}Piece_state;
+
 typedef struct step_t {
 	int srow; //source row
 	int scol; //source col
 	int drow; //dest row
 	int dcol; //dest col
-	struct piece_t *prevPiece; //pointer to the piece that was killed in this move
-	bool is_srcPiece_was_moved; //remember if the piece that moved in this step was moved before
+	struct piece_t *prevPiece; //pointer to the piece that was killed in this step
+	Piece_state src_previous_state; //remember the piece state before the move: was moved before? was pawn and promoted?
 	bool is_threatened;  //will the source piece be threatened by the other player if it goes with this step?
 } Step;
 
@@ -70,7 +76,7 @@ Vector *copy_vector(Vector *old);
 void destroy_vector(Vector *v);
 
 //Step
-Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved, bool is_threatened);
+Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, Piece_state src_prev_state, bool is_threatened);
 Step *copy_step(Step *old);
 void destroy_step(Step *step);
 void print_step(Step *step);

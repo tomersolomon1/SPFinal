@@ -14,6 +14,8 @@
 #define black 0
 #define white 1
 #define history_size 3
+#define AMOUNT_ROWS 8
+#define AMOUNT_COLS 8
 
 typedef struct gameboard_t  {
 	Piece *board[8][8];
@@ -55,8 +57,12 @@ void reset_board(Gameboard** gameboard);
  * returns CHESS_BOARD_INVALID_MOVE_<error-type> if move is NOT legal
  * */
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
-//helping function for set_step: setting step when hazraha
-void set_hazraha_move(Gameboard *gameboard, int row, int scol, int dcol);
+
+//helping function for set_step: setting step when castling
+void set_castling_move(Gameboard *gameboard, int row, int scol, int dcol);
+
+//make promotion for piece in board[row][col]
+void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type);
 
 /* checks if a step is valid
  * returns CHESS_BOARD_SUCCESS if legal move
@@ -88,10 +94,10 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step *step);
 /*helping function for set_all_valid_steps*/
 bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step);
 
-//set hazraha setps:
-void set_hazraha_steps(Gameboard * gameboard);
-//helping function for set_hazraha_steps
-bool is_hazraha_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock);
+//set castling setps:
+void set_castling_steps(Gameboard * gameboard);
+//helping function for set_castling_steps
+bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock);
 
 /*NEED TO BE IN MACRO - get piece in place*/
 Piece *get_piece_in_place(Gameboard *gameboard, int row, int col);
@@ -108,8 +114,8 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard);
  * returns CHESS_BOARD_SUCCESS otherwise */
 CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard);
 
-//helping function for undo_step, doing undo to hazraha step
-void undo_step_hazraha(Gameboard *gameboard, Step* step);
+//helping function for undo_step, doing undo to castling step
+void undo_step_castling(Gameboard *gameboard, Step* step);
 /* return the winner's color
  * if tie return 2
  * if not game over return -1*/
