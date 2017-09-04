@@ -7,7 +7,9 @@
 #include "Pieces.h"
 int type_amount_vectors[7] = {3,8,4,4,8,8,0};
 int type_max_amount_steps[7] = {3,8,14,14,27,10,0};
-//Vector:
+char sign_piece_type[] = {'M','N','B','R','Q','K','_'};
+
+//-------------------Vector-------------------
 
 Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot){
 	Vector *v = (Vector*) malloc(sizeof(Vector));
@@ -37,7 +39,7 @@ void destroy_vector(Vector *v){
 	}
 }
 
-//Step:
+//-------------------Step-------------------
 
 Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, bool is_srcPiece_was_moved, bool is_threatened){
 	Step *newStep = (Step*) malloc(sizeof(Step));
@@ -80,9 +82,9 @@ void print_step(Step *step){
 	printf(" threatened:%c | ", (step->is_threatened ? 'Y' : 'N'));
 }
 
-//Piece:
+//-------------------Piece-------------------
 
-Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int indexat) {
+Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat) {
 	Piece* newPiece = (Piece*) malloc(sizeof(Piece));
 	assert(newPiece != NULL);
 	newPiece->alive = true;
@@ -91,7 +93,8 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int
 	newPiece->colur = colur;
 	newPiece->has_moved = false;
 	newPiece->type = type;
-	newPiece->sign = sign;
+	//newPiece->sign = sign;
+	newPiece->sign =  sign_piece_type[type] + ((colur == black || type == Empty) ? 0 : ('a' - 'A'));
 	newPiece->indexat = indexat;
 	newPiece->amount_steps = 0;
 
@@ -99,6 +102,7 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int
 	int max_amount_steps = type_max_amount_steps[Pawn + type];
 
 	Vector **vectors = (Vector**)malloc(sizeof(Vector*) * amount_vectors);
+	assert(vectors != NULL);
 	set_vectors(type, colur, vectors);
 	newPiece->amount_vectors = amount_vectors;
 	newPiece->vectors = vectors;
@@ -159,6 +163,40 @@ void destroy_piece(Piece *piece) {
 		free(piece->vectors);
 		free(piece->steps);
 		free(piece);
+	}
+}
+
+void change_piece_type(Piece *piece, Piece_type new_type){
+	piece->type = new_type;
+	piece->sign = sign_piece_type[new_type] + (piece->colur == black ? 0 : ('a' - 'A'));
+	int amount_vectors = type_amount_vectors[new_type];
+	int max_amount_steps = type_max_amount_steps[new_type];
+
+	//free steps and vectors:
+	for(int i = 0; i < max_amount_steps; i++){
+		destroy_step(piece->steps[i]);
+	}
+	for(int i = 0; i < piece->amount_vectors; i++){
+		destroy_vector(piece->vectors[i]);
+	}
+	free(piece->vectors);
+	free(piece->steps);
+
+	//set new steps and vectors:
+	Vector **vectors = (Vector**)malloc(sizeof(Vector*) * amount_vectors);
+	assert(vectors != NULL);
+	set_vectors(new_type, piece->colur, vectors);
+	piece->amount_vectors = amount_vectors;
+	piece->vectors = vectors;
+	Step **steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
+	assert(steps != NULL);
+	for(int i = 0; i < max_amount_steps; i++){
+		steps[i] = NULL;
+	}
+	piece->steps = steps;
+
+	if(new_type == Pawn){
+		vectors[0]->vector_size = 1;
 	}
 }
 

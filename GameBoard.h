@@ -32,12 +32,13 @@ typedef enum chess_board_message_t {
 	CHESS_BOARD_INVALID_ARGUMENT,
 	CHESS_BOARD_NO_HISTORY,
 	CHESS_BOARD_SUCCESS,
+	CHESS_BOARD_PROMOTION
 } CHESS_BOARD_MESSAGE;
 
 /*create board*/
 Gameboard *create_board(int game_mode, int difficulty, int user_color);
 //helping function for create_board (adding piece to the board)
-void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat, char sign);
+void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat);
 
 /*destroy board*/
 void destroy_board(Gameboard *gameboard);

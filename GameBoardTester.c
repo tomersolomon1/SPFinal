@@ -11,11 +11,11 @@
 
 
 void check_GameBoard() {
-	FILE *f = fopen("C:\\Users\\sapir\\Desktop\\save0.xml", "r");
-	assert(f != NULL);
-	Gameboard * game = load_game(f);
-	fclose(f);
-	print_details_game(game);
+//	FILE *f = fopen("C:\\Users\\sapir\\Desktop\\save0.xml", "r");
+//	assert(f != NULL);
+//	Gameboard * game = load_game(f);
+//	fclose(f);
+//	print_details_game(game);
 //hazraha:
 /*	set_step(game, 1,1,2,1);
 	set_step(game, 7,1,5,0);
@@ -34,14 +34,17 @@ void check_GameBoard() {
 	set_step(game, 3,3,1,4);
 */
 //check:
-/*	set_step(game, 1,3,2,3);
+
+	Gameboard *game = create_board(1,1,1);
+	print_details_game(game);
+	set_step(game, 1,3,2,3);
 	set_step(game, 6,2,5,2);
 
 	set_step(game, 1,7,2,7);
 	set_step(game,7,3,4,0);
 
 	print_details_game(game);
-*/
+
 
 
 }

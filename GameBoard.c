@@ -15,40 +15,40 @@ Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	assert(newBoard != NULL);
 	newBoard->history = ArrayListCreate(history_size * 2);
 	int i = 0;
-	add_piece(newBoard, Pawn, black, 6, 0, i++, 'M');
-	add_piece(newBoard, Pawn, black, 6, 1, i++, 'M');
-	add_piece(newBoard, Pawn, black, 6, 2, i++, 'M');
-	add_piece(newBoard, Pawn, black, 6, 3, i++, 'M');
-	add_piece(newBoard, Pawn, black, 6, 4, i++, 'M');
-	add_piece(newBoard, Pawn, black, 6, 5, i++, 'M');
-	add_piece(newBoard, Pawn, black, 6, 6, i++, 'M');
-	add_piece(newBoard, Pawn, black, 6, 7, i++, 'M');
-	add_piece(newBoard, Bishop, black, 7, 2, i++, 'B');
-	add_piece(newBoard, Bishop, black, 7, 5, i++, 'B');
-	add_piece(newBoard, Knight, black, 7, 1, i++, 'N');
-	add_piece(newBoard, Knight, black, 7, 6, i++, 'N');
-	add_piece(newBoard, Rock, black, 7, 0, i++, 'R');
-	add_piece(newBoard, Rock, black, 7, 7, i++, 'R');
-	add_piece(newBoard, Queen, black, 7, 3, i++, 'Q');
-	add_piece(newBoard, King, black, 7, 4, i++, 'K');
+	add_piece(newBoard, Pawn, black, 6, 0, i++);
+	add_piece(newBoard, Pawn, black, 6, 1, i++);
+	add_piece(newBoard, Pawn, black, 6, 2, i++);
+	add_piece(newBoard, Pawn, black, 6, 3, i++);
+	add_piece(newBoard, Pawn, black, 6, 4, i++);
+	add_piece(newBoard, Pawn, black, 6, 5, i++);
+	add_piece(newBoard, Pawn, black, 6, 6, i++);
+	add_piece(newBoard, Pawn, black, 6, 7, i++);
+	add_piece(newBoard, Bishop, black, 7, 2, i++);
+	add_piece(newBoard, Bishop, black, 7, 5, i++);
+	add_piece(newBoard, Knight, black, 7, 1, i++);
+	add_piece(newBoard, Knight, black, 7, 6, i++);
+	add_piece(newBoard, Rock, black, 7, 0, i++);
+	add_piece(newBoard, Rock, black, 7, 7, i++);
+	add_piece(newBoard, Queen, black, 7, 3, i++);
+	add_piece(newBoard, King, black, 7, 4, i++);
 	i = 0;
-	add_piece(newBoard, Pawn, white, 1, 0, i++, 'm');
-	add_piece(newBoard, Pawn, white, 1, 1, i++, 'm');
-	add_piece(newBoard, Pawn, white, 1, 2, i++, 'm');
-	add_piece(newBoard, Pawn, white, 1, 3, i++, 'm');
-	add_piece(newBoard, Pawn, white, 1, 4, i++, 'm');
-	add_piece(newBoard, Pawn, white, 1, 5, i++, 'm');
-	add_piece(newBoard, Pawn, white, 1, 6, i++, 'm');
-	add_piece(newBoard, Pawn, white, 1, 7, i++, 'm');
-	add_piece(newBoard, Bishop, white, 0, 2, i++, 'b');
-	add_piece(newBoard, Bishop, white, 0, 5, i++, 'b');
-	add_piece(newBoard, Knight, white, 0, 1, i++, 'n');
-	add_piece(newBoard, Knight, white, 0, 6, i++, 'n');
-	add_piece(newBoard, Rock, white, 0, 0, i++, 'r');
-	add_piece(newBoard, Rock, white, 0, 7, i++, 'r');
-	add_piece(newBoard, Queen, white, 0, 3, i++, 'q');
-	add_piece(newBoard, King, white, 0, 4, i++, 'k');
-	newBoard->empty = (Piece *) create_piece(Empty, -1, -1, -1, '_', -1);
+	add_piece(newBoard, Pawn, white, 1, 0, i++);
+	add_piece(newBoard, Pawn, white, 1, 1, i++);
+	add_piece(newBoard, Pawn, white, 1, 2, i++);
+	add_piece(newBoard, Pawn, white, 1, 3, i++);
+	add_piece(newBoard, Pawn, white, 1, 4, i++);
+	add_piece(newBoard, Pawn, white, 1, 5, i++);
+	add_piece(newBoard, Pawn, white, 1, 6, i++);
+	add_piece(newBoard, Pawn, white, 1, 7, i++);
+	add_piece(newBoard, Bishop, white, 0, 2, i++);
+	add_piece(newBoard, Bishop, white, 0, 5, i++);
+	add_piece(newBoard, Knight, white, 0, 1, i++);
+	add_piece(newBoard, Knight, white, 0, 6, i++);
+	add_piece(newBoard, Rock, white, 0, 0, i++);
+	add_piece(newBoard, Rock, white, 0, 7, i++);
+	add_piece(newBoard, Queen, white, 0, 3, i++);
+	add_piece(newBoard, King, white, 0, 4, i++);
+	newBoard->empty = (Piece *) create_piece(Empty, -1, -1, -1, -1);
 	for(int i = 2; i < 6; i++){
 		for(int j = 0; j < 8; j++){
 			newBoard->board[i][j] = newBoard->empty;
@@ -62,8 +62,8 @@ Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	return newBoard;
 }
 
-void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat, char sign){
-	Piece *piece = (Piece *) create_piece(type, colur, row, col, sign, indexat);
+void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat){
+	Piece *piece = (Piece *) create_piece(type, colur, row, col, indexat);
 	gameboard->board[row][col] = piece;
 	gameboard->all_pieces[colur][indexat] = piece;
 }
@@ -87,7 +87,7 @@ Gameboard *copy_board(Gameboard* old) {
 		return NULL;
 	}
 	Gameboard *new = (Gameboard*) malloc(sizeof(Gameboard));
-	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 ,'_', -1);
+	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 , -1);
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
 			new->board[i][j] = empty;
@@ -131,6 +131,10 @@ void reset_board(Gameboard** gameboard){
 	destroy_board(*gameboard);
 	*gameboard = create_board(game_mode, difficulty, user_color);
 }
+
+//void make_promotion(Gameboard *gameboard, Piece* piece, Piece_type new_type){
+//	change_piece_type(piece, new_type);
+//}
 
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
 	CHESS_BOARD_MESSAGE cbm = is_valid_step(gameboard, srow, scol, drow, dcol);

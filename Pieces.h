@@ -75,13 +75,15 @@ Step *copy_step(Step *old);
 void destroy_step(Step *step);
 void print_step(Step *step);
 
+
 //Piece:
-Piece *create_piece(Piece_type type, int colur, int row, int col, char sign, int indexat);
+Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat);
 //copy_piece but steps remain null
 Piece *copy_piece(Piece *old);
 void destroy_piece(Piece *piece);
 void set_vectors(Piece_type type, int colur, Vector **vectors);
 //print all valid steps of a piece:
 void print_all_steps(Piece *piece);
+void change_piece_type(Piece *piece, Piece_type new_type);
 
 #endif /* PIECES_H_ */
