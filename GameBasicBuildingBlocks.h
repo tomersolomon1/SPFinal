@@ -5,9 +5,8 @@
  *      Author: User
  */
 
-#ifndef PIECES_H_
-#define PIECES_H_
-
+#ifndef GAMEBASICBUILDINGBLOCKS_H_
+#define GAMEBASICBUILDINGBLOCKS_H_
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,18 +16,47 @@
 
 #define black 0
 #define white 1
+#define AMOUNT_VECTORS_PAWN 3
+#define AMOUNT_VECTORS_KNIGHT 8
+#define AMOUNT_VECTORS_BISHOP 4
+#define AMOUNT_VECTORS_ROCK 4
+#define AMOUNT_VECTORS_QUEEN 8
+#define AMOUNT_VECTORS_KING 8
+
+#define AMOUNT_STEPS_PAWN 3
+#define AMOUNT_STEPS_KNIGHT 8
+#define AMOUNT_STEPS_BISHOP 14
+#define AMOUNT_STEPS_ROCK 14
+#define AMOUNT_STEPS_QUEEN 27
+#define AMOUNT_STEPS_KING 10
+
+#define SIGN_PAWN 'M'
+#define SIGN_KNIGHT 'N'
+#define SIGN_BISHOP 'B'
+#define SIGN_ROCK 'R'
+#define SIGN_QUEEN 'Q'
+#define SIGN_KING 'K'
+#define SIGN_EMPTY '_'
+
+#define AMOUNT_PIECES_PER_COLOR 16
 
 typedef enum {
-	Pawn, // = 0 (Hayal)
-	Knight, // = 1 (Parash)
-	Bishop, // = 2 (Ratz)
-	Rock, // = 3 (Tzarih)
-	Queen, // = 4
-	King, // = 5
-	Empty // = 6
+	Pawn,
+	Knight,
+	Bishop,
+	Rock,
+	Queen,
+	King,
+	Empty
 } Piece_type;
 
+typedef enum{
+	Was_not_moved,
+	Was_moved,
+	Was_promoted
+}Piece_state;
 
+//A progressing vector on the board:
 typedef struct Vector_t{
 	int delta_row;
 	int delta_col;
@@ -37,12 +65,7 @@ typedef struct Vector_t{
 	bool can_go_to_empty_spot; //can the piece move in that direction if its empty?
 } Vector;
 
-typedef enum{
-	Was_not_moved,
-	Was_moved,
-	Was_promoted
-}Piece_state;
-
+//A chess step:
 typedef struct step_t {
 	int srow; //source row
 	int scol; //source col
@@ -53,15 +76,16 @@ typedef struct step_t {
 	bool is_threatened;  //will the source piece be threatened by the other player if it goes with this step?
 } Step;
 
+//A chess piece:
 typedef struct piece_t {
 	Piece_type type;
-	int colur;
+	int colur; //piece color
 	int row; //row coordinate
 	int col; //column coordinate
 	int indexat; //index of piece in the array of pieces
-	bool alive;
-	bool has_moved;
-	char sign;
+	char sign; //piece sign
+	bool alive; //is piece alive?
+	bool has_moved; //has piece moved?
 	Step **steps; //all possible steps in a current game (size = 28)
 	int amount_steps; //how many possible steps in a current game
 	Vector **vectors; //all possible vector movements
@@ -70,26 +94,55 @@ typedef struct piece_t {
 
 
 
-//Vector:
+//-------------------Vector-------------------
+/*create vector*/
 Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot);
+
+/*copy vector*/
 Vector *copy_vector(Vector *old);
+
+/*destroy vector*/
 void destroy_vector(Vector *v);
 
-//Step
+//-------------------Step-------------------
+/*create step*/
 Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, Piece_state src_prev_state, bool is_threatened);
+
+/*copy step*/
 Step *copy_step(Step *old);
+
+/*destroy step*/
 void destroy_step(Step *step);
+
+/*print step (for debugging)*/
 void print_step(Step *step);
 
-
-//Piece:
+//-------------------Piece-------------------
+/*create piece*/
 Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat);
-//copy_piece but steps remain null
-Piece *copy_piece(Piece *old);
-void destroy_piece(Piece *piece);
+
+/*helping function for create piece, adds progressing vectors by piece type*/
 void set_vectors(Piece_type type, int colur, Vector **vectors);
-//print all valid steps of a piece:
+
+/*copy_piece, steps will be null*/
+Piece *copy_piece(Piece *old);
+
+/*destroy piece*/
+void destroy_piece(Piece *piece);
+
+/*print all valid steps of a piece*/
 void print_all_steps(Piece *piece);
+
+/*change piece type, for promotion and undo promotion*/
 void change_piece_type(Piece *piece, Piece_type new_type);
 
-#endif /* PIECES_H_ */
+/*get sign of piece by piece type and color*/
+char sign_of_piece(Piece_type type, int colur);
+
+/*get amount of progressing vectors by piece type*/
+int amount_vectors_of_piece_type(Piece_type type);
+
+/*get max amount of steps by piece type*/
+int amount_steps_of_piece_type(Piece_type type);
+
+#endif /* GAMEBASICBUILDINGBLOCKS_H_ */

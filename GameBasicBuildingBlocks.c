@@ -4,12 +4,9 @@
  *  Created on: Aug 10, 2017
  *      Author: sapir
  */
-#include "Pieces.h"
-int type_amount_vectors[7] = {3,8,4,4,8,8,0};
-int type_max_amount_steps[7] = {3,8,14,14,27,10,0};
-char sign_piece_type[] = {'M','N','B','R','Q','K','_'};
+#include "GameBasicBuildingBlocks.h"
 
-//-------------------Vector-------------------
+//-------------------Vectors-------------------
 
 Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot){
 	Vector *v = (Vector*) malloc(sizeof(Vector));
@@ -39,7 +36,7 @@ void destroy_vector(Vector *v){
 	}
 }
 
-//-------------------Step-------------------
+//-------------------Steps-------------------
 
 Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, Piece_state src_prev_state, bool is_threatened){
 	Step *newStep = (Step*) malloc(sizeof(Step));
@@ -54,7 +51,6 @@ Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, Piec
 	return newStep;
 }
 
-//copy but without pointer to prev Piece
 Step *copy_step(Step *old){
 	Step *new = (Step*) malloc(sizeof(Step));
 	assert(new != NULL);
@@ -82,7 +78,7 @@ void print_step(Step *step){
 	printf(" threatened:%c | ", (step->is_threatened ? 'Y' : 'N'));
 }
 
-//-------------------Piece-------------------
+//-------------------Pieces-------------------
 
 Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat) {
 	Piece* newPiece = (Piece*) malloc(sizeof(Piece));
@@ -93,13 +89,12 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat) {
 	newPiece->colur = colur;
 	newPiece->has_moved = false;
 	newPiece->type = type;
-	//newPiece->sign = sign;
-	newPiece->sign =  sign_piece_type[type] + ((colur == black || type == Empty) ? 0 : ('a' - 'A'));
+	newPiece->sign =  sign_of_piece(type, colur);
 	newPiece->indexat = indexat;
 	newPiece->amount_steps = 0;
 
-	int amount_vectors = type_amount_vectors[Pawn + type];
-	int max_amount_steps = type_max_amount_steps[Pawn + type];
+	int amount_vectors = amount_vectors_of_piece_type(type);
+	int max_amount_steps = amount_steps_of_piece_type(type);
 
 	Vector **vectors = (Vector**)malloc(sizeof(Vector*) * amount_vectors);
 	assert(vectors != NULL);
@@ -116,7 +111,6 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat) {
 	return newPiece;
 }
 
-//copy_piece but steps remain null
 Piece *copy_piece(Piece *old){
 	if(old == NULL){
 		return NULL;
@@ -140,7 +134,7 @@ Piece *copy_piece(Piece *old){
 		vectors[i] = copy_vector(old->vectors[i]);
 	}
 	newPiece->vectors = vectors;
-	int max_amount_steps = type_max_amount_steps[Pawn + newPiece->type];
+	int max_amount_steps = amount_steps_of_piece_type(newPiece->type);
 
 	Step **steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
 	assert(steps != NULL);
@@ -152,7 +146,7 @@ Piece *copy_piece(Piece *old){
 }
 
 void destroy_piece(Piece *piece) {
-	int max_amount_steps = type_max_amount_steps[Pawn + piece->type];
+	int max_amount_steps = amount_steps_of_piece_type(piece->type);
 	if(piece != NULL){
 		for(int i = 0; i < max_amount_steps; i++){
 			destroy_step(piece->steps[i]);
@@ -168,9 +162,9 @@ void destroy_piece(Piece *piece) {
 
 void change_piece_type(Piece *piece, Piece_type new_type){
 	piece->type = new_type;
-	piece->sign = sign_piece_type[new_type] + (piece->colur == black ? 0 : ('a' - 'A'));
-	int amount_vectors = type_amount_vectors[new_type];
-	int max_amount_steps = type_max_amount_steps[new_type];
+	piece->sign = sign_of_piece(new_type, piece->colur);
+	int amount_vectors = amount_vectors_of_piece_type(new_type);
+	int max_amount_steps = amount_steps_of_piece_type(new_type);
 
 	//free steps and vectors:
 	for(int i = 0; i < max_amount_steps; i++){
@@ -206,12 +200,12 @@ void set_vectors(Piece_type type, int colur, Vector **vectors){
 		vectors[1] = create_vector(1, 1, 1, true, false); //can eat diag
 		vectors[2] = create_vector(1, -1, 1, true, false); //can eat diag
 	}
-	if(type == Pawn && colur == black){
+	else if(type == Pawn && colur == black){
 		vectors[0] = create_vector(-1, 0, 2, false, true); //can go straight
 		vectors[1] = create_vector(-1, 1, 1, true, false); //can eat diag
 		vectors[2] = create_vector(-1, -1, 1, true, false); //can eat diag
 	}
-	if(type == Knight){
+	else if(type == Knight){
 		vectors[0] = create_vector(1, 2, 1, true, true);
 		vectors[1] = create_vector(1, -2, 1, true, true);
 		vectors[2] = create_vector(-1, 2, 1, true, true);
@@ -221,19 +215,19 @@ void set_vectors(Piece_type type, int colur, Vector **vectors){
 		vectors[6] = create_vector(-2, 1, 1, true, true);
 		vectors[7] = create_vector(-2, -1, 1, true, true);
 	}
-	if(type == Bishop){
+	else if(type == Bishop){
 		vectors[0] = create_vector(1, -1, 8, true, true);
 		vectors[1] = create_vector(-1, 1, 8, true, true);
 		vectors[2] = create_vector(1, 1, 8, true, true);
 		vectors[3] = create_vector(-1, -1, 8, true, true);
 	}
-	if(type == Rock){
+	else if(type == Rock){
 		vectors[0] = create_vector(1, 0, 8, true, true);
 		vectors[1] = create_vector(-1, 0, 8, true, true);
 		vectors[2] = create_vector(0, 1, 8, true, true);
 		vectors[3] = create_vector(0, -1, 8, true, true);
 	}
-	if(type == Queen){
+	else if(type == Queen){
 		vectors[0] = create_vector(1, 0, 8, true, true);
 		vectors[1] = create_vector(-1, 0, 8, true, true);
 		vectors[2] = create_vector(0, 1, 8, true, true);
@@ -243,7 +237,7 @@ void set_vectors(Piece_type type, int colur, Vector **vectors){
 		vectors[6] = create_vector(1, 1, 8, true, true);
 		vectors[7] = create_vector(-1, -1, 8, true, true);
 	}
-	if(type == King){
+	else if(type == King){
 		vectors[0] = create_vector(1, 0, 1, true, true);
 		vectors[1] = create_vector(-1, 0, 1, true, true);
 		vectors[2] = create_vector(0, 1, 1, true, true);
@@ -253,6 +247,65 @@ void set_vectors(Piece_type type, int colur, Vector **vectors){
 		vectors[6] = create_vector(1, 1, 1, true, true);
 		vectors[7] = create_vector(-1, -1, 1, true, true);
 	}
+}
+
+int amount_vectors_of_piece_type(Piece_type type){
+	switch (type){
+		case Pawn:
+			return AMOUNT_VECTORS_PAWN;
+		case Knight:
+			return AMOUNT_VECTORS_KNIGHT;
+		case Bishop:
+			return AMOUNT_VECTORS_BISHOP;
+		case Rock:
+			return AMOUNT_VECTORS_ROCK;
+		case Queen:
+			return AMOUNT_VECTORS_QUEEN;
+		case King:
+			return AMOUNT_VECTORS_KING;
+		default:
+			return 0;
+	}
+}
+
+int amount_steps_of_piece_type(Piece_type type){
+	switch (type){
+		case Pawn:
+			return AMOUNT_STEPS_PAWN;
+		case Knight:
+			return AMOUNT_STEPS_KNIGHT;
+		case Bishop:
+			return AMOUNT_STEPS_BISHOP;
+		case Rock:
+			return AMOUNT_STEPS_ROCK;
+		case Queen:
+			return AMOUNT_STEPS_QUEEN;
+		case King:
+			return AMOUNT_STEPS_KING;
+		default:
+			return 0;
+	}
+}
+
+char sign_of_piece(Piece_type type, int colur){
+	int add = (colur == black ? 0 : ('a' - 'A'));
+	switch (type){
+		case Pawn:
+			return SIGN_PAWN + add;
+		case Knight:
+			return SIGN_KNIGHT + add;
+		case Bishop:
+			return SIGN_BISHOP + add;
+		case Rock:
+			return SIGN_ROCK + add;
+		case Queen:
+			return SIGN_QUEEN + add;
+		case King:
+			return SIGN_KING + add;
+		case Empty:
+			return SIGN_EMPTY;
+	}
+	return ' ';
 }
 
 void print_all_steps(Piece *piece){
@@ -266,3 +319,4 @@ void print_all_steps(Piece *piece){
 		fflush(stdout);
 	}
 }
+

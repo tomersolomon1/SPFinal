@@ -5,21 +5,21 @@
 	<difficulty>1</difficulty>
 	<user_color>1</user_color>
 	<board>
-		<row_8>RNBQKBNR</row_8>
-		<row_7>_MMMMMMM</row_7>
-		<row_6>________</row_6>
-		<row_5>________</row_5>
-		<row_4>M__mm___</row_4>
-		<row_3>________</row_3>
-		<row_2>mmm_kmmm</row_2>
-		<row_1>rnbq_bnr</row_1>
+		<row_8>_NBQKBNR</row_8>
+		<row_7>n__MMMMM</row_7>
+		<row_6>__M_____</row_6>
+		<row_5>_M______</row_5>
+		<row_4>__b_____</row_4>
+		<row_3>____mn__</row_3>
+		<row_2>m_mm_mmm</row_2>
+		<row_1>r_bq_rk_</row_1>
 	</board>
 </game>
 <general>
 	<piece_1_15_moved>1</piece_1_15_moved>
 	<piece_1_12_moved>0</piece_1_12_moved>
-	<piece_1_13_moved>0</piece_1_13_moved>
+	<piece_1_13_moved>1</piece_1_13_moved>
 	<piece_0_15_moved>0</piece_0_15_moved>
-	<piece_0_12_moved>0</piece_0_12_moved>
+	<piece_0_12_moved>1</piece_0_12_moved>
 	<piece_0_13_moved>0</piece_0_13_moved>
 </general>

@@ -5,7 +5,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include "Pieces.h"
+
+#include "GameBasicBuildingBlocks.h"
 /**
  * ArrayList summary:
  *
@@ -264,7 +265,7 @@ bool ArrayListIsEmpty(ArrayList* src);
 ARRAY_LIST_MESSAGE ArrayListPushFirst(ArrayList* src, Step *elem);
 
 /**
- * print the list
+ * print the list (for debugging)
  * */
 void ArrayListPrint(ArrayList* src);
 

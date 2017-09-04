@@ -1,19 +1,15 @@
-/*
- * Board.c
- *
- *  Created on: 9 баев„ 2017
- *      Author: User
- */
 
-//set step, undo step
 #include "GameBoard.h"
 #define MIN(A,B) (((A) < (B)) ? (A) : (B))
 #define MAX(A,B) (((A) > (B)) ? (A) : (B))
+#define TURN_SWITCHED abs(1 - gameboard->turn)
+
+//-----------------------Game Board General functions-----------------------
 
 Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
 	assert(newBoard != NULL);
-	newBoard->history = ArrayListCreate(history_size * 2);
+	newBoard->history = ArrayListCreate(HISTORY_SIZE * 2);
 	int i = 0;
 	add_piece(newBoard, Pawn, black, 6, 0, i++);
 	add_piece(newBoard, Pawn, black, 6, 1, i++);
@@ -50,7 +46,7 @@ Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	add_piece(newBoard, King, white, 0, 4, i++);
 	newBoard->empty = (Piece *) create_piece(Empty, -1, -1, -1, -1);
 	for(int i = 2; i < 6; i++){
-		for(int j = 0; j < 8; j++){
+		for(int j = 0; j < BOARD_SIZE; j++){
 			newBoard->board[i][j] = newBoard->empty;
 		}
 	}
@@ -74,7 +70,7 @@ void destroy_board(Gameboard *gameboard) {
 	}
 	ArrayListDestroy(gameboard->history);
 	for(int i = 0; i < 2; i++){
-		for(int j = 0; j < 16; j++){
+		for(int j = 0; j < AMOUNT_PIECES_PER_COLOR; j++){
 			destroy_piece(gameboard->all_pieces[i][j]);
 		}
 	}
@@ -83,23 +79,20 @@ void destroy_board(Gameboard *gameboard) {
 }
 
 Gameboard *copy_board(Gameboard* old) {
-	if(old == NULL){
+	if(old == NULL)
 		return NULL;
-	}
 	Gameboard *new = (Gameboard*) malloc(sizeof(Gameboard));
 	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 , -1);
-	for(int i = 0; i < 8; i++){
-		for(int j = 0; j < 8; j++){
+	for(int i = 0; i < BOARD_SIZE; i++){
+		for(int j = 0; j < BOARD_SIZE; j++)
 			new->board[i][j] = empty;
-		}
 	}
 	for(int i = 0; i < 2; i++){
-		for(int j = 0; j < 16; j++){
+		for(int j = 0; j < AMOUNT_PIECES_PER_COLOR; j++){
 			new->all_pieces[i][j] = copy_piece(old->all_pieces[i][j]);
 			Piece *curr = new->all_pieces[i][j];
-			if(curr->alive){
+			if(curr->alive)
 				new->board[curr->row][curr->col] = curr;
-			}
 		}
 	}
 	new->turn = old->turn;
@@ -109,12 +102,10 @@ Gameboard *copy_board(Gameboard* old) {
 	new->history = ArrayListCopy(old->history);
 	for(int i = 0; i < new->history->actualSize; i++){
 		Piece* old_piece = old->history->elements[i]->prevPiece;
-		if(old_piece->type == Empty){
+		if(old_piece->type == Empty)
 			new->history->elements[i]->prevPiece = new->empty;
-		}
-		else{
+		else
 			new->history->elements[i]->prevPiece = new->all_pieces[old_piece->colur][old_piece->indexat];
-		}
 	}
 	//new->history
 	new->user_color = old->user_color;
@@ -132,11 +123,7 @@ void reset_board(Gameboard** gameboard){
 	*gameboard = create_board(game_mode, difficulty, user_color);
 }
 
-void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type){
-	Piece *piece = gameboard->board[row][col];
-	change_piece_type(piece, new_type);
-	set_all_valid_steps(gameboard);
-}
+//-----------------------Set Step-----------------------
 
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
 	CHESS_BOARD_MESSAGE cbm = is_valid_step(gameboard, srow, scol, drow, dcol);
@@ -148,7 +135,7 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 	Piece *dest_p = gameboard->board[drow][dcol];
 	if(source_p->has_moved)
 		src_prev_state = Was_moved;
-	if((drow == AMOUNT_ROWS - 1 || drow == 0) && source_p->type == Pawn) //promotion
+	if((drow == (BOARD_SIZE - 1) || drow == 0) && source_p->type == Pawn) //promotion
 		src_prev_state = Was_promoted;
 	Step *step = create_step(srow, scol, drow, dcol, dest_p, src_prev_state, false);
 	step->is_threatened = is_step_threatened(gameboard, source_p, step);
@@ -166,11 +153,17 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 		if(source_p->type == Pawn)
 			source_p->vectors[0]->vector_size = 1;
 	}
-	gameboard->turn = abs(1 - gameboard->turn);
+	gameboard->turn = TURN_SWITCHED;
 	set_all_valid_steps(gameboard);
 	if(src_prev_state == Was_promoted)
 		return CHESS_BOARD_PROMOTION;
 	return CHESS_BOARD_SUCCESS;
+}
+
+void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type){
+	Piece *piece = gameboard->board[row][col];
+	change_piece_type(piece, new_type);
+	set_all_valid_steps(gameboard);
 }
 
 void set_castling_move(Gameboard *gameboard, int row, int scol, int dcol){
@@ -209,23 +202,10 @@ CHESS_BOARD_MESSAGE is_valid_step(Gameboard *gameboard, int srow, int scol, int 
 	return CHESS_BOARD_INVALID_MOVE_RULES_VIOLATION;
 }
 
-bool is_check_curr_player(Gameboard *gameboard){
-	return is_check(gameboard, gameboard->turn);
-}
+//-----------------------Is (the other player) threatening piece-----------------------
 
-bool is_under_check(Gameboard * gameboard){
-	return is_check(gameboard, abs(1 - gameboard->turn));
-}
-
-//is the player with color colur threatening the other player's king?
-bool is_check(Gameboard *gameboard, int colur) {
-	Piece* king_threatened = gameboard->all_pieces[abs(1-colur)][15];
-	return is_threatening_piece(gameboard, king_threatened);
-}
-
-//is the (piece* threatened) threatened by the other player?
 bool is_threatening_piece(Gameboard* gameboard, Piece *threatened){
-	for(int i = 0; i < 16; i++){
+	for(int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++){
 		Piece *attacking = gameboard->all_pieces[abs(1 - threatened->colur)][i];
 		if(attacking->alive){
 			int amount_v = attacking->amount_vectors; //check all vectors
@@ -252,7 +232,7 @@ bool is_threatening_piece_per_vector(Gameboard* gameboard, Piece *threatened, Pi
 		amount_going --;
 		row = row + delta_row;
 		col = col + delta_col;
-		if(row < 0 || row > 7 || col < 0 || col > 7){ //out of board
+		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)){ //out of board
 			return false;
 		}
 		else if(gameboard->board[row][col]->type == Empty && can_go_to_empty){ // can go, empty
@@ -268,10 +248,23 @@ bool is_threatening_piece_per_vector(Gameboard* gameboard, Piece *threatened, Pi
 	return false;
 }
 
-//---
+bool is_check_curr_player(Gameboard *gameboard){
+	return is_check(gameboard, gameboard->turn);
+}
+
+bool is_under_check(Gameboard * gameboard){
+	return is_check(gameboard, TURN_SWITCHED);
+}
+
+bool is_check(Gameboard *gameboard, int colur) {
+	Piece* king_threatened = gameboard->all_pieces[abs(1 - colur)][15]; //15 is the place of king in all_pieces
+	return is_threatening_piece(gameboard, king_threatened);
+}
+
+//-----------------------Set all Valid Steps-----------------------
 
 void set_all_valid_steps(Gameboard *gameboard){
-	for(int i = 0; i < 16; i++){
+	for(int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++){
 		Piece *piece = gameboard->all_pieces[gameboard->turn][i];
 		if(piece->alive){
 			set_all_valid_steps_per_piece(gameboard, piece);
@@ -300,15 +293,15 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 	bool can_go_to_empty_spot = v->can_go_to_empty_spot;
 	int row = piece->row;
 	int col = piece->col;
+	Piece_state piece_state = (piece->has_moved? Was_moved: Was_not_moved);
 	while(amount_going > 0){
 		amount_going --;
 		row = row + delta_row;
 		col = col + delta_col;
-		if(row < 0 || row > 7 || col < 0 || col > 7){ //out of board
+		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)) //out of board
 			break;
-		}
 		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
-			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece->has_moved, true);
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece_state, true);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				s->is_threatened = is_step_threatened(gameboard, piece, s);
 				piece->steps[*amount_steps] = s;
@@ -317,7 +310,7 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 		}
 		else if(gameboard->board[row][col]->type != Empty &&
 				gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
-			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece->has_moved, true);
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece_state, true);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				s->is_threatened = is_step_threatened(gameboard, piece, s);
 				piece->steps[*amount_steps] = s;
@@ -329,7 +322,6 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 			break;
 		}
 	}
-
 }
 
 bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step* step){
@@ -337,11 +329,11 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step* step){
 	gameboard->board[step->drow][step->dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
 	step->prevPiece->alive = false;
-	gameboard->turn = abs(1-gameboard->turn);
+	gameboard->turn = TURN_SWITCHED;
 	if(is_check_curr_player(gameboard)){
 		answer = true;
 	}
-	gameboard->turn = abs(1-gameboard->turn);
+	gameboard->turn = TURN_SWITCHED;
 	step->prevPiece->alive = true;
 	gameboard->board[step->drow][step->dcol] = step->prevPiece;
 	gameboard->board[piece->row][piece->col] = piece;
@@ -353,11 +345,11 @@ bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step){
 	gameboard->board[step->drow][step->dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
 	step->prevPiece->alive = false;
-	gameboard->turn = abs(1-gameboard->turn);
+	gameboard->turn = TURN_SWITCHED;
 	if(is_threatening_piece(gameboard, piece)){
 		answer = true;
 	}
-	gameboard->turn = abs(1-gameboard->turn);
+	gameboard->turn = TURN_SWITCHED;
 	step->prevPiece->alive = true;
 	gameboard->board[step->drow][step->dcol] = step->prevPiece;
 	gameboard->board[piece->row][piece->col] = piece;
@@ -373,7 +365,7 @@ void set_castling_steps(Gameboard * gameboard){
 	Piece *rock;
 	int delta_col;
 	for(int i = 0; i <= 1; i++){ //go over the two rocks
-		rock = gameboard->all_pieces[turn][12+i];
+		rock = gameboard->all_pieces[turn][12 + i]; //12 is the 1st place of rock in all_pieces
 		if(is_castling_valid_per_rock(gameboard, king, rock)){
 			delta_col = (king->col < rock->col) ? 2 : -2;
 			Step *new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, Was_not_moved, true);
@@ -413,14 +405,7 @@ bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock)
 	return result;
 }
 
-//---
-
-Piece *get_piece_in_place(Gameboard *gameboard, int row, int col) {
-	if(row < 0 || row > 7 || col < 0 || col > 7){
-		return NULL;
-	}
-	return gameboard->board[row][col];
-}
+//-----------------------Undo-----------------------
 
 CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard) {
 	if(gameboard == NULL){
@@ -453,7 +438,7 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard) {
 			source_p->vectors[0]->vector_size = 2;
 		}
 	}
-	gameboard->turn = abs(1 - gameboard->turn);
+	gameboard->turn = TURN_SWITCHED;
 	ArrayListRemoveFirst(gameboard->history);
 	set_all_valid_steps(gameboard);
 	return CHESS_BOARD_SUCCESS;
@@ -489,27 +474,28 @@ void undo_step_castling(Gameboard *gameboard, Step *step){
 	king->has_moved = false;
 }
 
-// return the winner's color
-// if tie return 2
-// if not game over return -1
+//-----------------------Is Game Over-----------------------
+
 int is_game_over(Gameboard *gameboard) {
-	for(int i = 0; i < 16; i++){ // is there any piece that has legal move?
+	for(int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++){ // is there any piece that has legal move?
 		Piece *p = gameboard->all_pieces[gameboard->turn][i];
 		if(p->amount_steps > 0 && p->alive){
 			return -1;
 		}
 	}
-	if(is_check(gameboard, abs(1 - gameboard->turn))){ // is my kind under check?
-		return abs(1 - gameboard->turn);
+	if(is_check(gameboard, TURN_SWITCHED)){ // is my kind under check?
+		return TURN_SWITCHED;
 	}
 	return 2;
 }
 
+//-----------------------Print Board-----------------------
+
 void print_board(Gameboard *gameboard) {
-	for(int i = 7; i >= 0; i--){
+	for(int i = (BOARD_SIZE - 1); i >= 0; i--){
 		printf("%d| ", i + 1);
 		fflush(stdout);
-		for(int j = 0; j < 8; j++){
+		for(int j = 0; j < BOARD_SIZE; j++){
 			printf("%c ", gameboard->board[i][j]->sign);
 			fflush(stdout);
 		}
@@ -530,7 +516,7 @@ void print_details_game(Gameboard *gameboard){
 	ArrayListPrint(gameboard->history);
 	printf("all valid steps:\n");
 	fflush(stdout);
-	for(int i = 0; i < 16; i++){
+	for(int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++){
 		printf("%c: ", gameboard->all_pieces[gameboard->turn][i]->sign);
 		fflush(stdout);
 		print_all_steps(gameboard->all_pieces[gameboard->turn][i]);

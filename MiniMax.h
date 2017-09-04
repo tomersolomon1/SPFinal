@@ -5,7 +5,7 @@
  *      Author: User
  */
 
-#include "Pieces.h"
+#include "GameBasicBuildingBlocks.h"
 
 #ifndef MINIMAX_H_
 #define MINIMAX_H_
