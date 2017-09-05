@@ -19,8 +19,8 @@ int main(int argc, char *argv[]){
 			//check_parser();
 			//console_tester();
 		} else if (strcmp(argv[1], "1") == 0) { /* Sapir's tests */
-			//check_GameBoard();
-			run_gui();
+			check_GameBoard();
+			//run_gui();
 		} else if (strcmp(argv[1], "g") == 0) { /* game window (gui) test */
 			check_game_window();
 		}

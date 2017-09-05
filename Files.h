@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include "GameBoard.h"
 #define MAX_LEN_ROW 50
-#define MAX_TAG_LEN 13
 #define MAX_DATA_LENGTH 8
 
 /*load game from *f */
@@ -19,9 +18,6 @@ Gameboard *load_game(FILE* f);
 
 /*save game in xml format to *f */
 void save_xml(FILE *f, Gameboard* game);
-
-/*helping function*/
-bool is_str1_begins_with_str2(const char* str1, const char* str2);
 
 /*helping function for load_game - set the row by data from the xml data*/
 void set_row(Gameboard* game, int row_number, char* str);

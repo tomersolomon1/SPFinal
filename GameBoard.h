@@ -11,9 +11,14 @@
 #include <stdbool.h>
 #include "ArrayList.h"
 #include "GameBasicBuildingBlocks.h"
+
 #define HISTORY_SIZE 3
 #define BOARD_SIZE 8
 #define AMOUNT_PIECES_PER_COLOR 16
+
+#define MIN(A,B) (((A) < (B)) ? (A) : (B))
+#define MAX(A,B) (((A) > (B)) ? (A) : (B))
+#define SWITCHED(x) abs(1 - (x))
 
 typedef struct gameboard_t  {
 	/*all_pieces: a list of all game pieces

@@ -36,17 +36,6 @@ void save_xml(FILE *f, Gameboard* game){
 	fprintf(f, "</general>");
 }
 
-bool is_str1_begins_with_str2(const char* str1, const char* str2){
-	if(strlen(str1) < strlen(str2)){
-		return false;
-	}
-	int a = strncmp(str1, str2, strlen(str2));
-	if(a == 0){
-		return true;
-	}
-	return false;
-}
-
 Gameboard *load_game(FILE* f){
 	Gameboard *game = create_board(0, 0, 0);
 	for(int i = 0; i < 2; i++){ //"clean" game
@@ -60,27 +49,22 @@ Gameboard *load_game(FILE* f){
 			game->board[i][j] = game->empty;
 	}
 	char line[MAX_LEN_ROW];
-	char tag[MAX_TAG_LEN];
 	char data[MAX_DATA_LENGTH];
 	int data_int;
 	int row_number;
 	int piece_number;
 	int piece_color;
 	while(fgets(line, MAX_LEN_ROW, f) != NULL){ //go over lines
-		if(sscanf(line, "%*[ \t]<%13[^>]>%d", tag, &data_int) == 2){
-			if(is_str1_begins_with_str2(tag, "current_turn"))
-				game->turn = data_int;
-			else if(is_str1_begins_with_str2(tag, "game_mode"))
-				game->game_mode = data_int;
-			else if(is_str1_begins_with_str2(tag, "difficulty"))
-				game->difficulty = data_int;
-			else if(is_str1_begins_with_str2(tag, "user_color"))
-				game->user_color = data_int;
-		}
-		else if(sscanf(line, "%*[ \t]<%13[^_]_%d>%8[^<]", tag, &row_number, data) == 3){
-			if(is_str1_begins_with_str2(tag, "row"))
-				set_row(game, row_number - 1, data);
-		}
+		if(sscanf(line, "%*[ \t]<current_turn>%d", &data_int) == 1)
+			game->turn = data_int;
+		else if(sscanf(line, "%*[ \t]<game_mode>%d", &data_int) == 1)
+			game->game_mode = data_int;
+		else if(sscanf(line, "%*[ \t]<difficulty>%d", &data_int) == 1)
+			game->difficulty = data_int;
+		else if(sscanf(line, "%*[ \t]<user_color>%d", &data_int) == 1)
+			game->user_color = data_int;
+		else if(sscanf(line, "%*[ \t]<row_%d>%8[^<]", &row_number, data) == 2)
+			set_row(game, row_number - 1, data);
 		else if(sscanf(line,"%*[ \t]<piece_%d_%d_moved>%d", &piece_color, &piece_number, &data_int) == 3)
 			game->all_pieces[piece_color][piece_number]->has_moved = data_int;
 	}

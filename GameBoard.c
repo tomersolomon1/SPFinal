@@ -1,8 +1,5 @@
 
 #include "GameBoard.h"
-#define MIN(A,B) (((A) < (B)) ? (A) : (B))
-#define MAX(A,B) (((A) > (B)) ? (A) : (B))
-#define TURN_SWITCHED abs(1 - gameboard->turn)
 
 //-----------------------Game Board General functions-----------------------
 
@@ -150,10 +147,10 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 		source_p->has_moved = true;
 		source_p->row = drow;
 		source_p->col = dcol;
-		if(source_p->type == Pawn)
+		if(source_p->type == Pawn)//change pawn to be able to move only 1 step forward
 			source_p->vectors[0]->vector_size = 1;
 	}
-	gameboard->turn = TURN_SWITCHED;
+	gameboard->turn = SWITCHED(gameboard->turn);
 	set_all_valid_steps(gameboard);
 	if(src_prev_state == Was_promoted)
 		return CHESS_BOARD_PROMOTION;
@@ -167,7 +164,7 @@ void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type)
 }
 
 void set_castling_move(Gameboard *gameboard, int row, int scol, int dcol){
-	int side_rock = ((scol < dcol) ? 1 : -1); // -1 = left to king, 1 = right to king,
+	int side_rock = ((scol < dcol) ? 1 : -1); // -1 = rock is left to king, 1 = rock is right to king,
 	int scol_rock = ((scol < dcol) ? 7 : 0);
 	Piece *rock = gameboard->board[row][scol_rock];
 	Piece *king = gameboard->board[row][scol];
@@ -206,7 +203,7 @@ CHESS_BOARD_MESSAGE is_valid_step(Gameboard *gameboard, int srow, int scol, int 
 
 bool is_threatening_piece(Gameboard* gameboard, Piece *threatened){
 	for(int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++){
-		Piece *attacking = gameboard->all_pieces[abs(1 - threatened->colur)][i];
+		Piece *attacking = gameboard->all_pieces[SWITCHED(threatened->colur)][i];
 		if(attacking->alive){
 			int amount_v = attacking->amount_vectors; //check all vectors
 			while(amount_v > 0){
@@ -253,11 +250,11 @@ bool is_check_curr_player(Gameboard *gameboard){
 }
 
 bool is_under_check(Gameboard * gameboard){
-	return is_check(gameboard, TURN_SWITCHED);
+	return is_check(gameboard, SWITCHED(gameboard->turn));
 }
 
 bool is_check(Gameboard *gameboard, int colur) {
-	Piece* king_threatened = gameboard->all_pieces[abs(1 - colur)][15]; //15 is the place of king in all_pieces
+	Piece* king_threatened = gameboard->all_pieces[SWITCHED(colur)][15]; //15 is the place of king in all_pieces
 	return is_threatening_piece(gameboard, king_threatened);
 }
 
@@ -329,11 +326,11 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step* step){
 	gameboard->board[step->drow][step->dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
 	step->prevPiece->alive = false;
-	gameboard->turn = TURN_SWITCHED;
+	gameboard->turn = SWITCHED(gameboard->turn);
 	if(is_check_curr_player(gameboard)){
 		answer = true;
 	}
-	gameboard->turn = TURN_SWITCHED;
+	gameboard->turn = SWITCHED(gameboard->turn);
 	step->prevPiece->alive = true;
 	gameboard->board[step->drow][step->dcol] = step->prevPiece;
 	gameboard->board[piece->row][piece->col] = piece;
@@ -345,11 +342,11 @@ bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step){
 	gameboard->board[step->drow][step->dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
 	step->prevPiece->alive = false;
-	gameboard->turn = TURN_SWITCHED;
+	gameboard->turn = SWITCHED(gameboard->turn);
 	if(is_threatening_piece(gameboard, piece)){
 		answer = true;
 	}
-	gameboard->turn = TURN_SWITCHED;
+	gameboard->turn = SWITCHED(gameboard->turn);
 	step->prevPiece->alive = true;
 	gameboard->board[step->drow][step->dcol] = step->prevPiece;
 	gameboard->board[piece->row][piece->col] = piece;
@@ -427,18 +424,18 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard) {
 		dest_p->alive = true;
 		if(step->src_previous_state == Was_not_moved)
 			source_p->has_moved = false;
-		else if(step->src_previous_state == Was_promoted)
+		else if(step->src_previous_state == Was_promoted) //this step was promotion step
 			change_piece_type(source_p, Pawn);
 		source_p->row = step->srow;
 		source_p->col = step->scol;
 		dest_p->row = step->drow;
 		dest_p->col = step->dcol;
 
-		if(source_p->type == Pawn && !source_p->has_moved){
+		if(source_p->type == Pawn && !source_p->has_moved){ //if pawn in its initial spot - change it to be able to move 2 steps forward
 			source_p->vectors[0]->vector_size = 2;
 		}
 	}
-	gameboard->turn = TURN_SWITCHED;
+	gameboard->turn = SWITCHED(gameboard->turn);
 	ArrayListRemoveFirst(gameboard->history);
 	set_all_valid_steps(gameboard);
 	return CHESS_BOARD_SUCCESS;
@@ -483,8 +480,8 @@ int is_game_over(Gameboard *gameboard) {
 			return -1;
 		}
 	}
-	if(is_check(gameboard, TURN_SWITCHED)){ // is my kind under check?
-		return TURN_SWITCHED;
+	if(is_check(gameboard, SWITCHED(gameboard->turn))){ // is my kind under check?
+		return SWITCHED(gameboard->turn);
 	}
 	return 2;
 }
