@@ -17,9 +17,11 @@
 ArrayList* ArrayListCreate(int maxSize)
 {
 	ArrayList* array = (ArrayList*) malloc(sizeof(ArrayList));
+	//write_to_log_file("malloc array\n"); fflush(stdout);
 
 	array->maxSize = maxSize;
 	array->elements = (Step**) malloc(sizeof(Step*) * maxSize);
+	//write_to_log_file("malloc array_elements\n"); fflush(stdout);
 	for(int i = 0; i < maxSize; i++){
 		array->elements[i] = NULL;
 	}
@@ -39,10 +41,12 @@ ArrayList* ArrayListCopy(ArrayList* src)
 {
 	if(src == NULL){ return NULL; }
 	ArrayList* dst = (ArrayList*) malloc(sizeof(ArrayList));
+	//write_to_log_file("malloc array\n"); fflush(stdout);
 
 	dst->actualSize = src->actualSize;
 	dst->maxSize = src->maxSize;
 	dst->elements = (Step**) malloc(sizeof(Step*) * src->maxSize);
+	//write_to_log_file("malloc array_elements\n"); fflush(stdout);
 
 	for(int i = 0; i < src->maxSize; i++){
 		dst->elements[i] = NULL;
@@ -65,7 +69,9 @@ void ArrayListDestroy(ArrayList* src)
 			destroy_step(src->elements[i]);
 		}
 		free(src->elements);
+		//write_to_log_file("free array_elements\n"); fflush(stdout);
 		free(src);
+		//write_to_log_file("free array\n"); fflush(stdout);
 	}
 }
 

@@ -5,6 +5,7 @@
 
 Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
+	//write_to_log_file("malloc game\n"); fflush(stdout);
 	assert(newBoard != NULL);
 	newBoard->history = ArrayListCreate(HISTORY_SIZE * 2);
 	int i = 0;
@@ -73,12 +74,14 @@ void destroy_board(Gameboard *gameboard) {
 	}
 	destroy_piece(gameboard->empty);
 	free(gameboard);
+	//write_to_log_file("free game\n"); fflush(stdout);
 }
 
 Gameboard *copy_board(Gameboard* old) {
 	if(old == NULL)
 		return NULL;
 	Gameboard *new = (Gameboard*) malloc(sizeof(Gameboard));
+	//write_to_log_file("malloc game\n"); fflush(stdout);
 	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 , -1);
 	for(int i = 0; i < BOARD_SIZE; i++){
 		for(int j = 0; j < BOARD_SIZE; j++)
@@ -304,14 +307,19 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
 			}
+			else{
+				destroy_step(s);
+			}
 		}
-		else if(gameboard->board[row][col]->type != Empty &&
-				gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
+		else if(gameboard->board[row][col]->type != Empty && gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
 			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece_state, true);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				s->is_threatened = is_step_threatened(gameboard, piece, s);
 				piece->steps[*amount_steps] = s;
 				(*amount_steps)++;
+			}
+			else{
+				destroy_step(s);
 			}
 			break;
 		}

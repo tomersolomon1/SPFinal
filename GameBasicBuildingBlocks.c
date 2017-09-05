@@ -6,10 +6,18 @@
  */
 #include "GameBasicBuildingBlocks.h"
 
+//LOG
+/*extern FILE *f_log;
+void write_to_log_file(const char *event){
+	fprintf(f_log, event);
+}*/
+
 //-------------------Vectors-------------------
+
 
 Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot){
 	Vector *v = (Vector*) malloc(sizeof(Vector));
+	//write_to_log_file("malloc vector\n"); fflush(stdout);
 	assert(v != NULL);
 	v->delta_row = delta_row;
 	v->delta_col = delta_col;
@@ -21,6 +29,7 @@ Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_ea
 
 Vector *copy_vector(Vector *old){
 	Vector *v = (Vector *) malloc(sizeof(Vector));
+	//write_to_log_file("malloc vector\n"); fflush(stdout);
 	assert(v != NULL);
 	v->delta_col = old->delta_col;
 	v->delta_row = old->delta_row;
@@ -33,6 +42,7 @@ Vector *copy_vector(Vector *old){
 void destroy_vector(Vector *v){
 	if(v != NULL){
 		free(v);
+		//write_to_log_file("free vector\n"); fflush(stdout);
 	}
 }
 
@@ -40,6 +50,7 @@ void destroy_vector(Vector *v){
 
 Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, Piece_state src_prev_state, bool is_threatened){
 	Step *newStep = (Step*) malloc(sizeof(Step));
+	//write_to_log_file("malloc step\n"); fflush(stdout);
 	assert(newStep != NULL);
 	newStep->srow = srow;
 	newStep->dcol = dcol;
@@ -53,6 +64,7 @@ Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, Piec
 
 Step *copy_step(Step *old){
 	Step *new = (Step*) malloc(sizeof(Step));
+	//write_to_log_file("malloc step\n"); fflush(stdout);
 	assert(new != NULL);
 	new->srow = old->srow;
 	new->scol = old->scol;
@@ -67,6 +79,7 @@ Step *copy_step(Step *old){
 void destroy_step(Step *step){
 	if(step != NULL){
 		free(step);
+		//write_to_log_file("free step\n"); fflush(stdout);
 	}
 }
 
@@ -82,6 +95,7 @@ void print_step(Step *step){
 
 Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat) {
 	Piece* newPiece = (Piece*) malloc(sizeof(Piece));
+	//write_to_log_file("malloc piece\n"); fflush(stdout);
 	assert(newPiece != NULL);
 	newPiece->alive = true;
 	newPiece->col = col;
@@ -97,12 +111,14 @@ Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat) {
 	int max_amount_steps = amount_steps_of_piece_type(type);
 
 	Vector **vectors = (Vector**)malloc(sizeof(Vector*) * amount_vectors);
+	//write_to_log_file("malloc piece_vectors\n"); fflush(stdout);
 	assert(vectors != NULL);
 	set_vectors(type, colur, vectors);
 	newPiece->amount_vectors = amount_vectors;
 	newPiece->vectors = vectors;
 
 	Step **steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
+	//write_to_log_file("malloc piece_steps\n"); fflush(stdout);
 	assert(steps != NULL);
 	for(int i = 0; i < max_amount_steps; i++){
 		steps[i] = NULL;
@@ -116,6 +132,7 @@ Piece *copy_piece(Piece *old){
 		return NULL;
 	}
 	Piece* newPiece = (Piece*) malloc(sizeof(Piece));
+	//write_to_log_file("malloc piece\n"); fflush(stdout);
 	assert(newPiece != NULL);
 	newPiece->alive = old->alive;
 	newPiece->col = old->col;
@@ -129,6 +146,7 @@ Piece *copy_piece(Piece *old){
 	newPiece->amount_vectors = old->amount_vectors;
 
 	Vector **vectors = (Vector**) malloc(sizeof(Vector*) * newPiece->amount_vectors);
+	//write_to_log_file("malloc piece_vectors\n"); fflush(stdout);
 	assert(vectors != NULL);
 	for(int i = 0; i < newPiece->amount_vectors; i++){
 		vectors[i] = copy_vector(old->vectors[i]);
@@ -137,6 +155,7 @@ Piece *copy_piece(Piece *old){
 	int max_amount_steps = amount_steps_of_piece_type(newPiece->type);
 
 	Step **steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
+	//write_to_log_file("malloc piece_steps\n"); fflush(stdout);
 	assert(steps != NULL);
 	for(int i = 0; i < max_amount_steps; i++){
 		steps[i] = NULL;
@@ -155,8 +174,11 @@ void destroy_piece(Piece *piece) {
 			destroy_vector(piece->vectors[i]);
 		}
 		free(piece->vectors);
+		//write_to_log_file("free piece_vectors\n"); fflush(stdout);
 		free(piece->steps);
+		//write_to_log_file("free piece_steps\n"); fflush(stdout);
 		free(piece);
+		//write_to_log_file("free piece\n"); fflush(stdout);
 	}
 }
 
