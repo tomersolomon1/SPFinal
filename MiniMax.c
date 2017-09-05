@@ -61,8 +61,6 @@ bool update_ab(int *alpha, int *beta, int step_value, NodeType node_type, bool f
  * 		1 - max-node
  */
 StepValue *MiniMaxAlgo2(Gameboard *board, int alpha, int beta, int search_depth, NodeType node_type, int eval_perspective, bool first_option) {
-	//printf("\nminimax: alpha = %d, beta = %d, node-type: %d\n", alpha, beta, node_type);
-	//printf("turn: %d, search_depth: %d\n", board->turn, search_depth);
 	StepValue *best_sv = (StepValue *) malloc(sizeof(StepValue));
 	assert(best_sv != NULL);
 	best_sv->step = NULL; /* defalut */
@@ -77,19 +75,13 @@ StepValue *MiniMaxAlgo2(Gameboard *board, int alpha, int beta, int search_depth,
 		int piece_index = 0;
 		while ((alpha < beta) && (piece_index < 16)) { /* each player has 16 pieces */
 			Piece *current_piece = board->all_pieces[board->turn][piece_index];
-			//printf("piece pos: (%d, %d)\n", current_piece->col, current_piece->row);
 			if (current_piece->alive) {
 				for (int step_index = 0; (step_index < current_piece->amount_steps) && (alpha < beta); step_index++){
 					Step *step = current_piece->steps[step_index];
-					//printf("step: (%d, %d) -> (%d, %d), search_depth: %d\n", step->scol, step->srow, step->dcol, step->drow, search_depth);
-					//fflush(stdout);
 					set_step(board, step->srow, step->scol, step->drow, step->dcol);
 					StepValue *sv = MiniMaxAlgo2(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option);
 					if (update_ab(&alpha, &beta, sv->value, node_type, first_option)) {
-						//printf("better-option, a = %d, b = %d, node-type: %d\n", alpha, beta, node_type);
 						Step *good_step = ArrayListGetFirst(board->history);
-						//printf("better-step: (%d, %d) -> (%d, %d)\n", good_step->scol, good_step->srow, good_step->dcol, good_step->drow);
-						//fflush(stdout);
 						destroy_step(best_sv->step);
 						best_sv->step = copy_step(good_step);
 					}
