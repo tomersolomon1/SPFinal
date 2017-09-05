@@ -13,6 +13,7 @@
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
+#define GAME_DEBUG 1
 /*
  * assuming the move is legal
  * set the step, and show a SimpleMessageBox if the game is over
@@ -49,9 +50,18 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 		return true;
 	} else if (window->data->board_widget->board->game_mode == 1) { /* the game is not over, and we need to play the computer's turn */
 		Gameboard *copy = copy_board(window->data->board_widget->board);
-		Move move = find_best_move(copy, copy->difficulty);
-		destroy_board(copy);
-		return graphical_handle_single_move(window, move.srow, move.scol, move.drow, move.dcol);
+		if(GAME_DEBUG) {
+			printf("DEBUG!!\n");
+			fflush(stdout);
+			Move move = find_best_move(copy, copy->difficulty);
+			destroy_board(copy);
+			return graphical_handle_single_move(window, move.srow, move.scol, move.drow, move.dcol);
+		} else {
+			Step *best_step = find_best_step(copy, copy->difficulty);
+			bool game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol);
+			destroy_step(best_step);
+			return game_over;
+		}
 	}
 	return false; /* the game is not over yet */
 }
