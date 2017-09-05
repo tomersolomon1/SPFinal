@@ -38,7 +38,7 @@ void destroy_game_textures(BoardWidget *board_widget) {
 }
 
 /*
- * somebody else is incharge of destroying the gameboard itself
+ * somebody else is in-charge of destroying the gameboard itself
  */
 void destory_data(GameData *data) {
 	if (data == NULL) {
@@ -121,8 +121,6 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 		destroy_game_textures(board_widget);
 		return NULL;
 	}
-	printf("created RGB textures\n");
-	fflush(stdout);
 	// create texture for the pieces
 	for (int i = 0; i < 6; i++) {
 		SDL_Surface *white_piece_surface = SDL_LoadBMP(white_pieces_images[i]);
