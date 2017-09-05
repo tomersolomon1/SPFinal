@@ -110,6 +110,7 @@ void add_steps_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v,
 /*free all_valid_steps*/
 void free_all_valid_steps_minimax(Step** all_steps, Piece_type type);
 
+/*assuming that the step is valid!!*/
 CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
 
 Gameboard *copy_board_minimax(Gameboard* old);
