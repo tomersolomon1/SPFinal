@@ -81,8 +81,8 @@ StepValue *MiniMaxAlgo2(Gameboard *board, int alpha, int beta, int search_depth,
 					set_step(board, step->srow, step->scol, step->drow, step->dcol);
 					StepValue *sv = MiniMaxAlgo2(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option);
 					if (update_ab(&alpha, &beta, sv->value, node_type, first_option)) {
-						printf("history-size: %d\n", ArrayListSize(board->history));
-						fflush(stdout);
+						//printf("history-size: %d\n", ArrayListSize(board->history));
+						//fflush(stdout);
 						Step *good_step = ArrayListGetFirst(board->history);
 						destroy_step(best_sv->step);
 						best_sv->step = copy_step(good_step);

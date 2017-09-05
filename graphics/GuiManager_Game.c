@@ -13,7 +13,7 @@
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
-#define GAME_DEBUG 1
+#define GAME_DEBUG 0
 /*
  * assuming the move is legal
  * set the step, and show a SimpleMessageBox if the game is over

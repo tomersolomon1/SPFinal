@@ -14,16 +14,22 @@ GENERAL_OBJECTS = ArrayList.o Files.o GameBoard.o GameBasicBuildingBlocks.o Mini
 CONSOLE_OBJECTS = ConsoleMode.o Parser.o
 GUI_OBJECTS     =  Button.o Game_Window_Tester.o GameWindow.o GuiManager_Game.o GuiManager_Menu.o \
 GuiManager.o SPCommon.o Windows_Menu.o Windows.o
-UNIT_TESTS = FilesTester ParserTester console_tester GameBoardTester Game_Window_Tester
+UNIT_TESTS = FilesTester.o console_tester.o GameBoardTester.o Game_Window_Tester.o
 #ALL_OBJECTS := $(GENERAL_OBJECTS) $(CONSOLE_OBJECTS) $(GUI_OBJECTS) $(MINIMAX_OBJECT) $(MAIN_OBJECT) 
 
 # the executable file
-$(EXEC): $(GENERAL_OBJECTS) $(CONSOLE_OBJECTS) $(GUI_OBJECTS)
-	$(CC) $(GENERAL_OBJECTS) $(CONSOLE_OBJECTS) $(GUI_OBJECTS) $(SDL_LIB) -o $@
+$(EXEC): $(GENERAL_OBJECTS) $(CONSOLE_OBJECTS) $(GUI_OBJECTS) $(UNIT_TESTS)
+	$(CC) $(GENERAL_OBJECTS) $(CONSOLE_OBJECTS) $(GUI_OBJECTS) $(UNIT_TESTS) $(SDL_LIB) -o $@
 
 # tester rules - should add more tester rules later on
 FilesTester: $(GENERAL_OBJECTS)
-	$(CC) $(GENERAL_OBJECTS) -o $@
+	$(CC) $(CC_COMP_FLAG) -c $*.c
+GameBoardTester.o: GameBoard.h Files.h
+	$(CC) $(CC_COMP_FLAG) -c $*.c
+Game_Window_Tester.o: GameBoard.h Windows.h GameWindow.h GuiManager_Game.h
+	$(CC) $(CC_COMP_FLAG) $(SDL_COMP_FLAG) -c $*.c
+console_tester.o: ConsoleMode.h GameBoard.h
+		$(CC) $(CC_COMP_FLAG) -c $*.c
 Test.o: GameBoardTester.h ParserTester.h FilesTester.h ConsoleTester.h Game_Window_Tester.h GuiManager.h
 	$(CC) $(CC_COMP_FLAG) $(SDL_COMP_FLAG) -c $*.c
 
