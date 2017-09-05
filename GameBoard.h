@@ -55,7 +55,7 @@ void destroy_board(Gameboard *gameboard);
 
 /* copy board */
 Gameboard *copy_board(Gameboard* old);
-
+Gameboard *copy_board_minimax(Gameboard* old);
 /* reset board with same parameters like *gameboard */
 void reset_board(Gameboard** gameboard);
 
@@ -66,7 +66,7 @@ void reset_board(Gameboard** gameboard);
  * returns CHESS_BOARD_INVALID_MOVE_<error-type> if move is NOT legal
  * */
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
-
+CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
 //make promotion for piece in board[row][col]
 void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type);
 
@@ -97,6 +97,24 @@ bool is_under_check(Gameboard * gameboard);
 
 /*is the player with color "colur" threatening the other player's king?*/
 bool is_check(Gameboard *gameboard, int colur);
+
+//-----------------------MINIMAX-----------------------
+
+/* get all valid steps of piece in gameboard,
+ * and update amount_steps to be the amount of steps of the piece
+ * step ** is malloced inside the function
+ * */
+Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps);
+void add_steps_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v, Step** all_steps, int *amount_steps);
+
+/*free all_valid_steps*/
+void free_all_valid_steps_minimax(Step** all_steps, Piece_type type);
+
+CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
+
+Gameboard *copy_board_minimax(Gameboard* old);
+
+CHESS_BOARD_MESSAGE undo_step_minimax(Gameboard *gameboard);
 
 //---------------------------------Set all Valid Steps---------------------------------
 

@@ -261,6 +261,180 @@ bool is_check(Gameboard *gameboard, int colur) {
 	return is_threatening_piece(gameboard, king_threatened);
 }
 
+
+//-----------------------MINIMAX-----------------------
+
+Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps){
+	*amount_steps = 0;
+	int max_amount_steps = amount_steps_of_piece_type(piece->type);
+
+	Step **all_steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
+	//write_to_log_file("malloc piece_steps\n");
+	assert(all_steps != NULL);
+	for(int i = 0; i < max_amount_steps; i++){
+		all_steps[i] = NULL;
+	}
+	for(int i = 0; i < piece->amount_vectors; i++){
+		add_steps_per_vector_minimax(gameboard, piece, piece->vectors[i], all_steps, amount_steps);
+	}
+	return all_steps;
+}
+
+void add_steps_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v, Step** all_steps, int *amount_steps){
+	int delta_row = v->delta_row;
+	int delta_col = v->delta_col;
+	int amount_going = v->vector_size;
+	bool can_eat = v->can_eat;
+	bool can_go_to_empty_spot = v->can_go_to_empty_spot;
+	int row = piece->row;
+	int col = piece->col;
+	Piece_state piece_state = (piece->has_moved? Was_moved: Was_not_moved);
+	while(amount_going > 0){
+		amount_going --;
+		row = row + delta_row;
+		col = col + delta_col;
+		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)) //out of board
+			break;
+		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece_state, true);
+			if(!is_step_causes_check(gameboard, piece, s)){
+				all_steps[*amount_steps] = s;
+				(*amount_steps)++;
+			}
+			else{
+				destroy_step(s);
+			}
+		}
+		else if(gameboard->board[row][col]->type != Empty &&
+				gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece_state, true);
+			if(!is_step_causes_check(gameboard, piece, s)){
+				all_steps[*amount_steps] = s;
+				(*amount_steps)++;
+			}
+			else{
+				destroy_step(s);
+			}
+			break;
+		}
+		else{ // seeing your color piece
+			break;
+		}
+	}
+}
+
+void free_all_valid_steps_minimax(Step** all_steps, Piece_type type){
+	int max_amount_steps = amount_steps_of_piece_type(type);
+	for(int i = 0; i < max_amount_steps; i++){
+		destroy_step(all_steps[i]);
+	}
+	free(all_steps);
+	//write_to_log_file("free all_valid_steps\n");
+}
+
+Gameboard *copy_board_minimax(Gameboard* old){
+	if(old == NULL)
+			return NULL;
+	Gameboard *new = (Gameboard*) malloc(sizeof(Gameboard));
+	//write_to_log_file("malloc game\n"); fflush(stdout);
+	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 , -1);
+	for(int i = 0; i < BOARD_SIZE; i++){
+		for(int j = 0; j < BOARD_SIZE; j++)
+			new->board[i][j] = empty;
+	}
+	for(int i = 0; i < 2; i++){
+		for(int j = 0; j < AMOUNT_PIECES_PER_COLOR; j++){
+			new->all_pieces[i][j] = copy_piece(old->all_pieces[i][j]);
+			Piece *curr = new->all_pieces[i][j];
+			if(curr->alive)
+				new->board[curr->row][curr->col] = curr;
+		}
+	}
+	new->turn = old->turn;
+	new->empty = empty;
+	//when we copy history, inside the steps we still point to piece in previous board
+	//so the loop changes it:
+	new->history = ArrayListCopy(old->history);
+	for(int i = 0; i < new->history->actualSize; i++){
+		Piece* old_piece = old->history->elements[i]->prevPiece;
+		if(old_piece->type == Empty)
+			new->history->elements[i]->prevPiece = new->empty;
+		else
+			new->history->elements[i]->prevPiece = new->all_pieces[old_piece->colur][old_piece->indexat];
+	}
+	//new->history
+	new->user_color = old->user_color;
+	new->difficulty = old->difficulty;
+	new->game_mode = old->game_mode;
+	return new;
+}
+
+CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
+	Piece_state src_prev_state = Was_not_moved;
+	Piece *source_p = gameboard->board[srow][scol];
+	Piece *dest_p = gameboard->board[drow][dcol];
+	if(source_p->has_moved)
+		src_prev_state = Was_moved;
+	if((drow == (BOARD_SIZE - 1) || drow == 0) && source_p->type == Pawn) //promotion
+		src_prev_state = Was_promoted;
+	Step *step = create_step(srow, scol, drow, dcol, dest_p, src_prev_state, false);
+	ArrayListPushFirst(gameboard->history, step);
+
+	if(source_p->type == King && abs(dcol - scol) > 1 && srow == drow) //castling
+		set_castling_move(gameboard, srow, scol, dcol);
+	else{
+		gameboard->board[drow][dcol] = source_p;
+		gameboard->board[srow][scol] = gameboard->empty;
+		dest_p->alive = false;
+		source_p->has_moved = true;
+		source_p->row = drow;
+		source_p->col = dcol;
+		if(source_p->type == Pawn)//change pawn to be able to move only 1 step forward
+			source_p->vectors[0]->vector_size = 1;
+	}
+	gameboard->turn = SWITCHED(gameboard->turn);
+	if(src_prev_state == Was_promoted)
+		return CHESS_BOARD_PROMOTION;
+	return CHESS_BOARD_SUCCESS;
+}
+
+CHESS_BOARD_MESSAGE undo_step_minimax(Gameboard *gameboard) {
+	if(gameboard == NULL){
+		return CHESS_BOARD_INVALID_ARGUMENT;
+	}
+	if(ArrayListSize(gameboard->history) == 0){
+		return CHESS_BOARD_NO_HISTORY;
+	}
+	Step *step = ArrayListGetFirst(gameboard->history);
+	Piece *source_p = gameboard->board[step->drow][step->dcol];
+
+	if(source_p->type == King && abs(step->dcol - step->scol) > 1){ //castling
+		undo_step_castling(gameboard, step);
+	}
+	else{ //not castling
+		Piece *dest_p = step->prevPiece;
+		gameboard->board[step->drow][step->dcol] = dest_p;
+		gameboard->board[step->srow][step->scol] = source_p;
+		dest_p->alive = true;
+		if(step->src_previous_state == Was_not_moved)
+			source_p->has_moved = false;
+		else if(step->src_previous_state == Was_promoted) //this step was promotion step
+			change_piece_type(source_p, Pawn);
+		source_p->row = step->srow;
+		source_p->col = step->scol;
+		dest_p->row = step->drow;
+		dest_p->col = step->dcol;
+
+		if(source_p->type == Pawn && !source_p->has_moved){ //if pawn in its initial spot - change it to be able to move 2 steps forward
+			source_p->vectors[0]->vector_size = 2;
+		}
+	}
+	gameboard->turn = SWITCHED(gameboard->turn);
+	ArrayListRemoveFirst(gameboard->history);
+	return CHESS_BOARD_SUCCESS;
+}
+
+
 //-----------------------Set all Valid Steps-----------------------
 
 void set_all_valid_steps(Gameboard *gameboard){

@@ -39,6 +39,7 @@
 #define SIGN_EMPTY '_'
 
 #define AMOUNT_PIECES_PER_COLOR 16
+void write_to_log_file(const char *event);
 
 typedef enum {
 	Pawn,
