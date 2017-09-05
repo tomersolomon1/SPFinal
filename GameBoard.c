@@ -296,7 +296,7 @@ void add_steps_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v,
 		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)) //out of board
 			break;
 		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
-			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece_state, true);
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece_state, false);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				all_steps[*amount_steps] = s;
 				(*amount_steps)++;
@@ -307,7 +307,7 @@ void add_steps_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v,
 		}
 		else if(gameboard->board[row][col]->type != Empty &&
 				gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
-			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece_state, true);
+			Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece_state, false);
 			if(!is_step_causes_check(gameboard, piece, s)){
 				all_steps[*amount_steps] = s;
 				(*amount_steps)++;
