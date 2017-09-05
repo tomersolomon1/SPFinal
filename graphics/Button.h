@@ -17,8 +17,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
+#include <SDL.h>
+#include <SDL_video.h>
 
 //.y = position_buttons + DEFAULT_BTN_GAP*(i++)
 

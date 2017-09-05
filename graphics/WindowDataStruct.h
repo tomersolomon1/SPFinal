@@ -8,8 +8,8 @@
 #ifndef GRAPHICS_WINDOWDATASTRUCT_H_
 #define GRAPHICS_WINDOWDATASTRUCT_H_
 #include <stdbool.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
+#include <SDL.h>
+#include <SDL_video.h>
 
 typedef enum window_type_t{
 	Enterance,

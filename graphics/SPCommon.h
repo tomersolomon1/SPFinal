@@ -7,8 +7,8 @@
 
 #ifndef GRAPHICS_SPCOMMON_H_
 #define GRAPHICS_SPCOMMON_H_
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
+#include <SDL.h>
+#include <SDL_video.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <assert.h>
