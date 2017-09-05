@@ -149,6 +149,7 @@ bool get_number(const char *line, int *offset, int *arg, char range_offset) {
 }
 
 void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound) {
+	printf("bounds: %d, %d\n", lower_bound, upper_bound);
 	comm->need_arg = true;
 	int len = strlen(comm_s);
 	if (verify_command(comm, line, offset, comm_s, len, true)) {
