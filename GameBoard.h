@@ -113,9 +113,14 @@ void free_all_valid_steps_minimax(Step** all_steps, Piece_type type);
 /*assuming that the step is valid!!*/
 CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
 
-Gameboard *copy_board_minimax(Gameboard* old);
+//Gameboard *copy_board_minimax(Gameboard* old);
 
 CHESS_BOARD_MESSAGE undo_step_minimax(Gameboard *gameboard);
+
+int is_game_over_minimax(Gameboard *gameboard);
+bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece);
+bool is_step_causes_check_minimax(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece);
+bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v);
 
 //---------------------------------Set all Valid Steps---------------------------------
 

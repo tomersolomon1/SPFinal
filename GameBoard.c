@@ -5,7 +5,7 @@
 
 Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
-	//write_to_log_file("malloc game\n"); fflush(stdout);
+	////write_to_log_file("malloc game\n"); fflush(stdout);
 	assert(newBoard != NULL);
 	newBoard->history = ArrayListCreate(HISTORY_SIZE * 2);
 	int i = 0;
@@ -74,14 +74,14 @@ void destroy_board(Gameboard *gameboard) {
 	}
 	destroy_piece(gameboard->empty);
 	free(gameboard);
-	//write_to_log_file("free game\n"); fflush(stdout);
+	////write_to_log_file("free game\n"); fflush(stdout);
 }
 
 Gameboard *copy_board(Gameboard* old) {
 	if(old == NULL)
 		return NULL;
 	Gameboard *new = (Gameboard*) malloc(sizeof(Gameboard));
-	//write_to_log_file("malloc game\n"); fflush(stdout);
+	////write_to_log_file("malloc game\n"); fflush(stdout);
 	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 , -1);
 	for(int i = 0; i < BOARD_SIZE; i++){
 		for(int j = 0; j < BOARD_SIZE; j++)
@@ -265,11 +265,12 @@ bool is_check(Gameboard *gameboard, int colur) {
 //-----------------------MINIMAX-----------------------
 
 Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps){
+	//write_to_log_file("get_all_valid_steps_of_piece_minimax\n");
 	*amount_steps = 0;
 	int max_amount_steps = amount_steps_of_piece_type(piece->type);
 
 	Step **all_steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
-	//write_to_log_file("malloc piece_steps\n");
+	////write_to_log_file("malloc piece_steps\n");
 	assert(all_steps != NULL);
 	for(int i = 0; i < max_amount_steps; i++){
 		all_steps[i] = NULL;
@@ -324,19 +325,20 @@ void add_steps_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v,
 }
 
 void free_all_valid_steps_minimax(Step** all_steps, Piece_type type){
+	//write_to_log_file("free_all_valid_steps_of_piece_minimax\n");
 	int max_amount_steps = amount_steps_of_piece_type(type);
 	for(int i = 0; i < max_amount_steps; i++){
 		destroy_step(all_steps[i]);
 	}
 	free(all_steps);
-	//write_to_log_file("free all_valid_steps\n");
+	////write_to_log_file("free all_valid_steps\n");
 }
-
+/*
 Gameboard *copy_board_minimax(Gameboard* old){
 	if(old == NULL)
 			return NULL;
 	Gameboard *new = (Gameboard*) malloc(sizeof(Gameboard));
-	//write_to_log_file("malloc game\n"); fflush(stdout);
+	////write_to_log_file("malloc game\n"); fflush(stdout);
 	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 , -1);
 	for(int i = 0; i < BOARD_SIZE; i++){
 		for(int j = 0; j < BOARD_SIZE; j++)
@@ -367,9 +369,10 @@ Gameboard *copy_board_minimax(Gameboard* old){
 	new->difficulty = old->difficulty;
 	new->game_mode = old->game_mode;
 	return new;
-}
+}*/
 
 CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
+	//write_to_log_file("set_step_minimax\n");
 	Piece_state src_prev_state = Was_not_moved;
 	Piece *source_p = gameboard->board[srow][scol];
 	Piece *dest_p = gameboard->board[drow][dcol];
@@ -399,6 +402,7 @@ CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, i
 }
 
 CHESS_BOARD_MESSAGE undo_step_minimax(Gameboard *gameboard) {
+	//write_to_log_file("undo_step_minimax\n");
 	if(gameboard == NULL){
 		return CHESS_BOARD_INVALID_ARGUMENT;
 	}
@@ -434,6 +438,81 @@ CHESS_BOARD_MESSAGE undo_step_minimax(Gameboard *gameboard) {
 	return CHESS_BOARD_SUCCESS;
 }
 
+
+int is_game_over_minimax(Gameboard *gameboard){
+	for(int i = AMOUNT_PIECES_PER_COLOR - 1; i >= 0 ; i--){ // is there any piece that has legal move?
+		Piece *p = gameboard->all_pieces[gameboard->turn][i];
+		if(p->alive){
+			if(is_piece_having_legal_move_minimax(gameboard, p))
+				//write_to_log_file("is_game_over_minimax: return -1\n");
+				return -1;
+		}
+	}
+	if(is_check(gameboard, SWITCHED(gameboard->turn))){ // is my king under check?
+		//write_to_log_file("is_game_over_minimax: return winner\n");
+		return SWITCHED(gameboard->turn);
+	}
+	//write_to_log_file("is_game_over_minimax: return 2\n");
+	return 2;
+}
+
+bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece){
+	for(int i = 0; i < piece->amount_vectors; i++){
+		if(is_piece_having_legal_move_per_vector_minimax(gameboard, piece, piece->vectors[i])){
+			return true;
+		}
+	}
+	return false;
+}
+
+bool is_step_causes_check_minimax(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece){
+	bool answer = false;
+	gameboard->board[drow][dcol] = piece;
+	gameboard->board[piece->row][piece->col] = gameboard->empty;
+	prevPiece->alive = false;
+	gameboard->turn = SWITCHED(gameboard->turn);
+	if(is_check_curr_player(gameboard)){
+		answer = true;
+	}
+	gameboard->turn = SWITCHED(gameboard->turn);
+	prevPiece->alive = true;
+	gameboard->board[drow][dcol] = prevPiece;
+	gameboard->board[piece->row][piece->col] = piece;
+	return answer;
+}
+
+bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v){
+	int delta_row = v->delta_row;
+	int delta_col = v->delta_col;
+	int amount_going = v->vector_size;
+	bool can_eat = v->can_eat;
+	bool can_go_to_empty_spot = v->can_go_to_empty_spot;
+	int row = piece->row;
+	int col = piece->col;
+	while(amount_going > 0){
+		amount_going --;
+		row = row + delta_row;
+		col = col + delta_col;
+		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)) //out of board
+			break;
+		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
+			if(!is_step_causes_check_minimax(gameboard, piece, row, col, gameboard->empty)){
+				return true;
+			}
+		}
+		else if(gameboard->board[row][col]->type != Empty &&
+				gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
+			if(!is_step_causes_check_minimax(gameboard, piece, row, col, gameboard->board[row][col])){
+				return true;
+			}
+			break;
+		}
+		else{ // seeing your color piece
+			break;
+		}
+	}
+	return false;
+}
 
 //-----------------------Set all Valid Steps-----------------------
 

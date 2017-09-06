@@ -7,10 +7,10 @@
 #include "GameBasicBuildingBlocks.h"
 
 //LOG
-extern FILE *f_log;
-void write_to_log_file(const char *event){
-	fprintf(f_log, event);
-}
+//extern FILE *f_log;
+//void write_to_log_file(const char *event){
+//	fprintf(f_log, event);
+//}
 
 //-------------------Vectors-------------------
 

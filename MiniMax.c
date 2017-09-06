@@ -113,7 +113,7 @@ StepValue *MiniMaxAlgo3(Gameboard *board, int alpha, int beta, int search_depth,
 	StepValue *best_sv = (StepValue *) malloc(sizeof(StepValue));
 	assert(best_sv != NULL);
 	best_sv->step = NULL; /* defalut */
-	int game_over = is_game_over(board);
+	int game_over = is_game_over_minimax(board);
 	//printf("game-over: %d\n", game_over);
 	if (game_over == 1 || game_over == 0) { /* it's a checkmate */
 		best_sv->value = node_type ? INT_MIN : INT_MAX;
