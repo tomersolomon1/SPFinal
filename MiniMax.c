@@ -6,8 +6,8 @@
  */
 
 #include <limits.h>
-#include "GameBoard.h"
 #include "MiniMax.h"
+#include "GameBoard.h"
 
 void destroy_step_value(StepValue *sv) {
 	if (sv != NULL) {

@@ -5,10 +5,12 @@
  *      Author: User
  */
 
-#include "GameBasicBuildingBlocks.h"
 
 #ifndef MINIMAX_H_
 #define MINIMAX_H_
+
+#include "GameBasicBuildingBlocks.h"
+#include "GameBoard.h"
 
 typedef enum {
 	MinNode,
