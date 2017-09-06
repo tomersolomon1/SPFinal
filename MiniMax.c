@@ -99,18 +99,76 @@ StepValue *MiniMaxAlgo2(Gameboard *board, int alpha, int beta, int search_depth,
 	}
 }
 
+/* using the most recent functions of game-board utility
+ * assuming we can alter the board as we will
+ * we assume the game is not over
+ * return the best move according to the minimax-algo, using alpha-beta prunning
+ * node-types:
+ * 		0 - min-node
+ * 		1 - max-node
+ */
+StepValue *MiniMaxAlgo3(Gameboard *board, int alpha, int beta, int search_depth, NodeType node_type, int eval_perspective, bool first_option) {
+	//printf("minimax: turn: %d, search_depth: %d, alpha: %d, beta: %d\n", board->turn, search_depth, alpha, beta);
+	//fflush(stdout);
+	StepValue *best_sv = (StepValue *) malloc(sizeof(StepValue));
+	assert(best_sv != NULL);
+	best_sv->step = NULL; /* defalut */
+	int game_over = is_game_over(board);
+	//printf("game-over: %d\n", game_over);
+	if (game_over == 1 || game_over == 0) { /* it's a checkmate */
+		best_sv->value = node_type ? INT_MIN : INT_MAX;
+		return best_sv;
+	} else if (game_over == 2 || search_depth == 0) { /* it's a tie or a leaf in the mini-max tree */
+		best_sv->value = eval(board, eval_perspective);
+		return best_sv;
+	} else { /* the game is still on */
+		int piece_index = 0;
+		while ((alpha < beta) && (piece_index < 16)) { /* each player has 16 pieces */
+			Piece *current_piece = board->all_pieces[board->turn][piece_index];
+			//printf("\nnew piece: (%d, %d), color: %d, alive: %d",current_piece->col, current_piece->row, current_piece->colur, current_piece->alive);
+			//fflush(stdout);
+			if (current_piece->alive) {
+				int amount_steps = 0;
+				Step **valid_steps = get_all_valid_steps_of_piece_minimax(board, current_piece, &amount_steps);
+				//printf("\nnew piece: (%d, %d), n-steps: %d\n", current_piece->col, current_piece->row, amount_steps);
+				for (int step_index = 0; (step_index < amount_steps) && (alpha < beta); step_index++){
+					Step *step = valid_steps[step_index];
+					//printf("step: (%d, %d) -> (%d, %d)\n", step->scol, step->srow, step->dcol, step->drow);
+					set_step_minimax(board, step->srow, step->scol, step->drow, step->dcol);
+					StepValue *sv = MiniMaxAlgo3(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option);
+					if (update_ab(&alpha, &beta, sv->value, node_type, first_option)) {
+						//Step *good_step = ArrayListGetFirst(board->history);
+						//printf("better-step: (%d, %d) -> (%d, %d)\n", step->scol, step->srow, step->dcol, step->drow);
+						//printf("node-mode: %d, new-alpha: %d, new-beta: %d\n", node_type, alpha, beta);
+						//fflush(stdout);
+						destroy_step(best_sv->step);
+						best_sv->step = copy_step(step);
+					}
+					first_option = false;
+					destroy_step_value(sv);
+					undo_step_minimax(board);
+				}
+				free_all_valid_steps_minimax(valid_steps, current_piece->type);
+			}
+			piece_index++;
+		}
+		best_sv->value = node_type ? alpha : beta; /* to be removed?? */
+		return best_sv;
+	}
+}
+
 /* assuming we can alter the board as we will
  * we assume the game is not over
  */
 Step *find_best_step(Gameboard *board, int search_depth) {
-	printf("\nstart-of-move\n");
+	//printf("\nstart-of-move\n");
 	int alpha = INT_MIN;
 	int beta  = INT_MAX;
 	int eval_perspective = board->turn;
-	StepValue *best_sv = MiniMaxAlgo2(board, alpha, beta, search_depth, MaxNode, eval_perspective, true);
+	StepValue *best_sv = MiniMaxAlgo3(board, alpha, beta, search_depth, MaxNode, eval_perspective, true);
 	Step *best_step = copy_step(best_sv->step);
 	destroy_step_value(best_sv);
-	printf("end-of-move\n");
+	//printf("end-of-move\n");
 	return best_step;
 }
 

@@ -30,9 +30,11 @@ Game_Window_Tester.o: GameBoard.h Windows.h GameWindow.h GuiManager_Game.h
 	$(CC) $(CC_COMP_FLAG) $(SDL_COMP_FLAG) -c $*.c
 console_tester.o: ConsoleMode.h GameBoard.h
 		$(CC) $(CC_COMP_FLAG) -c $*.c
-Test.o: GameBoardTester.h ParserTester.h FilesTester.h ConsoleTester.h Game_Window_Tester.h GuiManager.h
+Test.o: GameBoardTester.h FilesTester.h ConsoleTester.h Game_Window_Tester.h GuiManager.h
 	$(CC) $(CC_COMP_FLAG) $(SDL_COMP_FLAG) -c $*.c
-
+ParserTester.o: Parser.h
+		$(CC) $(CC_COMP_FLAG) -c $*.c
+		
 # console & general-objects & minimax rules
 ArrayList.o: ArrayList.h GameBasicBuildingBlocks.o
 	$(CC) $(CC_COMP_FLAG) -c $*.c

@@ -57,9 +57,12 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 			destroy_board(copy);
 			return graphical_handle_single_move(window, move.srow, move.scol, move.drow, move.dcol);
 		} else {
+			//destroy_board(copy);
+			//copy = copy_board_minimax(window->data->board_widget->board);
 			Step *best_step = find_best_step(copy, copy->difficulty);
 			bool game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol);
 			destroy_step(best_step);
+			destroy_board(copy);
 			return game_over;
 		}
 	}
