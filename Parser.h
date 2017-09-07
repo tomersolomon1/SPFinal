@@ -52,9 +52,8 @@ void get_non_arg_command(Command *comm, const char *line, int offset, const char
 void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s, SP_commands type, Mode mode);
 void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s,
 		int lower_bound, int upper_bound, SP_commands type, Mode mode);
-bool get_number2(const char *line, int *offset, int *arg, char range_offset, int lower_bound,
+bool get_number(const char *line, int *offset, int *arg, char range_offset, int lower_bound,
 		int upper_bound, char valid_following, bool end_command);
-bool get_number(const char *line, int *offset, int *arg, char range_offset);
 bool getXY(Command *comm, const char *line, int *offset, int *row, int *col, int needed_space, bool first_coordinate);
 void get_move_arg(Command *comm, const char *line, int offset);
 Command *parser(const char *line);

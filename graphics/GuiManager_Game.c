@@ -23,6 +23,7 @@
  */
 
 bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol) {
+	char *colors[] = {"black", "white"};
 	Gameboard *board = window->data->board_widget->board;
 	set_step(board, srow, scol, drow, dcol, false);
 	//draw_board(window->data, window->windowRenderer, NULL); /* check the clear-renderer */

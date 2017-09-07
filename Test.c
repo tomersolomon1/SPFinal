@@ -25,7 +25,7 @@ int main(int argc, char *argv[]){
 
 			run_gui();
 
-		} else if (strcmp(argv[1], "g") == 0) { /* game window (gui) test */
+		} else if (strcmp(argv[1], "g") == 0) { /* game window (gui) test  */
 			check_game_window();
 		}
 	}
