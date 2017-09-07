@@ -19,38 +19,19 @@ void free_command(Command *comm) {
 	free(comm);
 }
 
-/* line[offset] is the first char to be checked
- * when the function returns, comm->extra_param is true if there are non-whitespace chars after offset
- */
-void valid_tail(Command *comm, const char *line, int offset) {
-	comm->extra_param = false; /* optimistic approach */
-	while ((offset < SP_MAX_LINE_LENGTH) && (line[offset] != '\0') && (line[offset] != '\n')) {
-		if (!isspace(line[offset])) {
-		    /* more non-whitespace chars than should be, therefore illegal command */
-			comm->extra_param = true;
-			return; /* no need for further evaluations */
-		}
-		offset++;
-	}
-}
-
 /* make sure this is the right command
- * return true if and only if line starts with the command in comm_s
+ * return true if and only if line starts with the comm_s
  */
-bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len, bool need_param) {
+bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len) {
 	int actual_len = 0;
-	//printf("offset = %d\n", offset);
 	for (; (actual_len < comm_len && offset < SP_MAX_LINE_LENGTH); actual_len++, offset++) {
 		if (comm_s[actual_len] != line[offset]) {
-			//printf("diff: comm_s[%d] = %c, line[%d] = %c\n", actual_len, comm_s[actual_len], offset, line[offset]);
 			comm->comm_e = Ivalid_command; /* it's not the command we thought it was */
 			return false;
 		}
 	}
-	if ((actual_len != comm_len) || ((offset == SP_MAX_LINE_LENGTH || line[offset] == '\0') && need_param) ||
-			(!isspace(line[offset]) && line[offset] != '\0')) {
+	if ((actual_len != comm_len) || (offset <= SP_MAX_LINE_LENGTH && !isspace(line[offset]) && line[offset] != '\0')) {
 		comm->comm_e = Ivalid_command;
-		return false;
 	}
 	return true;
 }
@@ -62,25 +43,29 @@ int get_non_whitespace_offset(const char str[]) {
 			str++;
 	}
 	if (i < SP_MAX_LINE_LENGTH && *str != '\0') { return i; } /* found a beginning of a word */
-	else { return -1; } /* no legal command is stored in srt */
+	else { return -1; } /* no legal command is stored in str */
 }
 
-/* should transform it into a macro?? */
-void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s) {
+void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s, SP_commands type, Mode mode) {
+	comm->comm_e = type;
+	comm->mode = mode;
 	int len = strlen(comm_s);
 	comm->need_arg = false;
-	verify_command(comm, line, offset, comm_s, len, false);
-	valid_tail(comm, line, offset+len);
+	verify_command(comm, line, offset, comm_s, len);
+	//valid_tail(comm, line, offset+len);
 }
 
-void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s) {
+void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s, SP_commands type, Mode mode) {
+	comm->comm_e = type;
+	comm->mode = mode;
 	int len = strlen(comm_s);
 	comm->need_arg  = true;
-	if (verify_command(comm, line, offset, comm_s, len, true)) {
+	if (verify_command(comm, line, offset, comm_s, len)) {
 		int addi_offset = get_non_whitespace_offset(line + offset + len);
 		if (addi_offset == -1) {
-			comm->valid_arg = false;
-			comm->comm_e = Ivalid_command; /* maybe shouldn't change command-type? */
+			//comm->valid_arg = false;
+			comm->file_name = NULL;
+
 		} else {
 			int file_name_offset =  addi_offset + offset + len;
 			comm->file_name = (char *) malloc(sizeof(char) * MAX_FILE_NAME);
@@ -94,36 +79,213 @@ void get_command_with_file_name(Command *comm, const char *line, int offset, con
 			}
 			comm->file_name[j] = '\0'; /* terminating the file-name */
 			comm->valid_arg = true;
-			valid_tail(comm, line, file_name_offset);
+			//valid_tail(comm, line, file_name_offset);
 		}
 	}
 }
 
-/* ignoring negative numbers
- * gets a pointer to arg, fill it, and check it's within the proper bounds
- * return true if and only if the lower_bound <= number <= upper_bound
- * in the end of this function, offset is the index of the first char after the argument
+/* new get-number func!!!!!
+ * offset is assumed not a whitespace
+ * read line[*offset], store it inside arg, and check it's within the proper bounds.
+ * advances offset by one after reading the number
+ * checks that the following char is either a whitespace, '\0', or a "valid following char"
+ * return true if and only if the number is within the proper bounds and has proper following char
+ * according to Moav, we can ignore pathological cases such as -1, 00001 etc
  */
-bool get_number2(const char *line, int *offset, int *arg, char range_offset, int lower_bound, int upper_bound) {
-	int n = 0;
-	bool number_validity = true; /* we are optimistic */
-	while (*offset < SP_MAX_LINE_LENGTH && line[*offset] == '0') {
-		(*offset)++;
-	} /* we consume all the zeroes */
+bool get_number2(const char *line, int *offset, int *arg, char range_offset, int lower_bound,
+		int upper_bound, char valid_following, bool end_command) {
+	if (line[*offset] != '\0' || line[*offset] != ',') { /* obviously not legal numbers, redundant check????? */
+		return false;
+	}
+	*arg = line[*offset] - range_offset;
+	(*offset)++;
+	// checking the parameter is in the right range, and the following char is valid
+	if (*arg > upper_bound || *arg < lower_bound) { /* the parameter is not a legal in the right range */
+		return false;
+	}
+	if (end_command) { /* the following char should be '\0' or white space */
+		if (*offset < SP_MAX_LINE_LENGTH && !isspace(line[*offset]) && line[*offset] != '\0') {
+			return false;
+		}
+	} else if (*offset >= SP_MAX_LINE_LENGTH || (line[*offset] != valid_following)) { /* the following char is inadequate */
+				return false;
+	}
+	return true;
+}
 
-	while (*offset < SP_MAX_LINE_LENGTH && !isspace(line[*offset]) && line[*offset] != '\0' && line[*offset] != ',' && line[*offset] != '>') {
-		int m = line[*offset] - range_offset; /* typical values: range_offset = '@' or '1' or '0' ('@' is the char before 'A' in the ascii table  */
-		//printf("m = %d, line[%d], = %c\n", m, *offset, line[*offset]);
-		(*offset)++;
-		n *= 10;
-		n += m;
-		if (m < 0) {
-			number_validity = false; /* there is some problem with the input */
+void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s,
+		int lower_bound, int upper_bound, SP_commands type, Mode mode) {
+	comm->comm_e = type;
+	comm->mode = mode;
+	comm->need_arg = true;
+	int len = strlen(comm_s);
+	if (verify_command(comm, line, offset, comm_s, len)) {
+		int addi = get_non_whitespace_offset(line + offset + len);
+		if (addi == -1) { /* there isn't any parameter */
+			comm->valid_arg = false;
+			comm->arg_in_range = false;
+			//comm->comm_e = Ivalid_command; /* maybe shouldn't change command-type? */
+		} else {
+			comm->valid_arg = true; // to be deleted later
+			int arg_offset = addi + offset + len;
+			comm->args_in_range = get_number2(line, &arg_offset, &comm->arg1, '0', lower_bound, upper_bound, '\0', true);
+			//valid_tail(comm, line, arg_offset); /* should check the 1 constant */
 		}
 	}
-	number_validity = (n < lower_bound || n> upper_bound) ? false : number_validity;
-	*arg = n;
-	return number_validity;
+}
+
+/* get XY coordinates in the form of <X,Y>, where X is in range 1-8, and Y is in range A-H
+ * return true if and only if managed to read the coordinates
+ */
+bool getXY(Command *comm, const char *line, int *offset, int *row, int *col, int needed_space, bool first_coordinate) {
+	if (*offset > SP_MAX_LINE_LENGTH - needed_space) { /* */
+		comm->comm_e = Ivalid_command; /* not enough room for parameters, treat the command as illegal */
+		return false;
+	} else {
+		if (line[*offset] == '<') { /* the coordinate should start with '<'*/
+			(*offset)++;
+			comm->args_in_range = get_number2(line, offset, row, '1', 0, 7, ',', false) && comm->args_in_range;
+			if (line[*offset] != ','){ /* probably redundant?? */
+				comm->args_in_range = false;
+				return false;
+			}
+			(*offset)++;
+			comm->args_in_range = get_number2(line, offset, col, 'A', 0, 7, '>', false) && comm->args_in_range;
+			if (line[*offset] != '>') { /* should be at the end of the parameter */
+				return false; /* probably redundant?? */
+			}
+			(*offset)++;
+			if (!isspace(line[(*offset)]) && (first_coordinate || line[*offset] != '\0')) {
+				return false;
+			} /* after the first parameter should be a whitespace, and after the second parameter it's ok to have whitespace or '\0' */
+
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+void get_move_arg(Command *comm, const char *line, int offset) {
+	comm->comm_e = Make_Move;
+	comm->mode = GameMode;
+	comm->need_arg      = true;
+	comm->valid_arg     = true; /* let's be optimistic */
+	comm->args_in_range = true; /* let's be optimistic */
+	int len = strlen("move");
+	if (!verify_command(comm, line, offset, "move", len)) { /* not "move" after all... */
+		return; /* no need for further evaluation */
+	}
+	int additional_offset = get_non_whitespace_offset(line + offset + len);
+	if (additional_offset == -1) { /* didn't find the first coordinate */
+		comm->comm_e = Ivalid_command;
+		return;  /* no need for further parsing */
+	}
+	offset = additional_offset + offset + len;
+	int needed_space = strlen("<x,y> "); /* also need room for the whitespace after the first coordinate, and '\0' or whitespace after the second coordinate */
+	bool got_param = getXY(comm, line, &offset, &(comm->arg1), &(comm->arg2), needed_space, true); /* getting the first coordinate */
+	if ((!got_param) || (!comm->args_in_range)) {
+		return;  /* something is wrong with the first coordinate, no need for further parsing */
+	}
+	additional_offset = get_non_whitespace_offset(line + offset);
+	if (additional_offset == -1) { /* didn't find the "to" */
+		comm->comm_e = Ivalid_command;
+		return;  /* no need for further parsing */
+	}
+	offset += additional_offset;
+	if ((offset >= SP_MAX_LINE_LENGTH - 2) || (line[offset] == 't') || (line[offset+1] == 'o')) { /* something wrong with the "to" */
+		comm->comm_e = Ivalid_command;
+		return;  /* no need for further parsing */
+	}
+	additional_offset = get_non_whitespace_offset(line + offset + 2);
+	if (additional_offset == -1) { //* didn't find the second coordinate */
+		comm->comm_e = Ivalid_command;
+		return;  /* no need for further parsing */
+	}
+	offset += 2 + additional_offset;
+	getXY(comm, line, &offset, &(comm->arg3), &(comm->arg4), needed_space, false); /* getting the second coordinate */
+}
+
+Command *parser(const char *line) {
+	Command *comm = (Command *) malloc(sizeof(Command));
+	assert(comm != NULL);
+	comm->comm_e =  Ivalid_command;
+	comm->file_name = NULL;
+	comm->valid_arg = true; /* optimistic */
+	int offset = get_non_whitespace_offset(line);
+	if ((offset == -1) || (offset+1 >= SP_MAX_LINE_LENGTH)) { return comm; } /* invalid command */
+	switch (line[offset]) { /* switching the leading char of the command */
+		case 'g': /* 'game_mode' */
+			get_int_arg(comm, line, offset, "game_mode", 1, 2, Set_GameMode, SettingsMode);
+			break;
+		case 'd': /* either 'difficulty' or 'default' */
+			switch (line[offset+1]) {
+				case 'i': /* 'difficulty' */
+					get_int_arg(comm, line, offset, "difficulty", 1, 5, Set_Difficulty, SettingsMode);
+					break;
+				case 'e': /* 'default' */
+					get_non_arg_command(comm, line, offset, "default", Restore_Default, SettingsMode);
+					break;
+			};
+			break;
+		case 'u': /* either 'user_color' or 'undo' */
+			switch (line[offset+1]) {
+				case 's': /* 'user_color */
+					get_int_arg(comm, line, offset, "user_color", 0, 1, Set_UserColor, SettingsMode);
+					break;
+				case 'n': /* 'undo' */
+					get_non_arg_command(comm, line, offset, "undo", Undo_Move, GameMode);
+					break;
+			};
+			break;
+		case 'l': /* 'load' */
+			get_command_with_file_name(comm, line, offset, "load", Load, SettingsMode);
+			break;
+		case 'p': /* 'print_settings */
+			get_non_arg_command(comm, line, offset, "print_setting", Print_Settings, SettingsMode);
+			break;
+		case 's': /* either 'save' or 'start' */
+			switch (line[offset+1]) {
+				case 'a': /* 'save' */
+					get_command_with_file_name(comm, line, offset, "save", Save, GameMode);
+					break;
+				case 't': /* 'start */
+					get_non_arg_command(comm, line, offset, "start", Start, SettingsMode);
+					break;
+			};
+			break;
+		case 'm': /* 'move' */
+			get_move_arg(comm, line, offset);
+			break;
+		case 'r': /* 'reset' */
+			get_non_arg_command(comm, line, offset, "reset", Reset, GameMode);
+			break;
+		case 'q': /* 'quit' */
+			get_non_arg_command(comm, line, offset, "quit", Quit, Both);
+			break;
+		default: /* unrecognized command */
+			return comm; /* Ivalid_command by default */
+	}
+	return comm;
+}
+
+
+///////////////////// old code
+
+/* line[offset] is the first char to be checked
+ * when the function returns, comm->extra_param is true if there are non-whitespace chars after offset
+ * not needed!!!!!!!!!
+ */
+void valid_tail(Command *comm, const char *line, int offset) {
+	comm->extra_param = false; /* optimistic approach */
+	while ((offset < SP_MAX_LINE_LENGTH) && (line[offset] != '\0') && (line[offset] != '\n')) {
+		if (!isspace(line[offset])) {
+		    /* more non-whitespace chars than should be, therefore illegal command */
+			comm->extra_param = true;
+			return; /* no need for further evaluations */
+		}
+		offset++;
+	}
 }
 
 bool get_number(const char *line, int *offset, int *arg, char range_offset) {
@@ -147,161 +309,3 @@ bool get_number(const char *line, int *offset, int *arg, char range_offset) {
 	*arg = number_validity ? n : -1; /* is illegal parameter for all our commands */
 	return number_validity;
 }
-
-void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound) {
-	printf("bounds: %d, %d\n", lower_bound, upper_bound);
-	comm->need_arg = true;
-	int len = strlen(comm_s);
-	if (verify_command(comm, line, offset, comm_s, len, true)) {
-		int addi = get_non_whitespace_offset(line + offset + len);
-		if (addi == -1) { /* there isn't any parameter */
-			comm->valid_arg = false;
-			comm->comm_e = Ivalid_command; /* maybe shouldn't change command-type? */
-		} else {
-			comm->valid_arg = true;
-			int arg_offset = addi + offset + len;
-			comm->args_in_range = get_number(line, &arg_offset, &comm->arg1, '0');
-			valid_tail(comm, line, arg_offset); /* should check the 1 constant */
-		}
-	}
-}
-
-/* the form of input should be <XXXXXX,YYYYYY>, where XXXXX is in range 1-8, and YYYYYY is in range A-H */
-void getXY(Command *comm, const char *line, int *offset, int *row, int *col) {
-	if (*offset > SP_MAX_LINE_LENGTH - 6) { /* at least 6 char: <x,y> and '\0' */
-		comm->comm_e = Ivalid_command; /* no room for parameters, treat the command as illegal */
-	} else {
-		if (line[*offset] == '<') {
-			(*offset)++;
-			comm->args_in_range = get_number(line, offset, row, '1') && comm->args_in_range;
-			if (line[*offset] != ',') { comm->valid_arg = false; }
-			(*offset)++;
-			comm->args_in_range = get_number(line, offset, col, 'A') && comm->args_in_range;
-			comm->valid_arg = (line[*offset] == '>') ? true : false;
-		} else {
-			 comm->valid_arg = false;
-		}
-	}
-}
-
-void get_move_arg(Command *comm, const char *line, int offset) {
-	comm->need_arg      = true;
-	comm->valid_arg     = true; /* let's be optimistic */
-	comm->args_in_range = true; /* let's be optimistic */
-	int len = strlen("move");
-	if (!verify_command(comm, line, offset, "move", len, true)) { /* not "move" after all... */
-		return; /* no need for further evaluation */
-	}
-	offset = get_non_whitespace_offset(line + offset + len) + offset + len;
-	getXY(comm, line, &offset, &(comm->arg1), &(comm->arg2)); /* getting the first coordinate */
-	if (!comm->valid_arg) { return; } /* no need for further parsing */
-	offset += 1; /* so now offset holds the index of the first char after the closing bracket in the first parameter */
-	offset += get_non_whitespace_offset(line + offset);
-	if ((offset < SP_MAX_LINE_LENGTH - 2) && (line[offset] == 't') && (line[offset+1] == 'o')) { /* checking for the "to" (first checking we're within the boundaries) */
-		offset += 2 + get_non_whitespace_offset(line + offset + 2);
-		getXY(comm, line, &offset, &(comm->arg3), &(comm->arg4)); /* getting the second coordinate */
-		offset += 1; /* should it be 6? or 5? */
-		valid_tail(comm, line, offset);
-	} else { /* the "to" is not in the right place */
-		comm->valid_arg = false;
-	}
-}
-
-Command *parser(const char *line) {
-	Command *comm = (Command *) malloc(sizeof(Command));
-	assert(comm != NULL);
-
-	comm->comm_e =  Ivalid_command;
-	comm->file_name = NULL;
-	comm->valid_arg = true; /* optimistic */
-	int offset = get_non_whitespace_offset(line);
-	if ((offset == -1) || (offset+1 >= SP_MAX_LINE_LENGTH)) { return comm; } /* invalid command */
-
-	switch (line[offset]) {
-		case 'g': /* 'game_mode' */
-			comm->comm_e = Set_GameMode;
-			comm->mode   = SettingsMode;
-			get_int_arg(comm, line, offset, "game_mode", 1, 2);
-			break;
-
-		case 'd': /* either 'difficulty' or 'default' */
-			switch (line[offset+1]) {
-				case 'i': /* 'difficulty' */
-					comm->comm_e = Set_Difficulty;
-					comm->mode   = SettingsMode;
-					get_int_arg(comm, line, offset, "difficulty", 1, 5);
-					break;
-				case 'e': /* 'default' */
-					comm->comm_e = Restore_Default;
-					comm->mode   = SettingsMode;
-					get_non_arg_command(comm, line, offset, "default");
-					break;
-			};
-			break;
-
-		case 'u': /* either 'user_color' or 'undo' */
-			switch (line[offset+1]) {
-				case 's': /* 'user_color */
-					comm->comm_e = Set_UserColor;
-					comm->mode   = SettingsMode;
-					get_int_arg(comm, line, offset, "user_color", 0, 1);
-					break;
-				case 'n': /* 'undo' */
-					comm->comm_e = Undo_Move;
-					comm->mode = GameMode;
-					get_non_arg_command(comm, line, offset, "undo");
-					break;
-			};
-			break;
-
-		case 'l': /* 'load' */
-			comm->comm_e = Load;
-			comm->mode   = SettingsMode;
-			get_command_with_file_name(comm, line, offset, "load");
-			break;
-
-		case 'p': /* 'print_settings */
-			comm->comm_e = Print_Settings;
-			comm->mode   = SettingsMode;
-			get_non_arg_command(comm, line, offset, "print_setting");
-			break;
-
-		case 's': /* either 'save' or 'start' */
-			switch (line[offset+1]) {
-				case 'a': /* 'save' */
-					comm->comm_e = Save;
-					comm->mode = GameMode;
-					get_command_with_file_name(comm, line, offset, "save");
-					break;
-				case 't': /* 'start */
-					comm->comm_e = Start;
-					comm->mode   = SettingsMode;
-					get_non_arg_command(comm, line, offset, "start");
-					break;
-			};
-			break;
-
-		case 'm': /* 'move' */
-			comm->comm_e = Make_Move;
-			comm->mode = GameMode;
-			get_move_arg(comm, line, offset);
-			break;
-
-		case 'r': /* 'reset' */
-			comm->comm_e = Reset;
-			comm->mode = GameMode;
-			get_non_arg_command(comm, line, offset, "reset");
-			break;
-
-		case 'q': /* 'quit' */
-			comm->comm_e = Quit;
-			comm->mode = Both;
-			get_non_arg_command(comm, line, offset, "quit");
-			break;
-
-		default: /* unrecognized command */
-			return comm;
-	}
-	return comm;
-}
-

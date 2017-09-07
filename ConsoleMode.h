@@ -9,6 +9,8 @@
 #define CONSOLEMODE_H_
 #include "GameBoard.h"
 
+#define in_range(x) (((x) > -1) && ((x) < (8)))
+
 extern char *colors[];
 
 int manage_console(Gameboard *gameboard);

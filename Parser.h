@@ -37,6 +37,7 @@ typedef struct command_t {
 	Mode mode; /* the mode associated with the command */
 	bool need_arg;
 	bool valid_arg;
+	bool arg_in_range;
 	bool extra_param;
 	bool args_in_range;
 	int arg1, arg2, arg3, arg4;
@@ -45,16 +46,16 @@ typedef struct command_t {
 
 void free_command(Command *comm);
 void valid_tail(Command *comm, const char *line, int offset);
-bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len, bool need_param);
+bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len);
 int get_non_whitespace_offset(const char *str);
-void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s);
-void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s);
-void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s, int lower_bound, int upper_bound);
-
-bool get_number2(const char *line, int *offset, int *arg, char range_offset, int lower_bound, int upper_bound);
-
+void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s, SP_commands type, Mode mode);
+void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s, SP_commands type, Mode mode);
+void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s,
+		int lower_bound, int upper_bound, SP_commands type, Mode mode);
+bool get_number2(const char *line, int *offset, int *arg, char range_offset, int lower_bound,
+		int upper_bound, char valid_following, bool end_command);
 bool get_number(const char *line, int *offset, int *arg, char range_offset);
-void getXY(Command *comm, const char *line, int *offset, int *row, int *col);
+bool getXY(Command *comm, const char *line, int *offset, int *row, int *col, int needed_space, bool first_coordinate);
 void get_move_arg(Command *comm, const char *line, int offset);
 Command *parser(const char *line);
 #endif /* PARSER_H_ */
