@@ -142,7 +142,7 @@ bool is_step_causes_check(Gameboard* gameboard, Piece* piece, int drow, int dcol
 bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step);
 
 //set all castling setps:
-void set_castling_steps(Gameboard * gameboard);
+void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, int *amount_steps);
 
 //helping function for set_castling_steps
 bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock);

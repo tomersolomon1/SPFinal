@@ -5,7 +5,6 @@
 
 Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
-	////write_to_log_file("malloc game\n"); fflush(stdout);
 	assert(newBoard != NULL);
 	newBoard->history = ArrayListCreate(HISTORY_SIZE * 2);
 	int i = 0;
@@ -74,14 +73,12 @@ void destroy_board(Gameboard *gameboard) {
 	}
 	destroy_piece(gameboard->empty);
 	free(gameboard);
-	////write_to_log_file("free game\n"); fflush(stdout);
 }
 
 Gameboard *copy_board(Gameboard* old) {
 	if(old == NULL)
 		return NULL;
 	Gameboard *new = (Gameboard*) malloc(sizeof(Gameboard));
-	////write_to_log_file("malloc game\n"); fflush(stdout);
 	Piece *empty = create_piece(Empty, -1 ,-1 ,-1 , -1);
 	for(int i = 0; i < BOARD_SIZE; i++){
 		for(int j = 0; j < BOARD_SIZE; j++)
@@ -270,15 +267,18 @@ Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, 
 	*amount_steps = 0;
 	int max_amount_steps = amount_steps_of_piece_type(piece->type);
 
-	Step **all_steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
-	assert(all_steps != NULL);
+	Step **all_piece_steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
+	assert(all_piece_steps != NULL);
 	for(int i = 0; i < max_amount_steps; i++){
-		all_steps[i] = NULL;
+		all_piece_steps[i] = NULL;
+	}
+	if(piece->type == King){
+		set_castling_steps(gameboard, piece, all_piece_steps, amount_steps);
 	}
 	for(int i = 0; i < piece->amount_vectors; i++){
-		add_steps_per_vector(gameboard, piece, piece->vectors[i], amount_steps, all_steps, false);
+		add_steps_per_vector(gameboard, piece, piece->vectors[i], amount_steps, all_piece_steps, false);
 	}
-	return all_steps;
+	return all_piece_steps;
 }
 
 void free_all_valid_steps_minimax(Step** all_steps, Piece_type type){
@@ -358,7 +358,8 @@ void set_all_valid_steps(Gameboard *gameboard){
 			set_all_valid_steps_per_piece(gameboard, piece);
 		}
 	}
-	set_castling_steps(gameboard);
+	Piece *king = gameboard->all_pieces[gameboard->turn][15]; //15 is the place of king in all_pieces
+	set_castling_steps(gameboard, king, king->steps, &(king->amount_steps));
 }
 
 void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece) {
@@ -444,9 +445,8 @@ bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step){
 	return answer;
 }
 
-void set_castling_steps(Gameboard * gameboard){
+void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, int *amount_steps){
 	int turn = gameboard->turn;
-	Piece *king = gameboard->all_pieces[turn][15];
 	if(king->has_moved) return;
 	if(is_under_check(gameboard)) return;
 	if(!king->alive) return;
@@ -456,10 +456,11 @@ void set_castling_steps(Gameboard * gameboard){
 		rock = gameboard->all_pieces[turn][12 + i]; //12 is the 1st place of rock in all_pieces
 		if(is_castling_valid_per_rock(gameboard, king, rock)){
 			delta_col = (king->col < rock->col) ? 2 : -2;
-			Step *new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, Was_not_moved, true);
-			new_step->is_threatened = is_step_threatened(gameboard, rock, new_step);
-			king->steps[king->amount_steps] = new_step;
-			king->amount_steps++;
+			Step *new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, Was_not_moved, false);
+			steps_list[*amount_steps] = new_step;
+			(*amount_steps)++;
+			//king->steps[king->amount_steps] = new_step;
+			//king->amount_steps++;
 		}
 	}
 
@@ -494,6 +495,7 @@ bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock)
 }
 
 //-----------------------Undo-----------------------
+
 
 CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard, bool is_minimax) {
 	if(gameboard == NULL){
@@ -533,6 +535,7 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard, bool is_minimax) {
 	return CHESS_BOARD_SUCCESS;
 }
 
+
 CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard) {
 	if(gameboard == NULL){
 		return CHESS_BOARD_INVALID_ARGUMENT;
@@ -544,6 +547,7 @@ CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard) {
 	undo_step(gameboard, false);
 	return CHESS_BOARD_SUCCESS;
 }
+
 
 void undo_step_castling(Gameboard *gameboard, Step *step){
 	int row = step->drow;
@@ -580,6 +584,7 @@ int is_game_over(Gameboard *gameboard) {
 
 //-----------------------Print Board-----------------------
 
+
 void print_board(Gameboard *gameboard) {
 	for(int i = (BOARD_SIZE - 1); i >= 0; i--){
 		printf("%d| ", i + 1);
@@ -596,6 +601,7 @@ void print_board(Gameboard *gameboard) {
 	fflush(stdout);
 }
 
+
 void print_board_to_log_file(Gameboard *gameboard) {
 	char* a = malloc(2);
 	a[1] = '\0';
@@ -609,6 +615,7 @@ void print_board_to_log_file(Gameboard *gameboard) {
 	}
 	free(a);
 }
+
 
 void print_details_game(Gameboard *gameboard){
 	printf("\n");
