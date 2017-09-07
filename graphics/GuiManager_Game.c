@@ -24,7 +24,7 @@
 
 bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol) {
 	Gameboard *board = window->data->board_widget->board;
-	set_step(board, srow, scol, drow, dcol);
+	set_step(board, srow, scol, drow, dcol, false);
 	//draw_board(window->data, window->windowRenderer, NULL); /* check the clear-renderer */
 	drawWindow(window, NULL);
 	int game_over = is_game_over(board);
@@ -77,7 +77,7 @@ void gui_first_move(Gameboard *board) {
 		Gameboard *copy = copy_board(board);
 		Move move = find_best_move(copy, copy->difficulty);
 		destroy_board(copy);
-		set_step(board, move.srow, move.scol, move.drow, move.dcol);
+		set_step(board, move.srow, move.scol, move.drow, move.dcol, false);
 	}
 }
 

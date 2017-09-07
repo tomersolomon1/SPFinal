@@ -20,6 +20,8 @@
 #define MAX(A,B) (((A) > (B)) ? (A) : (B))
 #define SWITCHED(x) abs(1 - (x))
 
+
+
 typedef struct gameboard_t  {
 	/*all_pieces: a list of all game pieces
 	*all_pieces[black=0] for black pieces
@@ -43,6 +45,7 @@ typedef enum chess_board_message_t {
 	CHESS_BOARD_PROMOTION
 } CHESS_BOARD_MESSAGE;
 
+
 //-------------------------------Game Board General functions-------------------------------
 /*create board*/
 Gameboard *create_board(int game_mode, int difficulty, int user_color);
@@ -55,7 +58,7 @@ void destroy_board(Gameboard *gameboard);
 
 /* copy board */
 Gameboard *copy_board(Gameboard* old);
-Gameboard *copy_board_minimax(Gameboard* old);
+
 /* reset board with same parameters like *gameboard */
 void reset_board(Gameboard** gameboard);
 
@@ -64,9 +67,16 @@ void reset_board(Gameboard** gameboard);
  * gets source and destination coordinates as 0-7 numbers
  * returns CHESS_BOARD_SUCCESS if legal move
  * returns CHESS_BOARD_INVALID_MOVE_<error-type> if move is NOT legal
+ * is_minimax:
+ * 		if set to true:  1. we assume that the step is legal
+ * 						 2. we wont want to update all valid steps
+ * 						    (because it's an expensive task in the minimax recursion)
+ * 		if set to false: 1. we don't assume that the step is legal
+ * 						 2. we want to update all the piece's valid steps
+ * 							(because we dont want to calculate all valid moves each time the user tries to make a step)
  * */
-CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
-CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
+CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol, bool is_minimax);
+
 //make promotion for piece in board[row][col]
 void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type);
 
@@ -105,17 +115,9 @@ bool is_check(Gameboard *gameboard, int colur);
  * step ** is malloced inside the function
  * */
 Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps);
-void add_steps_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v, Step** all_steps, int *amount_steps);
 
 /*free all_valid_steps*/
 void free_all_valid_steps_minimax(Step** all_steps, Piece_type type);
-
-/*assuming that the step is valid!!*/
-CHESS_BOARD_MESSAGE set_step_minimax(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
-
-//Gameboard *copy_board_minimax(Gameboard* old);
-
-CHESS_BOARD_MESSAGE undo_step_minimax(Gameboard *gameboard);
 
 int is_game_over_minimax(Gameboard *gameboard);
 bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece);
@@ -131,10 +133,10 @@ void set_all_valid_steps(Gameboard *gameboard);
 void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece);
 
 /*helping function for set_all_valid_steps*/
-void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *amount_steps);
+void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *amount_steps, Step **steps_list, bool check_is_threatened);
 
 /*helping function for set_all_valid_steps*/
-bool is_step_causes_check(Gameboard* gameboard, Piece* piece, Step *step);
+bool is_step_causes_check(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece);
 
 /*helping function for set_all_valid_steps*/
 bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step);
@@ -150,8 +152,9 @@ bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock)
 /* undo step
  * returns CHESS_BOARD_INVALID_ARGUMENT if game is null
  * returns CHESS_BOARD_NO_HISTORY if there's no history
- * returns CHESS_BOARD_SUCCESS if succeed */
-CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard);
+ * returns CHESS_BOARD_SUCCESS if succeed
+ * if is_minimax set to true, we wont set all valid steps in the game, otherwise we will*/
+CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard, bool is_minimax);
 
 /* double_undo - performing double undo if possible
  * returns CHESS_BOARD_INVALID_ARGUMENT if game is null

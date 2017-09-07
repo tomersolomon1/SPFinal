@@ -78,7 +78,7 @@ StepValue *MiniMaxAlgo2(Gameboard *board, int alpha, int beta, int search_depth,
 			if (current_piece->alive) {
 				for (int step_index = 0; (step_index < current_piece->amount_steps) && (alpha < beta); step_index++){
 					Step *step = current_piece->steps[step_index];
-					set_step(board, step->srow, step->scol, step->drow, step->dcol);
+					set_step(board, step->srow, step->scol, step->drow, step->dcol, true);
 					StepValue *sv = MiniMaxAlgo2(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option);
 					if (update_ab(&alpha, &beta, sv->value, node_type, first_option)) {
 						//printf("history-size: %d\n", ArrayListSize(board->history));
@@ -89,7 +89,7 @@ StepValue *MiniMaxAlgo2(Gameboard *board, int alpha, int beta, int search_depth,
 					}
 					first_option = false;
 					destroy_step_value(sv);
-					undo_step(board);
+					undo_step(board, true);
 				}
 			}
 			piece_index++;
@@ -108,8 +108,8 @@ StepValue *MiniMaxAlgo2(Gameboard *board, int alpha, int beta, int search_depth,
  * 		1 - max-node
  */
 StepValue *MiniMaxAlgo3(Gameboard *board, int alpha, int beta, int search_depth, NodeType node_type, int eval_perspective, bool first_option) {
-	//printf("minimax: turn: %d, search_depth: %d, alpha: %d, beta: %d\n", board->turn, search_depth, alpha, beta);
-	//fflush(stdout);
+//	printf("minimax: turn: %d, search_depth: %d, alpha: %d, beta: %d\n", board->turn, search_depth, alpha, beta);
+//	fflush(stdout);
 	StepValue *best_sv = (StepValue *) malloc(sizeof(StepValue));
 	assert(best_sv != NULL);
 	best_sv->step = NULL; /* defalut */
@@ -125,28 +125,21 @@ StepValue *MiniMaxAlgo3(Gameboard *board, int alpha, int beta, int search_depth,
 		int piece_index = 0;
 		while ((alpha < beta) && (piece_index < 16)) { /* each player has 16 pieces */
 			Piece *current_piece = board->all_pieces[board->turn][piece_index];
-			//printf("\nnew piece: (%d, %d), color: %d, alive: %d",current_piece->col, current_piece->row, current_piece->colur, current_piece->alive);
-			//fflush(stdout);
 			if (current_piece->alive) {
 				int amount_steps = 0;
 				Step **valid_steps = get_all_valid_steps_of_piece_minimax(board, current_piece, &amount_steps);
-				//printf("\nnew piece: (%d, %d), n-steps: %d\n", current_piece->col, current_piece->row, amount_steps);
 				for (int step_index = 0; (step_index < amount_steps) && (alpha < beta); step_index++){
 					Step *step = valid_steps[step_index];
-					//printf("step: (%d, %d) -> (%d, %d)\n", step->scol, step->srow, step->dcol, step->drow);
-					set_step_minimax(board, step->srow, step->scol, step->drow, step->dcol);
+					set_step(board, step->srow, step->scol, step->drow, step->dcol, true);
 					StepValue *sv = MiniMaxAlgo3(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option);
 					if (update_ab(&alpha, &beta, sv->value, node_type, first_option)) {
 						//Step *good_step = ArrayListGetFirst(board->history);
-						//printf("better-step: (%d, %d) -> (%d, %d)\n", step->scol, step->srow, step->dcol, step->drow);
-						//printf("node-mode: %d, new-alpha: %d, new-beta: %d\n", node_type, alpha, beta);
-						//fflush(stdout);
 						destroy_step(best_sv->step);
 						best_sv->step = copy_step(step);
 					}
 					first_option = false;
 					destroy_step_value(sv);
-					undo_step_minimax(board);
+					undo_step(board, true);
 				}
 				free_all_valid_steps_minimax(valid_steps, current_piece->type);
 			}
@@ -161,14 +154,12 @@ StepValue *MiniMaxAlgo3(Gameboard *board, int alpha, int beta, int search_depth,
  * we assume the game is not over
  */
 Step *find_best_step(Gameboard *board, int search_depth) {
-	//printf("\nstart-of-move\n");
 	int alpha = INT_MIN;
 	int beta  = INT_MAX;
 	int eval_perspective = board->turn;
 	StepValue *best_sv = MiniMaxAlgo3(board, alpha, beta, search_depth, MaxNode, eval_perspective, true);
 	Step *best_step = copy_step(best_sv->step);
 	destroy_step_value(best_sv);
-	//printf("end-of-move\n");
 	return best_step;
 }
 
@@ -197,7 +188,7 @@ Move find_best_move(Gameboard *board, int search_depth) {
 		if (current_piece->alive) {
 			for (int step_index = 0; (step_index < current_piece->amount_steps) && (alpha < beta); step_index++){
 				Step *step = current_piece->steps[step_index];
-				set_step(board, step->srow, step->scol, step->drow, step->dcol);
+				set_step(board, step->srow, step->scol, step->drow, step->dcol, true);
 				int step_value = MiniMaxAlgo(board, alpha, beta, search_depth-1, 0, eval_perspective);
 				if ((step_value > alpha) || first_option) { /* we have found a better move or it's the first move to be considered */
 					first_option = false;
@@ -208,7 +199,7 @@ Move find_best_move(Gameboard *board, int search_depth) {
 					best_move.drow = good_step->drow;
 					best_move.dcol = good_step->dcol;
 				}
-				undo_step(board);
+				undo_step(board, true);
 			}
 		}
 		piece_index++;
@@ -233,10 +224,10 @@ int MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, int nod
 			if (current_piece->alive) {
 				for (int step_index = 0; (step_index < current_piece->amount_steps) && (alpha < beta); step_index++){
 					Step *step = current_piece->steps[step_index];
-					set_step(board, step->srow, step->scol, step->drow, step->dcol);
+					set_step(board, step->srow, step->scol, step->drow, step->dcol, true);
 					int step_value = MiniMaxAlgo(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective);
 					prune(&alpha, &beta, step_value, node_type);
-					undo_step(board);
+					undo_step(board, true);
 				}
 			}
 			piece_index++;

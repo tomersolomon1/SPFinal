@@ -8,9 +8,12 @@
 
 //LOG
 //extern FILE *f_log;
-//void write_to_log_file(const char *event){
+void write_to_log_file(const char *event){
+//	FILE *f_log = fopen("log.txt","a");
 //	fprintf(f_log, event);
-//}
+//	fclose(f_log);
+	printf(event); fflush(stdout);
+}
 
 //-------------------Vectors-------------------
 
@@ -79,7 +82,6 @@ Step *copy_step(Step *old){
 void destroy_step(Step *step){
 	if(step != NULL){
 		free(step);
-		//write_to_log_file("free step\n"); fflush(stdout);
 	}
 }
 

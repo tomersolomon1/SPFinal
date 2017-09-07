@@ -37,15 +37,14 @@ void check_GameBoard() {
 
 	Gameboard *game = create_board(1,1,1);
 	print_details_game(game);
-	set_step_minimax(game, 1,3,2,3);
+	set_step(game, 1,3,2,3,false);
 	print_details_game(game);
-	undo_step_minimax(game);
+	set_step(game, 6,2,5,2,false);
 	print_details_game(game);
-//	set_step_minimax(game, 6,2,5,2);
-
-//	set_step_minimax(game, 1,7,2,7);
-//	set_step_minimax(game,7,3,4,0);
-//
+	set_step(game, 1,7,2,7,false);
+	print_details_game(game);
+	set_step(game,7,3,4,0,false);
+	print_details_game(game);
 //	print_details_game(game);
 
 

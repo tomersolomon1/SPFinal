@@ -52,7 +52,7 @@ void destroyWindow(Window* src) {
 		destroyButton(src->buttons[i]);
 	}
 	if(src->type == Game){
-		//destroyData(src->data);
+		destory_data(src->data);
 	}
 	SDL_DestroyRenderer(src->windowRenderer);
 	SDL_DestroyWindow(src->window);

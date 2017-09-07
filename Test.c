@@ -20,12 +20,11 @@ int main(int argc, char *argv[]){
 			//check_parser();
 			console_tester();
 		} else if (strcmp(argv[1], "1") == 0) { /* Sapir's tests */
-//			f_log = fopen("C:\\Users\\sapir\\Desktop\\try.txt","a");
 //			check_GameBoard();
 //			console_tester();
 
 			run_gui();
-//			fclose(f_log);
+
 		} else if (strcmp(argv[1], "g") == 0) { /* game window (gui) test */
 			check_game_window();
 		}
