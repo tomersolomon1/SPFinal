@@ -13,6 +13,6 @@
 
 extern char *colors[];
 
-int manage_console(Gameboard *gameboard);
+void manage_console(Gameboard *gameboard);
 
 #endif /* CONSOLEMODE_H_ */

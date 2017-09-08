@@ -203,97 +203,75 @@ void reset_game(Gameboard **gameboard) {
 }
 
 /* return 1 if we should enter game-mode, and 0 if should quit */
-int manage_console(Gameboard *gameboard) {
-	char *commands_s[] = {"game_mode", "difficulty", "user_color", "load", "default", "print_setting", "start", \
-			"move", "save", "undo", "reset", "quit" };
+void manage_console(Gameboard *gameboard) {
 	bool keep_on = true;
-	char *line = NULL;
-	int res = 0;
 	Mode console_mode = SettingsMode;
 	printf("Specify game setting or type 'start' to begin a game with the current setting:\n"); /* !!!!!! to be printed each time we are in settings mode */
 	fflush(stdout);
 	int counter = 0; /* for debugging!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-	while (keep_on && counter < ROUNDS) {
+	while (keep_on) {
 		Command *comm;
-		line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1)); /* tentative, until moav says what should we do */
+		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
 		assert(line != NULL);
 		if(DEBUGGING_STATE) {
 			strcpy(line, debug_comm[counter]);
+			counter++;
 			comm = parser(line);
 		} else {
 			fgets(line, SP_MAX_LINE_LENGTH, stdin);
-			printf("line||%s\n", line);
+			printf("Debug - line||%s", line);
 			comm = parser(line);
 			free(line);
 		}
-		if (comm->comm_e == Ivalid_command) {
-			printf("ERROR: invalid command\n"); /* should ask in the forum? */
-		} else if ((comm->mode != console_mode) && (comm->mode != Both)) { /* the command is not appropriate in the current mode */
-			if (comm->comm_e == Undo_Move) {
-				printf("Undo command not avaialbe in 2 players mode\n"); /* "avaialbe" appears in the instructions PDF */
-			} else {
-				char *mode_s = (console_mode == SettingsMode) ? "Settings" : "Game";
-				printf("ERROR: command not appropriate to %s Mode\n", mode_s);
-			}
-
-		} else { /* appropriate command and enough args  */
-			if (!comm->need_arg && comm->extra_param) {
-				printf("ERROR: command '%s' shouldn't get any parameters", commands_s[comm->comm_e]);
-			} else if (comm->need_arg && comm->extra_param) {
-				printf("ERROR: command '%s' got too many parameters", commands_s[comm->comm_e]);
-			} else if(comm->need_arg && !comm->valid_arg) {
-				printf("ERROR: invalid parameter\n");
-			} else { /* the command is appropriate for the mode, and got enough parameters */
-				switch (comm->comm_e) {
-					case Start:
-						console_mode = GameMode;
-						begin_game(gameboard);
-						break;
-					case Set_GameMode:
-						set_game_mode(gameboard, comm);
-						break;
-					case Set_Difficulty:
-						set_difficulty(gameboard, comm);
-						break;
-					case Set_UserColor:
-						set_color(gameboard, comm);
-						break;
-					case Load:
-						if(load_file(&gameboard, comm)) { /* changes game-mode if loading succeeded */
-							console_mode = GameMode;
-						}
-						break;
-					case Restore_Default:
-						resore_default_values(gameboard);
-						break;
-					case Print_Settings:
-						print_settings(gameboard);
-						break;
-					case Make_Move:
-						keep_on = make_move(gameboard, comm);
-						break;
-					case Save:
-						save_game(gameboard, comm);
-						break;
-					case Undo_Move:
-						undo_move(gameboard);
-						break;
-					case Reset:
-						console_mode = SettingsMode;
-						reset_game(&gameboard);
-						break;
-					case Quit:
-						printf("Exiting...\n");
-						keep_on = false;
-						break;
-					case Ivalid_command: /* the compiler rises warning without this case */
-						break;
-				}
+		if (comm->comm_e == Ivalid_command  || (comm->mode != console_mode && comm->mode != Both)) {
+			printf("ERROR: invalid command\n");
+		} else { /* appropriate command  */
+			switch (comm->comm_e) {
+				case Start:
+					console_mode = GameMode;
+					begin_game(gameboard);
+					break;
+				case Set_GameMode:
+					set_game_mode(gameboard, comm);
+					break;
+				case Set_Difficulty:
+					set_difficulty(gameboard, comm);
+					break;
+				case Set_UserColor:
+					set_color(gameboard, comm);
+					break;
+				case Load:
+					load_file(&gameboard, comm);
+					break;
+				case Restore_Default:
+					resore_default_values(gameboard);
+					break;
+				case Print_Settings:
+					print_settings(gameboard);
+					break;
+				case Make_Move:
+					keep_on = make_move(gameboard, comm);
+					break;
+				case Save:
+					save_game(gameboard, comm);
+					break;
+				case Undo_Move:
+					undo_move(gameboard);
+					break;
+				case Reset:
+					console_mode = SettingsMode;
+					reset_game(&gameboard);
+					printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
+					break;
+				case Quit:
+					printf("Exiting...\n");
+					keep_on = false;
+					break;
+				case Ivalid_command: /* the compiler rises warning without this case */
+					break;
 			}
 		}
-		counter += 1; /* for debugging */
 		fflush(stdout);
 		free(comm);
 	}
-	return res;
 }

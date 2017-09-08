@@ -396,33 +396,33 @@ void more_file_commands() {
 	// exact parameters
 	char line1[] = "save f1.txt";
 	Command *comm = parser(line1);
-	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\ncomm->file_name: %s\n"
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->arg_in_range: %d\ncomm->file_name: %s\n"
 			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
-			line1, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+			line1, commands_es[comm->comm_e], comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
 	free_command(comm);
 
 	// too many parameters
 	char line2[] = "save f1.txt f2.txt";
 	comm = parser(line2);
-	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\ncomm->file_name: %s\n"
+	printf("line:%s|END|\ncomm->comm_e = %s,comm->arg_in_range: %d\ncomm->file_name: %s\n"
 			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
-			line2, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+			line2, commands_es[comm->comm_e], comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
 	free_command(comm);
 
 	// no parameters
 	char line3[] = "load ";
 	comm = parser(line3);
-	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\ncomm->file_name: %s\n"
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->arg_in_range: %d\ncomm->file_name: %s\n"
 			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
-			line3, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+			line3, commands_es[comm->comm_e], comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
 	free_command(comm);
 
 	// exact parameters, with offset
 	char line4[] = " 	 	load f1.txt";
 	comm = parser(line4);
-	printf("line:%s|END|\ncomm->comm_e = %s, comm->valid_arg: %d\ncomm->arg_in_range: %d\ncomm->file_name: %s\n"
+	printf("line:%s|END|\ncomm->comm_e = %s, comm->arg_in_range: %d\ncomm->file_name: %s\n"
 			"comm->arg1: %d, comm->arg2: %d, comm->arg3: %d, comm->arg4: %d\n\n",
-			line4, commands_es[comm->comm_e], comm->valid_arg, comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+			line4, commands_es[comm->comm_e], comm->args_in_range,comm->file_name, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
 	free_command(comm);
 }
 

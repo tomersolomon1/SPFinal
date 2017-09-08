@@ -111,7 +111,7 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
 	if (verify_command(comm, line, offset, comm_s, len)) {
 		int addi = get_non_whitespace_offset(line + offset + len);
 		if (addi == -1) { /* there isn't any parameter */
-			comm->arg_in_range = false;
+			comm->args_in_range = false;
 		} else {
 			int arg_offset = addi + offset + len;
 			comm->args_in_range = get_number(line, &arg_offset, &comm->arg1, '0', lower_bound, upper_bound, '\0', true);
@@ -255,21 +255,7 @@ Command *parser(const char *line) {
 
 //// ---------------------------------------- old code ---------------------
 
-/* line[offset] is the first char to be checked
- * when the function returns, comm->extra_param is true if there are non-whitespace chars after offset
- * not needed!!!!!!!!!
- */
-void valid_tail(Command *comm, const char *line, int offset) {
-	comm->extra_param = false; /* optimistic approach */
-	while ((offset < SP_MAX_LINE_LENGTH) && (line[offset] != '\0') && (line[offset] != '\n')) {
-		if (!isspace(line[offset])) {
-		    /* more non-whitespace chars than should be, therefore illegal command */
-			comm->extra_param = true;
-			return; /* no need for further evaluations */
-		}
-		offset++;
-	}
-}
+
 
 bool get_number_old(const char *line, int *offset, int *arg, char range_offset) {
 	int n = 0;
