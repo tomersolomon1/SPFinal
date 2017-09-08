@@ -61,7 +61,6 @@ void get_command_with_file_name(Command *comm, const char *line, int offset, con
 		int addi_offset = get_non_whitespace_offset(line + offset + len);
 		if (addi_offset == -1) {
 			comm->file_name = NULL;
-
 		} else {
 			int file_name_offset =  addi_offset + offset + len;
 			comm->file_name = (char *) malloc(sizeof(char) * MAX_FILE_NAME);
@@ -131,25 +130,25 @@ bool getXY(Command *comm, const char *line, int *offset, int *row, int *col, int
 		if (line[*offset] == '<') { /* the coordinate should start with '<'*/
 			(*offset)++;
 			comm->args_in_range = get_number(line, offset, row, '1', 0, 7, ',', false) && comm->args_in_range;
-			if (line[*offset] != ','){ /* probably redundant?? */
+			if ((line[*offset] != ',') || (!comm->args_in_range)){ /* if first argument is faulty, no need for further parsing */
 				comm->args_in_range = false;
 				return false;
 			}
 			(*offset)++;
 			comm->args_in_range = get_number(line, offset, col, 'A', 0, 7, '>', false) && comm->args_in_range;
 			if (line[*offset] != '>') { /* should be at the end of the parameter */
-				return false; /* probably redundant?? */
+				comm->args_in_range = false;
 			}
 			(*offset)++;
 			if (!isspace(line[(*offset)]) && (first_coordinate || line[*offset] != '\0')) {
-				return false;
+				comm->args_in_range = false;
 			} /* after the first parameter should be a whitespace, and after the second parameter it's ok to have whitespace or '\0' */
 
 		} else {
-			return false;
+			comm->args_in_range = false;
 		}
 	}
-	return true;
+	return comm->args_in_range;
 }
 
 void get_move_arg(Command *comm, const char *line, int offset) {
@@ -168,7 +167,7 @@ void get_move_arg(Command *comm, const char *line, int offset) {
 	offset = additional_offset + offset + len;
 	int needed_space = strlen("<x,y> "); /* also need room for the whitespace after the first coordinate, and '\0' or whitespace after the second coordinate */
 	bool got_param = getXY(comm, line, &offset, &(comm->arg1), &(comm->arg2), needed_space, true); /* getting the first coordinate */
-	if ((!got_param) || (!comm->args_in_range)) {
+	if (!got_param) {
 		return;  /* something is wrong with the first coordinate, no need for further parsing */
 	}
 	additional_offset = get_non_whitespace_offset(line + offset);
@@ -176,8 +175,9 @@ void get_move_arg(Command *comm, const char *line, int offset) {
 		comm->comm_e = Ivalid_command;
 		return;  /* no need for further parsing */
 	}
+	//printf("additional_offset: %d\n", additional_offset);
 	offset += additional_offset;
-	if ((offset >= SP_MAX_LINE_LENGTH - 2) || (line[offset] == 't') || (line[offset+1] == 'o')) { /* something wrong with the "to" */
+	if ((offset >= SP_MAX_LINE_LENGTH - 2) || (line[offset] != 't') || (line[offset+1] != 'o')) { /* something wrong with the "to" */
 		comm->comm_e = Ivalid_command;
 		return;  /* no need for further parsing */
 	}
