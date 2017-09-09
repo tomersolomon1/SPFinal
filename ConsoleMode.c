@@ -124,13 +124,12 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 /* return false if the game is over, otherwise return true */
 bool make_move(Gameboard *gameboard, Command *comm) {
 	char *colors[] = {"black", "white"};
-	//printf("make_move - move: <%d, %d> to <%d, %d>\n", comm->arg1, comm->arg2, comm->arg3, comm->arg4); /* for debugging */
-	if (comm->args_in_range) { /* the move coordinates represent a valid squares */
+	if (comm->args_in_range) { /* the move coordinates represent a valid squares on the board */
 		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
 		if (move_consequences == 1) { /* the game is over */
 			return false;
 		} else if (move_consequences == 2) { /* legal move, and the game is still on */
-			if (gameboard->game_mode == 2) { /* there are two different players */
+			if (gameboard->game_mode == 2) { /* there are two players */
 				print_board(gameboard);
 				printf("%s player - enter your move:\n", colors[gameboard->turn]);
 				return true;
@@ -157,15 +156,44 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 	}
 }
 
+bool castling_move(Gameboard *gameboard, Command *comm) {
+	if (!comm->args_in_range) {
+		printf("Invalid position on the board\n");
+		return true;
+	} else if (gameboard->board[comm->arg1][comm->arg2]->colur != gameboard->turn) {
+		printf("The specified position does not contain your piece\n");
+		return true;
+	} else if (gameboard->board[comm->arg1][comm->arg2]->type != Rock) {
+		printf("Wrong position for a rook\n");
+		return true;
+	} else if (gameboard->board[comm->arg1][comm->arg2]->has_moved
+			|| gameboard->all_pieces[gameboard->turn][KING_INDEX]->has_moved) {
+		printf("Illegal castling move\n"); /* we can't have castling if the rock or the king has moved */
+		return true;
+	} else {
+		// the rock is fine, we to check the king is in the right place
+		int base_row = gameboard->turn ? WHITE_ROW : BLACK_ROW;
+		int dcol = (comm->arg2 == 7) ? 6 : 2; /* the king should move to <row,G> or <row,C> */
+		comm->arg1 = base_row;
+		comm->arg2 = KING_STARTING_COL;
+		comm->arg3 = base_row;
+		comm->arg4 = dcol;
+		if (!is_valid_step(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4)) {
+			printf("Illegal castling move\n"); /* we can't have castling if */
+			return true;
+		}
+		return make_move(gameboard, comm);
+	}
+}
+
+/* used for sorting the steps by qsort function */
 int steps_comperator(const void *p, const void *q) {
 	Step **step1 = (Step **) p;
 	Step **step2 = (Step **) q;
 	if ((*step1)->drow == (*step2)->drow) {
 		return (*step1)->dcol - (*step2)->dcol;
-		//return 0;
 	} else {
 		return (*step1)->drow - (*step2)->drow;
-		//return 0;
 	}
 }
 
@@ -191,8 +219,6 @@ void present_moves(Gameboard *gameboard, Piece *piece) {
 }
 
 void get_moves(Gameboard *gameboard, Command *comm) {
-	printf("get moves!\n");
-	fflush(stdout);
 	if (gameboard->game_mode != 1 || (gameboard->difficulty != 1 && gameboard->difficulty != 2)) {
 		printf("ERROR: invalid command\n"); /* get_moves is only supported in game-mode 1, and difficulty levels 1 and 2 */
 		return;
@@ -288,7 +314,10 @@ void manage_console(Gameboard *gameboard) {
 					print_settings(gameboard);
 					break;
 				case Make_Move:
-					keep_on = make_move(gameboard, comm);
+					keep_on = make_move(gameboard, comm); /* so we know if the game is over */
+					break;
+				case Castle:
+					keep_on = castling_move(gameboard, comm); /* so we know if the game is over */
 					break;
 				case Get_Moves:
 					get_moves(gameboard, comm);

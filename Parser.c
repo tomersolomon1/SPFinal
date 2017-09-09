@@ -170,7 +170,7 @@ void coordinates_commands(Command *comm, const char *line, int offset, const cha
 	int needed_space = strlen("<x,y> "); /* also need room for the whitespace after the first coordinate, and '\0' or whitespace after the second coordinate */
 	bool got_param = getXY(comm, line, &offset, &(comm->arg1), &(comm->arg2), needed_space, is_move_commands); /* getting the first coordinate */
 	if ((!got_param) || (!is_move_commands)) {
-		return;  /* something is wrong with the first coordinate or it's get_moves command, no need for further parsing */
+		return;  /* something is wrong with the first coordinate or it's get_moves or castling command, no need for further parsing */
 	}
 	additional_offset = get_non_whitespace_offset(line + offset);
 	if (additional_offset == -1) { /* didn't find the "to" */
@@ -204,6 +204,9 @@ Command *parser(const char *line) {
 	int offset = get_non_whitespace_offset(line);
 	if ((offset == -1) || (offset+1 >= SP_MAX_LINE_LENGTH)) { return comm; } /* invalid command */
 	switch (line[offset]) { /* switching the leading char of the command */
+		case 'c': /* 'castle' */
+			coordinates_commands(comm, line, offset, "castle", Castle);
+			break;
 		case 'g': /* 'game_mode' or 'get_moves' */
 			switch (line[offset+1]) {
 			case 'a': /* 'game_mode' */
@@ -265,29 +268,3 @@ Command *parser(const char *line) {
 	return comm;
 }
 
-
-//// ---------------------------------------- old code ---------------------
-
-
-
-bool get_number_old(const char *line, int *offset, int *arg, char range_offset) {
-	int n = 0;
-	bool number_validity = true; /* we are optimistic */
-	while (*offset < SP_MAX_LINE_LENGTH && line[*offset] == '0') {
-		(*offset)++;
-	} /* we consume all the zeroes */
-
-	while (*offset < SP_MAX_LINE_LENGTH && !isspace(line[*offset]) && line[*offset] != '\0' && line[*offset] != ',' && line[*offset] != '>') {
-		int m = line[*offset] - range_offset; /* typical values: range_offset = '@' or '1' or '0' ('@' is the char before 'A' in the ascii table  */
-		//printf("m = %d, line[%d], = %c\n", m, *offset, line[*offset]);
-		(*offset)++;
-		n *= 10;
-		n += m;
-		if (m < 0) {
-			number_validity = false; /* there is some problem with the input */
-			break;
-		}
-	}
-	*arg = number_validity ? n : -1; /* is illegal parameter for all our commands */
-	return number_validity;
-}

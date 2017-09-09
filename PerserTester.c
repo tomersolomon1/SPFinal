@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 char *commands_es[] = {"Set_GameMode", "Set_Difficulty", "Set_UserColor", "Load", "Restore_Default", "Print_Settings", "Start",\
-			"Make_Move", "Get_Moves", "Save", "Undo_Move", "Reset",\
+			"Make_Move", "Castle", "Get_Moves", "Save", "Undo_Move", "Reset",\
 			"Quit", "Ivalid_command"}; /* string representation of the enums */
 
 void no_arg_commands() {

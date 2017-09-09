@@ -24,6 +24,7 @@ typedef enum {
 
 	/* Game-Mode commands */
 	Make_Move,
+	Castle,
 	Get_Moves,
 	Save,
 	Undo_Move,

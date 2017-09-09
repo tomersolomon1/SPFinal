@@ -14,7 +14,11 @@
 
 #define HISTORY_SIZE 3
 #define BOARD_SIZE 8
+#define BLACK_ROW 7
+#define WHITE_ROW 0
+#define KING_STARTING_COL 4
 #define AMOUNT_PIECES_PER_COLOR 16
+#define KING_INDEX 15
 
 #define MIN(A,B) (((A) < (B)) ? (A) : (B))
 #define MAX(A,B) (((A) > (B)) ? (A) : (B))
