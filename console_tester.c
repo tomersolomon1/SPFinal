@@ -26,7 +26,7 @@ void test_strings() {
 void console_tester() {
 	Gameboard *gameboard = create_board(1, 2, 1);
 	manage_console(gameboard);
-	destroy_board(gameboard);
+	//destroy_board(gameboard);
 }
 
 void emulate_problem() {

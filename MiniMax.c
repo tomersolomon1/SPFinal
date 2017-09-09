@@ -88,8 +88,6 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 					Step *step = valid_steps[step_index];
 					set_step(board, step->srow, step->scol, step->drow, step->dcol, true);
 					StepValue *sv = MiniMaxAlgo(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option);
-					if(current_piece->type == Queen && search_depth == 4) //print queen steps of first level
-							print_step(step); printf("value: %d\n-------------------\n", sv->value); fflush(stdout);
 					if (update_ab(&alpha, &beta, sv->value, node_type, first_option)) {
 						//Step *good_step = ArrayListGetFirst(board->history);
 						destroy_step(best_sv->step);

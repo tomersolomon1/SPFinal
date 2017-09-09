@@ -158,12 +158,15 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 }
 
 int steps_comperator(const void *p, const void *q) {
-	Step *step1 = (Step *) p;
-	Step *step2 = (Step *) q;
-	if (step1->drow < step2->drow) {
-		return -1;
+	Step **step1 = (Step **) p;
+	Step **step2 = (Step **) q;
+	if ((*step1)->drow == (*step2)->drow) {
+		return (*step1)->dcol - (*step2)->dcol;
+		//return 0;
+	} else {
+		return (*step1)->drow - (*step2)->drow;
+		//return 0;
 	}
-	return 0;
 }
 
 void present_moves(Gameboard *gameboard, Piece *piece) {
@@ -176,6 +179,9 @@ void present_moves(Gameboard *gameboard, Piece *piece) {
 		for (int i = 0; i < piece->amount_steps; i++) {
 			Step *step = piece->steps[i];
 			printf("<%c,%c>", decimal_numbers[step->drow], ABC[step->dcol]);
+			if (step->is_threatened) {
+				printf("*");
+			}
 			if (gameboard->board[step->drow][step->dcol]->colur == opponent_color) {
 				printf("^");
 			}
@@ -185,6 +191,8 @@ void present_moves(Gameboard *gameboard, Piece *piece) {
 }
 
 void get_moves(Gameboard *gameboard, Command *comm) {
+	printf("get moves!\n");
+	fflush(stdout);
 	if (gameboard->game_mode != 1 || (gameboard->difficulty != 1 && gameboard->difficulty != 2)) {
 		printf("ERROR: invalid command\n"); /* get_moves is only supported in game-mode 1, and difficulty levels 1 and 2 */
 		return;
@@ -251,7 +259,6 @@ void manage_console(Gameboard *gameboard) {
 		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
 		assert(line != NULL);
 		fgets(line, SP_MAX_LINE_LENGTH, stdin);
-		printf("Debug - line||%s", line);
 		Command *comm = parser(line);
 		free(line);
 		if (comm->comm_e == Ivalid_command  || (comm->mode != console_mode && comm->mode != Both)) {
@@ -284,6 +291,7 @@ void manage_console(Gameboard *gameboard) {
 					keep_on = make_move(gameboard, comm);
 					break;
 				case Get_Moves:
+					get_moves(gameboard, comm);
 					break;
 				case Save:
 					save_game(gameboard, comm);
@@ -306,6 +314,6 @@ void manage_console(Gameboard *gameboard) {
 		}
 		fflush(stdout);
 		free(comm);
-		free(gameboard);
 	}
+	destroy_board(gameboard);
 }
