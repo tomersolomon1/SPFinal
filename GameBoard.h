@@ -19,6 +19,7 @@
 #define KING_STARTING_COL 4
 #define AMOUNT_PIECES_PER_COLOR 16
 #define KING_INDEX 15
+#define KING_SIDE_CASTLING_COL 6
 
 #define MIN(A,B) (((A) < (B)) ? (A) : (B))
 #define MAX(A,B) (((A) > (B)) ? (A) : (B))

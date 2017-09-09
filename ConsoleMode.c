@@ -94,7 +94,7 @@ void print_settings(Gameboard *gameboard) {
 
 
 /* return 0 if it's illegal move, 1 if the game is over, and 2 if the game is not over */
-int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol) {
+int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol, bool user_turn) {
 	char *colors[] = {"black", "white"};
 	CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, drow, dcol, false);
 	if (move_message != CHESS_BOARD_SUCCESS) {
@@ -110,22 +110,34 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 			printf("Checkmate! %s player wins the game\n", colors[game_over]);
 			return 1;
 		} else if (game_over == 2) {
-			printf("The game is tied\n");
+			if (user_turn) {
+				printf("The game is tied\n");
+			} else { /* it was the computer's turn */
+				printf("The game ends in a tie\n");
+			}
 			return 1;
 		} else { /* the game is still on! */
 			if(is_under_check(gameboard)) {
-				printf("Check: %s King is threatened!\n\n", colors[gameboard->turn]);
+				if (user_turn) {
+					printf("Check: %s King is threatened!\n\n", colors[gameboard->turn]);
+				} else { /* it was the computer's turn */
+					printf("Check!\n");
+				}
 			}
 		}
 	}
 	return 2; /* the game is still on */
 }
 
+bool is_castling(Step *step) {
+	return step->is_threatened; /* just for compiling, to be changed later on */
+}
+
 /* return false if the game is over, otherwise return true */
 bool make_move(Gameboard *gameboard, Command *comm) {
 	char *colors[] = {"black", "white"};
 	if (comm->args_in_range) { /* the move coordinates represent a valid squares on the board */
-		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
+		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4, true);
 		if (move_consequences == 1) { /* the game is over */
 			return false;
 		} else if (move_consequences == 2) { /* legal move, and the game is still on */
@@ -134,10 +146,18 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 				printf("%s player - enter your move:\n", colors[gameboard->turn]);
 				return true;
 			} else { /* it's now the computer turn */
+				char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 				Gameboard *copy = copy_board(gameboard);
 				Step *step = find_best_step(copy, copy->difficulty);
+				if (is_castling(step)) {
+					int rock_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
+					printf("Computer: castle King at <%d,%c> and Rook at <%d,%c>\n", 1+step->srow, ABC[step->scol],  1+step->srow, ABC[rock_col]);
+				} else {
+					//char *pieces_str = {"pawn", "knight", "bishop", "rook", "king"};
+					printf("Computer: move [pawn|bishop|knight|rook|queen] at <x,y> to <i,j>\n");
+				}
 				destroy_board(copy);
-				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol);
+				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false);
 				destroy_step(step);
 				if (move_consequences == 1) { /* the game is over */
 					return false;
