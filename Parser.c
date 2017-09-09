@@ -151,12 +151,14 @@ bool getXY(Command *comm, const char *line, int *offset, int *row, int *col, int
 	return comm->args_in_range;
 }
 
-void get_move_arg(Command *comm, const char *line, int offset) {
-	comm->comm_e = Make_Move;
+void coordinates_commands(Command *comm, const char *line, int offset, const char *comm_name,
+		SP_commands type) {
+	comm->comm_e = type;
 	comm->mode = GameMode;
 	comm->args_in_range = true; /* let's be optimistic */
-	int len = strlen("move");
-	if (!verify_command(comm, line, offset, "move", len)) { /* not "move" after all... */
+	bool is_move_commands = (type == Make_Move);
+	int len = strlen(comm_name);
+	if (!verify_command(comm, line, offset, comm_name, len)) { /* not "move" after all... */
 		return; /* no need for further evaluation */
 	}
 	int additional_offset = get_non_whitespace_offset(line + offset + len);
@@ -166,16 +168,15 @@ void get_move_arg(Command *comm, const char *line, int offset) {
 	}
 	offset = additional_offset + offset + len;
 	int needed_space = strlen("<x,y> "); /* also need room for the whitespace after the first coordinate, and '\0' or whitespace after the second coordinate */
-	bool got_param = getXY(comm, line, &offset, &(comm->arg1), &(comm->arg2), needed_space, true); /* getting the first coordinate */
-	if (!got_param) {
-		return;  /* something is wrong with the first coordinate, no need for further parsing */
+	bool got_param = getXY(comm, line, &offset, &(comm->arg1), &(comm->arg2), needed_space, is_move_commands); /* getting the first coordinate */
+	if ((!got_param) || (!is_move_commands)) {
+		return;  /* something is wrong with the first coordinate or it's get_moves command, no need for further parsing */
 	}
 	additional_offset = get_non_whitespace_offset(line + offset);
 	if (additional_offset == -1) { /* didn't find the "to" */
 		comm->comm_e = Ivalid_command;
 		return;  /* no need for further parsing */
 	}
-	//printf("additional_offset: %d\n", additional_offset);
 	offset += additional_offset;
 	if ((offset >= SP_MAX_LINE_LENGTH - 2) || (line[offset] != 't') || (line[offset+1] != 'o')) { /* something wrong with the "to" */
 		comm->comm_e = Ivalid_command;
@@ -190,16 +191,28 @@ void get_move_arg(Command *comm, const char *line, int offset) {
 	getXY(comm, line, &offset, &(comm->arg3), &(comm->arg4), needed_space, false); /* getting the second coordinate */
 }
 
-Command *parser(const char *line) {
+Command *init_command() {
 	Command *comm = (Command *) malloc(sizeof(Command));
 	assert(comm != NULL);
 	comm->comm_e =  Ivalid_command;
 	comm->file_name = NULL;
+	return comm;
+}
+
+Command *parser(const char *line) {
+	Command *comm = init_command();
 	int offset = get_non_whitespace_offset(line);
 	if ((offset == -1) || (offset+1 >= SP_MAX_LINE_LENGTH)) { return comm; } /* invalid command */
 	switch (line[offset]) { /* switching the leading char of the command */
-		case 'g': /* 'game_mode' */
-			get_int_arg(comm, line, offset, "game_mode", 1, 2, Set_GameMode, SettingsMode);
+		case 'g': /* 'game_mode' or 'get_moves' */
+			switch (line[offset+1]) {
+			case 'a': /* 'game_mode' */
+				get_int_arg(comm, line, offset, "game_mode", 1, 2, Set_GameMode, SettingsMode);
+				break;
+			case 'e': /* 'game_mode' or 'get_moves' */
+				coordinates_commands(comm, line, offset, "get_moves", Get_Moves);
+				break; /* 'get_moves' */
+			}
 			break;
 		case 'd': /* either 'difficulty' or 'default' */
 			switch (line[offset+1]) {
@@ -238,7 +251,7 @@ Command *parser(const char *line) {
 			};
 			break;
 		case 'm': /* 'move' */
-			get_move_arg(comm, line, offset);
+			coordinates_commands(comm, line, offset, "move", Make_Move);
 			break;
 		case 'r': /* 'reset' */
 			get_non_arg_command(comm, line, offset, "reset", Reset, GameMode);

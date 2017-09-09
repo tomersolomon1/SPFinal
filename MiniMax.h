@@ -33,7 +33,7 @@ int sumup_pieces(Gameboard *board, int color);
 int eval(Gameboard *board, int eval_perspective);
 void prune(int *alpha, int *beta, int step_value, int node_type);
 Move find_best_move(Gameboard *board, int search_depth); /* old version of the min-max algo*/
-int MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, int node_type, int eval_perspective);
+StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, NodeType node_type, int eval_perspective, bool first_option);
 Step *find_best_step(Gameboard *board, int search_depth); /* new version of the min-max algo*/
 
 

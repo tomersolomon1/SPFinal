@@ -16,20 +16,14 @@
 #include "MiniMax.h"
 #include "Files.h"
 
-# define DEBUGGING_STATE 0 /* for debugging purposes */
-# define ROUNDS			 100 /* for debugging purposes */
-
-
-// "load s1.txt\n"
-char *debug_comm[] = {"start", "move <1,B> to <3,C>\n", "move <2,C> to <4,C>\n", "move <2,F> to <4,F>\n"};
-
 void begin_game(Gameboard *gameboard) {
 	char *colors[] = {"black", "white"};
 	if (gameboard->game_mode == 1 && gameboard->user_color == 0) { /* performs a computer move only in mode 1, and if the user plays as black */
 		Gameboard *copy = copy_board(gameboard);
-		Move move = find_best_move(copy, gameboard->difficulty);
+		Step *step = find_best_step(copy, copy->difficulty);
 		destroy_board(copy);
-		set_step(gameboard, move.srow, move.scol, move.drow, move.dcol, false);
+		set_step(gameboard, step->srow, step->scol, step->drow, step->dcol, false);
+		destroy_step(step);
 	}
 	print_board(gameboard);
 	printf("%s player - enter your move:\n", colors[gameboard->user_color]);
@@ -131,7 +125,7 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 bool make_move(Gameboard *gameboard, Command *comm) {
 	char *colors[] = {"black", "white"};
 	//printf("make_move - move: <%d, %d> to <%d, %d>\n", comm->arg1, comm->arg2, comm->arg3, comm->arg4); /* for debugging */
-	if (in_range(comm->arg1) && in_range(comm->arg2) && in_range(comm->arg3) && in_range(comm->arg4)) { /* the move coordinates represent a valid squares */
+	if (comm->args_in_range) { /* the move coordinates represent a valid squares */
 		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4);
 		if (move_consequences == 1) { /* the game is over */
 			return false;
@@ -142,9 +136,10 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 				return true;
 			} else { /* it's now the computer turn */
 				Gameboard *copy = copy_board(gameboard);
-				Move move = find_best_move(copy, gameboard->difficulty);
+				Step *step = find_best_step(copy, copy->difficulty);
 				destroy_board(copy);
-				move_consequences = make_single_move(gameboard, move.srow, move.scol, move.drow, move.dcol);
+				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol);
+				destroy_step(step);
 				if (move_consequences == 1) { /* the game is over */
 					return false;
 				} else { /* the game is still on */
@@ -160,6 +155,50 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 		printf("Invalid position on the board\n");
 		return true; /* the game is still on */
 	}
+}
+
+int steps_comperator(const void *p, const void *q) {
+	Step *step1 = (Step *) p;
+	Step *step2 = (Step *) q;
+	if (step1->drow < step2->drow) {
+		return -1;
+	}
+	return 0;
+}
+
+void present_moves(Gameboard *gameboard, Piece *piece) {
+	char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+	char decimal_numbers[] = { '1', '2', '3', '4', '5', '6', '7', '8'};
+	int opponent_color = 1 - piece->colur;
+	if (piece->amount_steps > 0) {
+		int step_size = sizeof(piece->steps[0]); /* there should be at least one step, since piece->amount_steps > 0 */
+		qsort((void*) piece->steps, piece->amount_steps, step_size, steps_comperator);
+		for (int i = 0; i < piece->amount_steps; i++) {
+			Step *step = piece->steps[i];
+			printf("<%c,%c>", decimal_numbers[step->drow], ABC[step->dcol]);
+			if (gameboard->board[step->drow][step->dcol]->colur == opponent_color) {
+				printf("^");
+			}
+			printf("\n");
+		}
+	}
+}
+
+void get_moves(Gameboard *gameboard, Command *comm) {
+	if (gameboard->game_mode != 1 || (gameboard->difficulty != 1 && gameboard->difficulty != 2)) {
+		printf("ERROR: invalid command\n"); /* get_moves is only supported in game-mode 1, and difficulty levels 1 and 2 */
+		return;
+	}
+	if (!comm->args_in_range) {
+		printf("Invalid position on the board\n");
+		return;
+	}
+	if (gameboard->board[comm->arg1][comm->arg2]->colur != gameboard->user_color) {
+		char *colors[] = {"black", "white"};
+		printf("The specified position does not contain %s player piece\n", colors[gameboard->user_color]);
+		return;
+	}
+	present_moves(gameboard, gameboard->board[comm->arg1][comm->arg2]);
 }
 
 void save_game(Gameboard *gameboard, Command *comm) {
@@ -208,21 +247,13 @@ void manage_console(Gameboard *gameboard) {
 	Mode console_mode = SettingsMode;
 	printf("Specify game setting or type 'start' to begin a game with the current setting:\n"); /* !!!!!! to be printed each time we are in settings mode */
 	fflush(stdout);
-	int counter = 0; /* for debugging!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 	while (keep_on) {
-		Command *comm;
 		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
 		assert(line != NULL);
-		if(DEBUGGING_STATE) {
-			strcpy(line, debug_comm[counter]);
-			counter++;
-			comm = parser(line);
-		} else {
-			fgets(line, SP_MAX_LINE_LENGTH, stdin);
-			printf("Debug - line||%s", line);
-			comm = parser(line);
-			free(line);
-		}
+		fgets(line, SP_MAX_LINE_LENGTH, stdin);
+		printf("Debug - line||%s", line);
+		Command *comm = parser(line);
+		free(line);
 		if (comm->comm_e == Ivalid_command  || (comm->mode != console_mode && comm->mode != Both)) {
 			printf("ERROR: invalid command\n");
 		} else { /* appropriate command  */
@@ -252,6 +283,8 @@ void manage_console(Gameboard *gameboard) {
 				case Make_Move:
 					keep_on = make_move(gameboard, comm);
 					break;
+				case Get_Moves:
+					break;
 				case Save:
 					save_game(gameboard, comm);
 					break;
@@ -273,5 +306,6 @@ void manage_console(Gameboard *gameboard) {
 		}
 		fflush(stdout);
 		free(comm);
+		free(gameboard);
 	}
 }

@@ -76,9 +76,10 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 void gui_first_move(Gameboard *board) {
 	if (board->game_mode == 1 && board->turn == abs(1-board->user_color)) {
 		Gameboard *copy = copy_board(board);
-		Move move = find_best_move(copy, copy->difficulty);
+		Step *step = find_best_step(copy, copy->difficulty);
 		destroy_board(copy);
-		set_step(board, move.srow, move.scol, move.drow, move.dcol, false);
+		set_step(board, step->srow, step->scol, step->drow, step->dcol, false);
+		destroy_step(step);
 	}
 }
 

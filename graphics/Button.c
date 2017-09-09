@@ -18,14 +18,14 @@ Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 	}
 	// Allocate data
 	Button *button = (Button*) malloc(sizeof(Button));
+	assert(button != NULL);
 	SDL_Surface* loadingSurface1        = SDL_LoadBMP(active_image); // We use the surface as a temp var;
 	SDL_Surface* loadingSurface2        = SDL_LoadBMP(inactive_image); // We use the surface as a temp var;
 	SDL_Texture* active_buttonTexture   = SDL_CreateTextureFromSurface(windowRender, loadingSurface1);
 	SDL_Texture* inactive_buttonTexture = SDL_CreateTextureFromSurface(windowRender, loadingSurface2);
 
-	if (button == NULL || loadingSurface1 == NULL || loadingSurface2 == NULL
+	if (loadingSurface1 == NULL || loadingSurface2 == NULL
 			|| active_buttonTexture == NULL || inactive_buttonTexture == NULL) {
-		free(button);
 		free(button);
 		SDL_FreeSurface(loadingSurface1); // It's safe to pass NULL
 		SDL_FreeSurface(loadingSurface2); // It's safe to pass NULL

@@ -16,16 +16,15 @@
 //FILE *f_log;
 int main(int argc, char *argv[]){
 	if (argc == 2) {
-		if (strcmp(argv[1], "0") == 0) { /* Tomer's tests  */
-			//check_parser();
+		if (strcmp(argv[1], "0") == 0) { /* console test  */
 			console_tester();
 		} else if (strcmp(argv[1], "1") == 0) { /* Sapir's tests */
 //			check_GameBoard();
-//			console_tester();
 			run_gui();
-
 		} else if (strcmp(argv[1], "g") == 0) { /* game window (gui) test  */
 			check_game_window();
+		} else if (strcmp(argv[1], "p") == 0) { /* parser test */
+			check_parser();
 		}
 	}
 	return 0;
