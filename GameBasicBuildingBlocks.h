@@ -54,8 +54,9 @@ typedef enum {
 typedef enum{
 	Was_not_moved,
 	Was_moved,
-	Was_promoted
-}Piece_state;
+	Was_promoted,
+	Castling_move
+} Piece_state;
 
 //A progressing vector on the board:
 typedef struct Vector_t{

@@ -24,22 +24,28 @@
 #define MIN(A,B) (((A) < (B)) ? (A) : (B))
 #define MAX(A,B) (((A) > (B)) ? (A) : (B))
 #define SWITCHED(x) abs(1 - (x))
-#define IS_CASTLING_STEP(x) (((x)->type == King) && (abs((x)->dcol - (x)->scol) > 1) && ((x)->srow == (x)->drow))
+#define IS_CASTLING_STEP(X, Y) (((X)->type == King) && (abs((Y)->dcol - (Y)->scol) > 1) && ((Y)->srow == (Y)->drow))
 
 
 
 typedef struct gameboard_t  {
-	/*all_pieces: a list of all game pieces
-	*all_pieces[black=0] for black pieces
-	*all_pieces[white=1] for white pieces*/
+   /* all_pieces: a list of all game pieces
+	* all_pieces[black=0] for black pieces
+	* all_pieces[white=1] for white pieces
+	*/
 	Piece *all_pieces[2][AMOUNT_PIECES_PER_COLOR];
-	Piece *board[BOARD_SIZE][BOARD_SIZE]; //the board itself, with pointers to the pieces by their place
-	int turn; //current turn
+
+	/* the board itself, contains pointers to the pieces by their place
+	 * accessing by board[row][col]
+	 */
+	Piece *board[BOARD_SIZE][BOARD_SIZE];
+
+	int turn; // current turn
 	ArrayList *history; //array list for saving history
-	Piece *empty; //the game's empty piece
-	int game_mode; //=1 for 1-player, =2 for 2-player
-	int difficulty; //=1-4 by the difficulty level
-	int user_color; //the user color
+	Piece *empty; // the game's "empty piece"
+	int game_mode; // 1 for 1-player, =2 for 2-player
+	int difficulty; // range: 1-4, the difficulty level
+	int user_color; // the user color: black = 0, white = 1
 } Gameboard;
 
 typedef enum chess_board_message_t {

@@ -129,10 +129,6 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 	return 2; /* the game is still on */
 }
 
-bool is_castling(Step *step) {
-	return step->is_threatened; /* just for compiling, to be changed later on */
-}
-
 /* return false if the game is over, otherwise return true */
 bool make_move(Gameboard *gameboard, Command *comm) {
 	char *colors[] = {"black", "white"};
@@ -149,14 +145,15 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 				char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 				Gameboard *copy = copy_board(gameboard);
 				Step *step = find_best_step(copy, copy->difficulty);
-				if (is_castling(step)) {
+				destroy_board(copy); /* we don't need it anymore */
+				Piece *moving_piece = gameboard->board[step->srow][step->scol];
+				if (IS_CASTLING_STEP(moving_piece, step)) {
 					int rock_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
 					printf("Computer: castle King at <%d,%c> and Rook at <%d,%c>\n", 1+step->srow, ABC[step->scol],  1+step->srow, ABC[rock_col]);
 				} else {
-					//char *pieces_str = {"pawn", "knight", "bishop", "rook", "king"};
-					printf("Computer: move [pawn|bishop|knight|rook|queen] at <x,y> to <i,j>\n");
+					char *pieces_str[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
+					printf("Computer: move %s at <%d,%c> to <%d,%c>\n", pieces_str[moving_piece->type], 1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->scol]);
 				}
-				destroy_board(copy);
 				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false);
 				destroy_step(step);
 				if (move_consequences == 1) { /* the game is over */
@@ -210,6 +207,13 @@ bool castling_move(Gameboard *gameboard, Command *comm) {
 int steps_comperator(const void *p, const void *q) {
 	Step **step1 = (Step **) p;
 	Step **step2 = (Step **) q;
+	if ((*step1)->src_previous_state == Castling_move && (*step2)->src_previous_state == Castling_move) {
+		return (*step1)->dcol - (*step2)->dcol; /* dcol */
+	} else if ((*step1)->src_previous_state == Castling_move && (*step2)->src_previous_state != Castling_move) {
+		return -1;
+	} else if ((*step1)->src_previous_state != Castling_move && (*step2)->src_previous_state == Castling_move) {
+		return 1;
+	}
 	if ((*step1)->drow == (*step2)->drow) {
 		return (*step1)->dcol - (*step2)->dcol;
 	} else {
