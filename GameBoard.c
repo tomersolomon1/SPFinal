@@ -456,11 +456,9 @@ void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, i
 		rock = gameboard->all_pieces[turn][12 + i]; //12 is the 1st place of rock in all_pieces
 		if(is_castling_valid_per_rock(gameboard, king, rock)){
 			delta_col = (king->col < rock->col) ? 2 : -2;
-			Step *new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, Was_not_moved, false);
+			Step *new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, Castling_Move, false);
 			steps_list[*amount_steps] = new_step;
 			(*amount_steps)++;
-			//king->steps[king->amount_steps] = new_step;
-			//king->amount_steps++;
 		}
 	}
 
