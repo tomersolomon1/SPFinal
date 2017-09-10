@@ -63,7 +63,7 @@ typedef struct Vector_t{
 	int delta_row;
 	int delta_col;
 	int vector_size;
-	bool can_eat; //can the piece move in that direction if there's an enemy piece there?
+	bool can_eat; // can the piece move in that direction if there's an enemy piece there?
 	bool can_go_to_empty_spot; //can the piece move in that direction if its empty?
 } Vector;
 
