@@ -207,11 +207,11 @@ bool castling_move(Gameboard *gameboard, Command *comm) {
 int steps_comperator(const void *p, const void *q) {
 	Step **step1 = (Step **) p;
 	Step **step2 = (Step **) q;
-	if ((*step1)->src_previous_state == Castling_move && (*step2)->src_previous_state == Castling_move) {
+	if ((*step1)->src_previous_state == Castling_Move && (*step2)->src_previous_state == Castling_Move) {
 		return (*step1)->dcol - (*step2)->dcol; /* dcol */
-	} else if ((*step1)->src_previous_state == Castling_move && (*step2)->src_previous_state != Castling_move) {
+	} else if ((*step1)->src_previous_state == Castling_Move && (*step2)->src_previous_state != Castling_Move) {
 		return -1;
-	} else if ((*step1)->src_previous_state != Castling_move && (*step2)->src_previous_state == Castling_move) {
+	} else if ((*step1)->src_previous_state != Castling_Move && (*step2)->src_previous_state == Castling_Move) {
 		return 1;
 	}
 	if ((*step1)->drow == (*step2)->drow) {
