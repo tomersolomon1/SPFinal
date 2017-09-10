@@ -55,7 +55,7 @@ typedef enum{
 	Was_not_moved,
 	Was_moved,
 	Was_promoted,
-	Castling_move
+	Castling_Move
 } Piece_state;
 
 //A progressing vector on the board:
