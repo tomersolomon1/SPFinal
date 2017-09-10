@@ -210,15 +210,17 @@ int steps_comperator(const void *p, const void *q) {
 	if ((*step1)->src_previous_state == Castling_Move && (*step2)->src_previous_state == Castling_Move) {
 		return (*step1)->dcol - (*step2)->dcol; /* dcol */
 	} else if ((*step1)->src_previous_state == Castling_Move && (*step2)->src_previous_state != Castling_Move) {
-		return -1;
-	} else if ((*step1)->src_previous_state != Castling_Move && (*step2)->src_previous_state == Castling_Move) {
 		return 1;
+	} else if ((*step1)->src_previous_state != Castling_Move && (*step2)->src_previous_state == Castling_Move) {
+		return -1;
+	} else { /* neither of the steps is castling move */
+		if ((*step1)->drow == (*step2)->drow) {
+			return (*step1)->dcol - (*step2)->dcol;
+		} else {
+			return (*step1)->drow - (*step2)->drow;
+		}
 	}
-	if ((*step1)->drow == (*step2)->drow) {
-		return (*step1)->dcol - (*step2)->dcol;
-	} else {
-		return (*step1)->drow - (*step2)->drow;
-	}
+
 }
 
 void present_moves(Gameboard *gameboard, Piece *piece) {
@@ -230,14 +232,19 @@ void present_moves(Gameboard *gameboard, Piece *piece) {
 		qsort((void*) piece->steps, piece->amount_steps, step_size, steps_comperator);
 		for (int i = 0; i < piece->amount_steps; i++) {
 			Step *step = piece->steps[i];
-			printf("<%c,%c>", decimal_numbers[step->drow], ABC[step->dcol]);
-			if (step->is_threatened) {
-				printf("*");
+			if (step->src_previous_state == Castling_Move) {
+				int rock_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
+				printf("castle <%c,%c>\n", decimal_numbers[step->srow], ABC[rock_col]);
+			} else { /* no castling, so can't be threatened, and can't capture any piece */
+				printf("<%c,%c>", decimal_numbers[step->drow], ABC[step->dcol]);
+				if (step->is_threatened) {
+					printf("*");
+				}
+				if (gameboard->board[step->drow][step->dcol]->colur == opponent_color) {
+					printf("^");
+				}
+				printf("\n");
 			}
-			if (gameboard->board[step->drow][step->dcol]->colur == opponent_color) {
-				printf("^");
-			}
-			printf("\n");
 		}
 	}
 }
