@@ -24,6 +24,7 @@
 #define MIN(A,B) (((A) < (B)) ? (A) : (B))
 #define MAX(A,B) (((A) > (B)) ? (A) : (B))
 #define SWITCHED(x) abs(1 - (x))
+#define IS_CASTLING_STEP(x) (((x)->type == King) && (abs((x)->dcol - (x)->scol) > 1) && ((x)->srow == (x)->drow))
 
 
 
