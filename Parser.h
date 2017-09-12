@@ -31,7 +31,7 @@ typedef enum {
 	Reset,
 
 	Quit, /* this command is for both modes */
-	Ivalid_command /* for invalid commands */
+	Invalid_command /* for invalid commands */
 } SP_commands;
 
 typedef struct command_t {

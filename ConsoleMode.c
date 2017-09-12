@@ -318,7 +318,7 @@ void manage_console(Gameboard *gameboard) {
 		fgets(line, SP_MAX_LINE_LENGTH, stdin);
 		Command *comm = parser(line);
 		free(line);
-		if (comm->comm_e == Ivalid_command  || (comm->mode != console_mode && comm->mode != Both)) {
+		if (comm->comm_e == Invalid_command  || (comm->mode != console_mode && comm->mode != Both)) {
 			printf("ERROR: invalid command\n");
 		} else { /* appropriate command  */
 			switch (comm->comm_e) {
@@ -368,7 +368,7 @@ void manage_console(Gameboard *gameboard) {
 					printf("Exiting...\n");
 					keep_on = false;
 					break;
-				case Ivalid_command: /* the compiler rises warning without this case */
+				case Invalid_command: /* the compiler rises warning without this case */
 					break;
 			}
 		}
