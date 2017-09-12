@@ -22,10 +22,56 @@
  * 		false - the game isn't over
  */
 
-bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol) {
+Piece_type choose_promotion() {
+	const SDL_MessageBoxButtonData buttons[] = {
+			{ 0, 0, "Pawn" },
+			{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "Knight" },
+			{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 2, "Bishop" },
+			{ 0, 3, "Rock" },
+			{ 0, 4, "Queen" },
+	};
+	const SDL_MessageBoxColorScheme colorScheme = {
+		{ /* .colors (.r, .g, .b) */
+			/* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+			{ 255,   0,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_TEXT] */
+			{   0, 255,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+			{ 255, 255,   0 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+			{   0,   0, 255 },
+			/* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+			{ 255,   0, 255 }
+		}
+	};
+	const SDL_MessageBoxData messageboxdata = {
+		SDL_MESSAGEBOX_INFORMATION, /* .flags */
+		NULL, /* .window */
+		"Promotion!", /* .title */
+		"Which piece do you want your pawn to be promoted to?", /* .message */
+		SDL_arraysize(buttons), /* .numbuttons */
+		buttons, /* .buttons */
+		&colorScheme /* .colorScheme */
+	};
+	int buttonid;
+	if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+		SDL_Log("error displaying message box");
+		return Empty; /* signaling error */
+	}
+	return buttonid; /* we leave without saving */
+}
+
+bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol, bool is_user_move) {
 	char *colors[] = {"black", "white"};
 	Gameboard *board = window->data->board_widget->board;
-	set_step(board, srow, scol, drow, dcol, false);
+	CHESS_BOARD_MESSAGE msg = set_step(board, srow, scol, drow, dcol, false);
+	if (msg == CHESS_BOARD_PROMOTION && is_user_move) {
+		Piece_type piece_type = choose_promotion();
+		if (piece_type != Empty)  {
+			make_promotion(board, drow, dcol, piece_type);
+		}
+
+	}
 	//draw_board(window->data, window->windowRenderer, NULL); /* check the clear-renderer */
 	drawWindow(window, NULL);
 	int game_over = is_game_over(board);
@@ -45,23 +91,24 @@ bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, 
 	return false;
 }
 
+/* delete  GAME_DEBUG !!!!!!!!!!!!!!!!!!!!*/
 bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dcol) {
-	bool game_over = graphical_handle_single_move(window, srow, scol, drow, dcol);
+	bool game_over = graphical_handle_single_move(window, srow, scol, drow, dcol, true);
 	if (game_over) {
 		return true;
 	} else if (window->data->board_widget->board->game_mode == 1) { /* the game is not over, and we need to play the computer's turn */
 		Gameboard *copy = copy_board(window->data->board_widget->board);
-		if(GAME_DEBUG) {
+		if(GAME_DEBUG) { /* to be deletedddddddddddddddddddddddddddddddddddddddddddddddddddddd */
 			printf("DEBUG!!\n");
 			fflush(stdout);
 			Move move = find_best_move(copy, copy->difficulty);
 			destroy_board(copy);
-			return graphical_handle_single_move(window, move.srow, move.scol, move.drow, move.dcol);
+			return graphical_handle_single_move(window, move.srow, move.scol, move.drow, move.dcol, false);
 		} else {
 			//destroy_board(copy);
 			//copy = copy_board_minimax(window->data->board_widget->board);
 			Step *best_step = find_best_step(copy, copy->difficulty);
-			bool game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol);
+			bool game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol, false);
 			destroy_step(best_step);
 			destroy_board(copy);
 			return game_over;
@@ -234,68 +281,3 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 	return next_window;
 }
 
-
-// ---------------------------------------------- old versions ---------------
-Window_type handle_game_events2(Window *window, SDL_Event *event,  Gameboard **game) {
-	if (event == NULL || window == NULL ) {
-		return ExitGame;
-	}
-	switch(event->type) {
-		case SDL_MOUSEBUTTONDOWN:
-			if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)) {
-				int relative_x = event->button.x - window->data->board_widget->location->x;
-				int relative_y = event->button.y - window->data->board_widget->location->y;
-				int x_board = (8*relative_x / window->data->board_widget->location->w);
-				int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
-				Piece *piece = window->data->board_widget->board->board[y_board][x_board];
-				if (piece->type != Empty &&  /* the user clicked on one of his pieces */
-					((piece->colur == window->data->board_widget->board->user_color && window->data->board_widget->board->game_mode == 1)
-					|| (piece->colur == window->data->board_widget->board->turn && window->data->board_widget->board->game_mode == 2))) {
-					window->data->selected_piece_color = piece->colur;
-					window->data->selected_piece_index = piece->indexat;
-					if (event->button.button == SDL_BUTTON_LEFT) { /* selected the piece for moving */
-						window->data->picked_piece  = true;
-					} else if (event->button.button == SDL_BUTTON_RIGHT && ((*game)->game_mode == 1)
-							&& ((*game)->difficulty == 1 || (*game)->difficulty == 2)) {
-						window->data->highlight_moves = true;
-					}
-
-				}
-			}
-			else if (event->button.button == SDL_BUTTON_LEFT) { /* the click wasn't inside the board, and it's a left click  */
-				Button* clicked_button = get_button_clicked(event, window->buttons, window->num_buttons);
-				if (clicked_button != NULL) { /* some button was clicked */
-					return handle_game_buttons(window, clicked_button, game);
-				}
-			}
-			return Game; /* if no case was applied */
-		case SDL_MOUSEBUTTONUP:
-			if (event->button.button == SDL_BUTTON_LEFT && window->data->picked_piece) { /* the selected piece was dropped */
-				window->data->picked_piece  = false;
-				if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)) {
-					int relative_x = event->button.x - window->data->board_widget->location->x;
-					int relative_y = event->button.y - window->data->board_widget->location->y;
-					int x_board = (8*relative_x / window->data->board_widget->location->w);
-					int y_board = 7 - (8*relative_y / window->data->board_widget->location->h);
-					Piece *piece = window->data->board_widget->board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
-					CHESS_BOARD_MESSAGE mssg = is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board);
-					if (mssg == CHESS_BOARD_SUCCESS) {
-						graphical_handle_move(window, piece->row, piece->col, y_board, x_board);
-						window->data->saved_game = false;
-					}
-				}
-			}
-			if (ArrayListSize(window->data->board_widget->board->history) > 1 && window->data->board_widget->board->game_mode == 1) {
-				window->buttons[UndoButtonIndex]->active = true;
-			}
-			return Game;;
-		case SDL_MOUSEMOTION:
-			if(!window->data->picked_piece || !mouse_in_rec(event->motion.x, event->motion.y, window->data->board_widget->location)) {
-				window->data->picked_piece = false;
-			}
-			return Game;
-		default:
-			return Game;
-	}
-	return Game;
-}

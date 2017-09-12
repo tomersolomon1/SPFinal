@@ -191,7 +191,7 @@ void change_piece_type(Piece *piece, Piece_type new_type){
 	int max_amount_steps = amount_steps_of_piece_type(new_type);
 
 	//free steps and vectors:
-	for(int i = 0; i < max_amount_steps; i++){
+	for(int i = 0; i < piece->amount_steps; i++){
 		destroy_step(piece->steps[i]);
 	}
 	for(int i = 0; i < piece->amount_vectors; i++){
@@ -205,6 +205,7 @@ void change_piece_type(Piece *piece, Piece_type new_type){
 	assert(vectors != NULL);
 	set_vectors(new_type, piece->colur, vectors);
 	piece->amount_vectors = amount_vectors;
+	piece->amount_steps = max_amount_steps;
 	piece->vectors = vectors;
 	Step **steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
 	assert(steps != NULL);

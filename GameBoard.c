@@ -496,46 +496,48 @@ bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock)
 
 
 CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard, bool is_minimax) {
-	if(gameboard == NULL){
+	if (gameboard == NULL) {
 		return CHESS_BOARD_INVALID_ARGUMENT;
 	}
-	if(ArrayListSize(gameboard->history) == 0){
+	if (ArrayListSize(gameboard->history) == 0) {
 		return CHESS_BOARD_NO_HISTORY;
 	}
 	Step *step = ArrayListGetFirst(gameboard->history);
 	Piece *source_p = gameboard->board[step->drow][step->dcol];
 
-	if(source_p->type == King && abs(step->dcol - step->scol) > 1){ //castling
+	if (source_p->type == King && abs(step->dcol - step->scol) > 1) { // castling
 		undo_step_castling(gameboard, step);
 	}
-	else{ //not castling
+	else { //not castling
 		Piece *dest_p = step->prevPiece;
 		gameboard->board[step->drow][step->dcol] = dest_p;
 		gameboard->board[step->srow][step->scol] = source_p;
 		dest_p->alive = true;
-		if(step->src_previous_state == Was_not_moved)
+		if (step->src_previous_state == Was_not_moved) {
 			source_p->has_moved = false;
-		else if(step->src_previous_state == Was_promoted) //this step was promotion step
+		}
+		else if (step->src_previous_state == Was_promoted) { // this step was a promotion step
 			change_piece_type(source_p, Pawn);
+		}
 		source_p->row = step->srow;
 		source_p->col = step->scol;
 		dest_p->row = step->drow;
 		dest_p->col = step->dcol;
-
-		if(source_p->type == Pawn && !source_p->has_moved){ //if pawn in its initial spot - change it to be able to move 2 steps forward
+		if (source_p->type == Pawn && !source_p->has_moved) { //if pawn in its initial spot - change it to be able to move 2 steps forward
 			source_p->vectors[0]->vector_size = 2;
 		}
 	}
 	gameboard->turn = SWITCHED(gameboard->turn);
 	ArrayListRemoveFirst(gameboard->history);
-	if(!is_minimax)
+	if (!is_minimax) {
 		set_all_valid_steps(gameboard);
+	}
 	return CHESS_BOARD_SUCCESS;
 }
 
 
 CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard) {
-	if(gameboard == NULL){
+	if(gameboard == NULL) {
 		return CHESS_BOARD_INVALID_ARGUMENT;
 	}
 	if (ArrayListSize(gameboard->history) < 2) {
