@@ -394,7 +394,7 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
 			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->empty)){
 				if((row == (BOARD_SIZE - 1) || row == 0) && piece->type == Pawn) //promotion
-					Piece_state = Was_promoted;
+					piece_state = Was_promoted;
 				Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece_state, true);
 				s->is_threatened = (check_is_threatened? is_step_threatened(gameboard, piece, s) : true);
 				steps_list[*amount_steps] = s;
