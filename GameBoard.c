@@ -135,6 +135,7 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 		src_prev_state = Was_moved;
 	if((drow == (BOARD_SIZE - 1) || drow == 0) && source_p->type == Pawn) //promotion
 		src_prev_state = Was_promoted;
+
 	Step *step = create_step(srow, scol, drow, dcol, dest_p, src_prev_state, false);
 	step->is_threatened = is_step_threatened(gameboard, source_p, step);
 	ArrayListPushFirst(gameboard->history, step);
@@ -392,6 +393,8 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 			break;
 		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
 			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->empty)){
+				if((row == (BOARD_SIZE - 1) || row == 0) && piece->type == Pawn) //promotion
+					Piece_state = Was_promoted;
 				Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece_state, true);
 				s->is_threatened = (check_is_threatened? is_step_threatened(gameboard, piece, s) : true);
 				steps_list[*amount_steps] = s;
