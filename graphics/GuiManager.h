@@ -10,6 +10,7 @@
 #include "Windows.h"
 #include "GuiManager_Menu.h"
 #include "GuiManager_Game.h"
+
 #define GAME_DEFAULT_DIFFICULTY 1
 #define GAME_DEFAULT_MODE 1
 #define GAME_DEFAULT_COLOR white

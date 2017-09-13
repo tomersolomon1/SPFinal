@@ -89,8 +89,6 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 					CHESS_BOARD_MESSAGE msg = commit_move(board, step->srow, step->scol, step->drow, step->dcol, true, promotion_option);
 					if (step->src_previous_state == Was_promoted) { /* a pawn can be promoted to only 5 different pieces */
 						promote_to = promotion_option;
-						printf("promotion! promote to: %d, in: <%d,%d>\n", promote_to, step->drow, step->dcol);
-						fflush(stdout);
 						if (promotion_option < 4) {
 							promotion_option += 1;
 							step_index -= 1; /* we are stalling the enumeration of the steps, so we could check all promotion possibilities */
@@ -130,11 +128,6 @@ StepValue *find_best_step(Gameboard *board, int search_depth) {
 	int beta  = INT_MAX;
 	int eval_perspective = board->turn;
 	StepValue *best_sv = MiniMaxAlgo(board, alpha, beta, search_depth, MaxNode, eval_perspective, true);
-	//Step *best_step = copy_step(best_sv->step);
-	if (best_sv->step->src_previous_state == Was_promoted) { /* to be changed */
-		printf("Was_promoted! best promote to: %d\n", best_sv->promote_to);
-		fflush(stdout);
-	}
 	return best_sv;
 }
 

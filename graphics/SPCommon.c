@@ -54,6 +54,5 @@ SDL_Rect* spCopyRect(SDL_Rect* src){
 bool mouse_in_rec(int x, int y, SDL_Rect *rect) {
 	SDL_Point point = {.x = x, .y = y };
 	return SDL_PointInRect(&point, rect);
-
 }
 

@@ -16,17 +16,21 @@
 #include "MiniMax.h"
 #include "Files.h"
 
+/* performs a computer move only in mode 1, and when we start the game it's not the user's turn */
 void begin_game(Gameboard *gameboard) {
-	char *colors[] = {"black", "white"};
-	if (gameboard->game_mode == 1 && gameboard->user_color == 0) { /* performs a computer move only in mode 1, and if the user plays as black */
+	if (gameboard->game_mode == 1 && gameboard->turn == abs(1-gameboard->user_color)) {
 		Gameboard *copy = copy_board(gameboard);
-		//Step *step = find_best_step(copy, copy->difficulty);
 		StepValue *best_move = find_best_step(copy, copy->difficulty);
 		Step *step = best_move->step;
 		destroy_board(copy);
-		set_step(gameboard, step->srow, step->scol, step->drow, step->dcol, false);
+		commit_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
 		destroy_step_value(best_move);
 	}
+}
+
+void console_begin_game(Gameboard *gameboard) {
+	char *colors[] = {"black", "white"};
+	begin_game(gameboard);
 	print_board(gameboard);
 	printf("%s player - enter your move:\n", colors[gameboard->user_color]);
 }
@@ -96,9 +100,11 @@ void print_settings(Gameboard *gameboard) {
 
 
 /* return 0 if it's illegal move, 1 if the game is over, and 2 if the game is not over */
-int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol, bool user_turn) {
+int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol,
+		bool user_turn, Piece_type computer_promotion) {
 	char *colors[] = {"black", "white"};
-	CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, drow, dcol, false);
+	//CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, drow, dcol, false);
+	CHESS_BOARD_MESSAGE move_message = commit_move(gameboard, srow, scol, drow, dcol, false, computer_promotion);
 	if (move_message != CHESS_BOARD_SUCCESS) {
 		if (move_message == CHESS_BOARD_INVALID_MOVE_NO_PIECE) {
 			printf("The specified position does not contain your piece\n");
@@ -135,7 +141,7 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 bool make_move(Gameboard *gameboard, Command *comm) {
 	char *colors[] = {"black", "white"};
 	if (comm->args_in_range) { /* the move coordinates represent a valid squares on the board */
-		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4, true);
+		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4, true, Empty);
 		if (move_consequences == 1) { /* the game is over */
 			return false;
 		} else if (move_consequences == 2) { /* legal move, and the game is still on */
@@ -146,7 +152,6 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 			} else { /* it's now the computer turn */
 				char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 				Gameboard *copy = copy_board(gameboard);
-				//Step *step = find_best_step(copy, copy->difficulty);
 				StepValue *best_move = find_best_step(copy, copy->difficulty);
 				Step *step = best_move->step;
 				destroy_board(copy); /* we don't need it anymore */
@@ -158,7 +163,7 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 					char *pieces_str[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
 					printf("Computer: move %s at <%d,%c> to <%d,%c>\n", pieces_str[moving_piece->type], 1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->scol]);
 				}
-				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false);
+				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
 				destroy_step_value(best_move);
 				if (move_consequences == 1) { /* the game is over */
 					return false;

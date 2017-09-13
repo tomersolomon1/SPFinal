@@ -6,6 +6,7 @@
  */
 
 #include "GuiManager.h"
+#include "../ConsoleMode.h"
 
 void run_gui(){
 	Window_type type_window = Enterance;
@@ -106,6 +107,6 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 		}
 	}
 	else if(wndw->type == Game){
-		gui_first_move(*game);
+		begin_game(*game);
 	}
 }
