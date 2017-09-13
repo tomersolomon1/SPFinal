@@ -85,9 +85,9 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 				int promote_to = Empty; /* default */
 				for (int step_index = 0, promotion_option = 0; (step_index < amount_steps) && (alpha < beta); step_index++){
 					Step *step = valid_steps[step_index];
-					CHESS_BOARD_MESSAGE msg = set_step(board, step->srow, step->scol, step->drow, step->dcol, true);
-					if (msg == CHESS_BOARD_PROMOTION && step->src_previous_state == Was_promoted) { /* a pawn can be promoted to only 5 different pieces */
-						make_promotion(board, step->drow, step->dcol, promotion_option);
+					//CHESS_BOARD_MESSAGE msg = set_step(board, step->srow, step->scol, step->drow, step->dcol, true);
+					CHESS_BOARD_MESSAGE msg = commit_move(board, step->srow, step->scol, step->drow, step->dcol, true, promotion_option);
+					if (step->src_previous_state == Was_promoted) { /* a pawn can be promoted to only 5 different pieces */
 						promote_to = promotion_option;
 						printf("promotion! promote to: %d, in: <%d,%d>\n", promote_to, step->drow, step->dcol);
 						fflush(stdout);
@@ -105,6 +105,8 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 						best_sv->step = copy_step(step);
 						if (msg == CHESS_BOARD_PROMOTION) { /* it was a promotion move */
 							best_sv->promote_to = promote_to; /* saving the piece-type we are promoting to */
+						} else {
+							best_sv->promote_to = Empty;
 						}
 					}
 					first_option = false;
@@ -123,18 +125,17 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 /* assuming we can alter the board as we will
  * we assume the game is not over
  */
-Step *find_best_step(Gameboard *board, int search_depth) {
+StepValue *find_best_step(Gameboard *board, int search_depth) {
 	int alpha = INT_MIN;
 	int beta  = INT_MAX;
 	int eval_perspective = board->turn;
 	StepValue *best_sv = MiniMaxAlgo(board, alpha, beta, search_depth, MaxNode, eval_perspective, true);
-	Step *best_step = copy_step(best_sv->step);
-	if (best_step->src_previous_state == Was_promoted) {
-		printf("promotion! best promote to: %d\n", best_sv->promote_to);
+	//Step *best_step = copy_step(best_sv->step);
+	if (best_sv->step->src_previous_state == Was_promoted) { /* to be changed */
+		printf("Was_promoted! best promote to: %d\n", best_sv->promote_to);
 		fflush(stdout);
 	}
-	destroy_step_value(best_sv);
-	return best_step;
+	return best_sv;
 }
 
 ////// -----------------------  old code -----------------

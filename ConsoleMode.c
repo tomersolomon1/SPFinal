@@ -20,10 +20,12 @@ void begin_game(Gameboard *gameboard) {
 	char *colors[] = {"black", "white"};
 	if (gameboard->game_mode == 1 && gameboard->user_color == 0) { /* performs a computer move only in mode 1, and if the user plays as black */
 		Gameboard *copy = copy_board(gameboard);
-		Step *step = find_best_step(copy, copy->difficulty);
+		//Step *step = find_best_step(copy, copy->difficulty);
+		StepValue *best_move = find_best_step(copy, copy->difficulty);
+		Step *step = best_move->step;
 		destroy_board(copy);
 		set_step(gameboard, step->srow, step->scol, step->drow, step->dcol, false);
-		destroy_step(step);
+		destroy_step_value(best_move);
 	}
 	print_board(gameboard);
 	printf("%s player - enter your move:\n", colors[gameboard->user_color]);
@@ -144,7 +146,9 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 			} else { /* it's now the computer turn */
 				char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 				Gameboard *copy = copy_board(gameboard);
-				Step *step = find_best_step(copy, copy->difficulty);
+				//Step *step = find_best_step(copy, copy->difficulty);
+				StepValue *best_move = find_best_step(copy, copy->difficulty);
+				Step *step = best_move->step;
 				destroy_board(copy); /* we don't need it anymore */
 				Piece *moving_piece = gameboard->board[step->srow][step->scol];
 				if (IS_CASTLING_STEP(moving_piece, step)) {
@@ -155,7 +159,7 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 					printf("Computer: move %s at <%d,%c> to <%d,%c>\n", pieces_str[moving_piece->type], 1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->scol]);
 				}
 				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false);
-				destroy_step(step);
+				destroy_step_value(best_move);
 				if (move_consequences == 1) { /* the game is over */
 					return false;
 				} else { /* the game is still on */

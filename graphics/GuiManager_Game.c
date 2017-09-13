@@ -61,10 +61,12 @@ Piece_type choose_promotion() {
 	return buttonid; /* we leave without saving */
 }
 
-bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol, bool is_user_move) {
+bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol,
+		bool is_user_move, Piece_type computer_promotion) {
 	char *colors[] = {"black", "white"};
 	Gameboard *board = window->data->board_widget->board;
-	CHESS_BOARD_MESSAGE msg = set_step(board, srow, scol, drow, dcol, false);
+	//CHESS_BOARD_MESSAGE msg = set_step(board, srow, scol, drow, dcol, false);
+	CHESS_BOARD_MESSAGE msg = commit_move(board, srow, scol, drow, dcol, false, computer_promotion);
 	if (msg == CHESS_BOARD_PROMOTION && is_user_move) {
 		Piece_type piece_type = choose_promotion();
 		if (piece_type != Empty)  {
@@ -93,7 +95,7 @@ bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, 
 
 /* delete  GAME_DEBUG !!!!!!!!!!!!!!!!!!!!*/
 bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dcol) {
-	bool game_over = graphical_handle_single_move(window, srow, scol, drow, dcol, true);
+	bool game_over = graphical_handle_single_move(window, srow, scol, drow, dcol, true, Empty);
 	if (game_over) {
 		return true;
 	} else if (window->data->board_widget->board->game_mode == 1) { /* the game is not over, and we need to play the computer's turn */
@@ -103,13 +105,15 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 			fflush(stdout);
 			Move move = find_best_move(copy, copy->difficulty);
 			destroy_board(copy);
-			return graphical_handle_single_move(window, move.srow, move.scol, move.drow, move.dcol, false);
+			return graphical_handle_single_move(window, move.srow, move.scol, move.drow, move.dcol, false, Empty);
 		} else {
 			//destroy_board(copy);
 			//copy = copy_board_minimax(window->data->board_widget->board);
-			Step *best_step = find_best_step(copy, copy->difficulty);
-			bool game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol, false);
-			destroy_step(best_step);
+			//Step *best_step = find_best_step(copy, copy->difficulty);
+			StepValue *best_move = find_best_step(copy, copy->difficulty);
+			Step *best_step = best_move->step;
+			bool game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol, false, best_move->promote_to);
+			destroy_step_value(best_move);
 			destroy_board(copy);
 			return game_over;
 		}
@@ -123,10 +127,12 @@ bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dco
 void gui_first_move(Gameboard *board) {
 	if (board->game_mode == 1 && board->turn == abs(1-board->user_color)) {
 		Gameboard *copy = copy_board(board);
-		Step *step = find_best_step(copy, copy->difficulty);
+		StepValue *best_move = find_best_step(copy, copy->difficulty);
+		Step *step = best_move->step;
+		//Step *step = find_best_step(copy, copy->difficulty);
 		destroy_board(copy);
 		set_step(board, step->srow, step->scol, step->drow, step->dcol, false);
-		destroy_step(step);
+		destroy_step_value(best_move);
 	}
 }
 

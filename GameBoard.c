@@ -160,10 +160,19 @@ CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow,
 	return CHESS_BOARD_SUCCESS;
 }
 
-void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type){
+void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type) {
 	Piece *piece = gameboard->board[row][col];
 	change_piece_type(piece, new_type);
 	set_all_valid_steps(gameboard);
+}
+
+CHESS_BOARD_MESSAGE commit_move(Gameboard *gameboard, int srow,
+		int scol, int drow, int dcol, bool is_minimax, Piece_type promote_to) {
+	CHESS_BOARD_MESSAGE msg = set_step(gameboard, srow, scol, drow, dcol, is_minimax);
+	if (msg == CHESS_BOARD_PROMOTION && promote_to != Empty) { /* Empty signals that the promotion was made by the user */
+		make_promotion(gameboard, drow, dcol, promote_to);
+	}
+	return msg;
 }
 
 void set_castling_move(Gameboard *gameboard, int row, int scol, int dcol){
@@ -384,7 +393,7 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 	bool can_go_to_empty_spot = v->can_go_to_empty_spot;
 	int row = piece->row;
 	int col = piece->col;
-	Piece_state piece_state = (piece->has_moved? Was_moved: Was_not_moved);
+	Piece_state piece_state = (piece->has_moved ? Was_moved: Was_not_moved);
 	while(amount_going > 0){
 		amount_going --;
 		row = row + delta_row;
@@ -392,9 +401,10 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)) //out of board
 			break;
 		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
-			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->empty)){
-				if((row == (BOARD_SIZE - 1) || row == 0) && piece->type == Pawn) //promotion
+			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->empty)) {
+				if((row == (BOARD_SIZE - 1) || row == 0) && piece->type == Pawn) { // promotion
 					piece_state = Was_promoted;
+				}
 				Step *s = create_step(piece->row, piece->col, row, col, gameboard->empty, piece_state, true);
 				s->is_threatened = (check_is_threatened? is_step_threatened(gameboard, piece, s) : true);
 				steps_list[*amount_steps] = s;
@@ -402,7 +412,10 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 			}
 		}
 		else if(gameboard->board[row][col]->type != Empty && gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
-			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->board[row][col])){
+			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->board[row][col])) {
+				if((row == (BOARD_SIZE - 1) || row == 0) && piece->type == Pawn) { // promotion
+					piece_state = Was_promoted;
+				}
 				Step *s = create_step(piece->row, piece->col, row, col, gameboard->board[row][col], piece_state, true);
 				s->is_threatened = (check_is_threatened? is_step_threatened(gameboard, piece, s) : true);
 				steps_list[*amount_steps] = s;

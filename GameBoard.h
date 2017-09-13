@@ -59,13 +59,13 @@ typedef enum chess_board_message_t {
 
 
 //-------------------------------Game Board General functions-------------------------------
-/*create board*/
+/* create board */
 Gameboard *create_board(int game_mode, int difficulty, int user_color);
 
 /*helping function for create_board (adding piece to the board)*/
 void add_piece(Gameboard* gameboard, Piece_type type, int colur, int row, int col, int indexat);
 
-/*destroy board*/
+/* destroy board */
 void destroy_board(Gameboard *gameboard);
 
 /* copy board */
@@ -89,10 +89,13 @@ void reset_board(Gameboard** gameboard);
  * */
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol, bool is_minimax);
 
-//make promotion for piece in board[row][col]
+/* make promotion for piece in board[row][col] */
 void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type);
 
-//helping function for set_step: setting step when castling
+/* setting the step, and performing and calling make_promotion if needed */
+CHESS_BOARD_MESSAGE commit_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol, bool is_minimax, Piece_type promote_to);
+
+/* helping function for set_step: setting step when castling */
 void set_castling_move(Gameboard *gameboard, int row, int scol, int dcol);
 
 /* checks if a step is valid
@@ -114,10 +117,10 @@ bool is_threatening_piece_per_vector(Gameboard* gameboard, Piece *threatened, Pi
 /* is current player threatening the opponent's king?*/
 bool is_check_curr_player(Gameboard *gameboard);
 
-/*is current player under check?*/
+/* is current player under check? */
 bool is_under_check(Gameboard * gameboard);
 
-/*is the player with color "colur" threatening the other player's king?*/
+/* is the player with color "colur" threatening the other player's king? */
 bool is_check(Gameboard *gameboard, int colur);
 
 //-----------------------MINIMAX-----------------------
@@ -128,7 +131,7 @@ bool is_check(Gameboard *gameboard, int colur);
  * */
 Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps);
 
-/*free all_valid_steps*/
+/* free all_valid_steps */
 void free_all_valid_steps_minimax(Step** all_steps, Piece_type type);
 
 int is_game_over_minimax(Gameboard *gameboard);
@@ -138,25 +141,25 @@ bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *
 
 //---------------------------------Set all Valid Steps---------------------------------
 
-/*set all valid steps, for all pieces of current turn*/
+/* set all valid steps, for all pieces of current turn */
 void set_all_valid_steps(Gameboard *gameboard);
 
-/*helping function for set_all_valid_steps*/
+/* helping function for set_all_valid_steps*/
 void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece);
 
-/*helping function for set_all_valid_steps*/
+/* helping function for set_all_valid_steps*/
 void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *amount_steps, Step **steps_list, bool check_is_threatened);
 
-/*helping function for set_all_valid_steps*/
+/* helping function for set_all_valid_steps*/
 bool is_step_causes_check(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece);
 
-/*helping function for set_all_valid_steps*/
+/* helping function for set_all_valid_steps*/
 bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step);
 
-//set all castling setps:
+/* set all castling setps: */
 void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, int *amount_steps);
 
-//helping function for set_castling_steps
+/* helping function for set_castling_steps */
 bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock);
 
 //-------------------------------------Undo-------------------------------------
@@ -174,7 +177,7 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard, bool is_minimax);
  * returns CHESS_BOARD_SUCCESS otherwise */
 CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard);
 
-//helping function for undo_step, doing undo to castling step
+/* helping function for undo_step, doing undo to castling step */
 void undo_step_castling(Gameboard *gameboard, Step* step);
 
 //----------------------------------Is Game Over----------------------------------
@@ -186,10 +189,10 @@ int is_game_over(Gameboard *gameboard);
 
 //----------------------------------Print Board----------------------------------
 
-/*print board for in console format*/
+/* print board for in console format */
 void print_board(Gameboard *gameboard);
 
-/*for debugging - print board and details*/
+/* for debugging - print board and details */
 void print_details_game(Gameboard *gameboard);
 
 #endif /* GAMEBOARD_H_ */
