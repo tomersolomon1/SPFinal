@@ -27,6 +27,7 @@ typedef struct Move {
 typedef struct step_value {
 	Step *step;
 	int value;
+	Piece_type promote_to;
 } StepValue;
 
 int sumup_pieces(Gameboard *board, int color);
