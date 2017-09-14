@@ -632,7 +632,6 @@ void print_board_to_log_file(Gameboard *gameboard) {
 	free(a);
 }
 
-
 void print_details_game(Gameboard *gameboard){
 	printf("\n");
 	fflush(stdout);

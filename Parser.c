@@ -13,6 +13,20 @@
 #include "Parser.h"
 #include "GameBasicBuildingBlocks.h"
 
+/*
+ * line[offset] is the first char to be checked
+ */
+bool check_tail_validity(const char *line, int offset) {
+	while ((offset < SP_MAX_LINE_LENGTH) && (line[offset] != '\0') && (line[offset] != '\n')) {
+		if (!isspace(line[offset])) {
+		    /* more non-whitespace chars than should be, therefore illegal command */
+			return false; /* no need for further evaluations */
+		}
+		offset++;
+	}
+	return true;
+}
+
 Piece_type get_piece(const char *line, const char *guessed_piece_name,
 		int offset, Piece_type guessed_piece) {
 	int len = strlen(guessed_piece_name);
@@ -23,6 +37,10 @@ Piece_type get_piece(const char *line, const char *guessed_piece_name,
 		}
 	}
 	if (i < len) { /* we didn't read all of guessed_piece_name */
+		return Empty;
+	}
+	bool valid_tail = check_tail_validity(line, offset);
+	if (!valid_tail) {
 		return Empty;
 	}
 	return guessed_piece;
@@ -52,17 +70,11 @@ void free_command(Command *comm) {
 }
 
 /* line[offset] is the first char to be checked
- * when the function returns, comm->extra_param is true if there are non-whitespace chars after offset
- * not needed!!!!!!!!!
  */
-void valid_tail(Command *comm, const char *line, int offset) {
-	while ((offset < SP_MAX_LINE_LENGTH) && (line[offset] != '\0') && (line[offset] != '\n')) {
-		if (!isspace(line[offset])) {
-		    /* more non-whitespace chars than should be, therefore illegal command */
-			comm->comm_e = Invalid_command;
-			return; /* no need for further evaluations */
-		}
-		offset++;
+void valid_commands_tail(Command *comm, const char *line, int offset) {
+	bool tail_validity = check_tail_validity(line, offset);
+	if (!tail_validity) {
+		comm->comm_e = Invalid_command;
 	}
 }
 
@@ -99,7 +111,7 @@ void get_non_arg_command(Command *comm, const char *line, int offset, const char
 	int len = strlen(comm_s);
 	verify_command(comm, line, offset, comm_s, len);
 	if (comm->comm_e != Invalid_command) {
-		valid_tail(comm, line, offset + len);
+		valid_commands_tail(comm, line, offset + len);
 	}
 }
 
@@ -123,7 +135,7 @@ void get_command_with_file_name(Command *comm, const char *line, int offset, con
 				j++;
 			}
 			comm->file_name[j] = '\0'; /* terminating the file-name */
-			valid_tail(comm, line, file_name_offset);
+			valid_commands_tail(comm, line, file_name_offset);
 		}
 	}
 }
@@ -167,7 +179,7 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
 			int arg_offset = addi + offset + len;
 			comm->args_in_range = get_number(line, &arg_offset, &comm->arg1, '0', lower_bound, upper_bound, '\0', true);
 			if (comm->args_in_range) {
-				valid_tail(comm, line, arg_offset);
+				valid_commands_tail(comm, line, arg_offset);
 			}
 		}
 	}
@@ -227,7 +239,7 @@ void coordinates_commands(Command *comm, const char *line, int offset, const cha
 	bool got_param = getXY(comm, line, &offset, &(comm->arg1), &(comm->arg2), needed_space, is_move_commands); /* getting the first coordinate */
 	if ((!got_param) || (!is_move_commands)) {
 		if (got_param) {
-			valid_tail(comm, line, offset);
+			valid_commands_tail(comm, line, offset);
 		}
 		return;  /* something is wrong with the first coordinate or it's get_moves or castling command, no need for further parsing */
 	}
@@ -249,7 +261,7 @@ void coordinates_commands(Command *comm, const char *line, int offset, const cha
 	offset += 2 + additional_offset;
 	got_param = getXY(comm, line, &offset, &(comm->arg3), &(comm->arg4), needed_space, false); /* getting the second coordinate */
 	if (got_param) {
-		valid_tail(comm, line, offset);
+		valid_commands_tail(comm, line, offset);
 	}
 }
 
