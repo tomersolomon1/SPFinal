@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "DataDefinitions.h"
+#include "GameBasicBuildingBlocks.h"
 
 typedef enum {
 	/* Settings-Mode commands */
@@ -42,6 +43,7 @@ typedef struct command_t {
 	char *file_name; /* useful for load & save commands */
 } Command;
 
+Piece_type get_promotion_type_parser(const char *line);
 void free_command(Command *comm);
 void valid_tail(Command *comm, const char *line, int offset);
 bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len);

@@ -11,6 +11,38 @@
 #include <assert.h>
 #include <ctype.h>
 #include "Parser.h"
+#include "GameBasicBuildingBlocks.h"
+
+Piece_type get_piece(const char *line, const char *guessed_piece_name,
+		int offset, Piece_type guessed_piece) {
+	int len = strlen(guessed_piece_name);
+	int i = 0;
+	for (; (i < len && offset < SP_MAX_LINE_LENGTH); i++, offset++) {
+		if (guessed_piece_name[i] != line[offset]) {
+			return Empty;
+		}
+	}
+	if (i < len) { /* we didn't read all of guessed_piece_name */
+		return Empty;
+	}
+	return guessed_piece;
+}
+
+Piece_type get_promotion_type_parser(const char *line) {
+	int offset = get_non_whitespace_offset(line);
+	if (offset == -1) {
+			return Empty; /* returning no valid piece */
+	}
+	Piece_type promote_to = Empty;
+	switch (line[offset]) {
+	case 'p': promote_to = get_piece(line, "pawn", offset, Pawn); break;
+	case 'b': promote_to = get_piece(line, "bishop", offset, Bishop); break;
+	case 'k': promote_to = get_piece(line, "knight", offset, Knight); break;
+	case 'r': promote_to = get_piece(line, "rook", offset, Rock); break;
+	case 'q': promote_to = get_piece(line, "queen", offset, Queen); break;
+	}
+	return promote_to;
+}
 
 void free_command(Command *comm) {
 	if (comm->file_name != NULL) {

@@ -98,6 +98,22 @@ void print_settings(Gameboard *gameboard) {
 	}
 }
 
+void handle_user_promotion(Gameboard *gameboard, int drow, int dcol) {
+	Piece_type promote_to = Empty;
+	while (promote_to == Empty) {
+		printf("Pawn promotion- please replace the pawn by queen, rook, knight, bishop or pawn:\n");
+		fflush(stdout);
+		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
+		assert(line != NULL);
+		fgets(line, SP_MAX_LINE_LENGTH, stdin);
+		promote_to = get_promotion_type_parser(line);
+		free(line);
+		if (promote_to == Empty) {
+			printf("Invalid Type\n");
+		}
+	}
+	make_promotion(gameboard, drow, dcol, promote_to);
+}
 
 /* return 0 if it's illegal move, 1 if the game is over, and 2 if the game is not over */
 int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol,
@@ -105,32 +121,33 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 	char *colors[] = {"black", "white"};
 	//CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, drow, dcol, false);
 	CHESS_BOARD_MESSAGE move_message = commit_move(gameboard, srow, scol, drow, dcol, false, computer_promotion);
-	if (move_message != CHESS_BOARD_SUCCESS) {
+	if (move_message != CHESS_BOARD_SUCCESS && move_message != CHESS_BOARD_PROMOTION) {
 		if (move_message == CHESS_BOARD_INVALID_MOVE_NO_PIECE) {
 			printf("The specified position does not contain your piece\n");
 		} else {
 			printf("Illegal move\n");
 		}
 		return 0;
-	} else { /* legal move */
-		int game_over = is_game_over(gameboard);
-		if (game_over == 0 || game_over == 1) {
-			printf("Checkmate! %s player wins the game\n", colors[game_over]);
-			return 1;
-		} else if (game_over == 2) {
+	} else if (move_message == CHESS_BOARD_PROMOTION && user_turn) {
+		handle_user_promotion(gameboard, drow, dcol);
+	}
+	int game_over = is_game_over(gameboard);
+	if (game_over == 0 || game_over == 1) {
+		printf("Checkmate! %s player wins the game\n", colors[game_over]);
+		return 1;
+	} else if (game_over == 2) {
+		if (user_turn) {
+			printf("The game is tied\n");
+		} else { /* it was the computer's turn */
+			printf("The game ends in a tie\n");
+		}
+		return 1;
+	} else { /* the game is still on! */
+		if(is_under_check(gameboard)) {
 			if (user_turn) {
-				printf("The game is tied\n");
+				printf("Check: %s King is threatened!\n\n", colors[gameboard->turn]);
 			} else { /* it was the computer's turn */
-				printf("The game ends in a tie\n");
-			}
-			return 1;
-		} else { /* the game is still on! */
-			if(is_under_check(gameboard)) {
-				if (user_turn) {
-					printf("Check: %s King is threatened!\n\n", colors[gameboard->turn]);
-				} else { /* it was the computer's turn */
-					printf("Check!\n");
-				}
+				printf("Check!\n");
 			}
 		}
 	}
@@ -151,6 +168,7 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 				return true;
 			} else { /* it's now the computer turn */
 				char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+				char *pieces_str[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
 				Gameboard *copy = copy_board(gameboard);
 				StepValue *best_move = find_best_step(copy, copy->difficulty);
 				Step *step = best_move->step;
@@ -158,10 +176,14 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 				Piece *moving_piece = gameboard->board[step->srow][step->scol];
 				if (IS_CASTLING_STEP(moving_piece, step)) {
 					int rock_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
-					printf("Computer: castle King at <%d,%c> and Rook at <%d,%c>\n", 1+step->srow, ABC[step->scol],  1+step->srow, ABC[rock_col]);
+					printf("Computer: castle King at <%d,%c> and Rook at <%d,%c>\n",
+							1+step->srow, ABC[step->scol],  1+step->srow, ABC[rock_col]);
+				} else if (step->src_previous_state == Was_promoted) {
+					printf("Computer: move pawn <%d,%c> to <%d,%c> and promote to %s\n",
+							1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol], pieces_str[best_move->promote_to]);
 				} else {
-					char *pieces_str[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
-					printf("Computer: move %s at <%d,%c> to <%d,%c>\n", pieces_str[moving_piece->type], 1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->scol]);
+					printf("Computer: move %s at <%d,%c> to <%d,%c>\n",
+							pieces_str[moving_piece->type], 1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol]);
 				}
 				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
 				destroy_step_value(best_move);
@@ -333,7 +355,7 @@ void manage_console(Gameboard *gameboard) {
 			switch (comm->comm_e) {
 				case Start:
 					console_mode = GameMode;
-					begin_game(gameboard);
+					console_begin_game(gameboard);
 					break;
 				case Set_GameMode:
 					set_game_mode(gameboard, comm);
