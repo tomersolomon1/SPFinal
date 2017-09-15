@@ -112,7 +112,7 @@ bool load_file(Gameboard **gameboard_p, Command *comm) {
 	}
 	fclose(input_file);
 	free(comm->file_name);
-	print_board(*gameboard_p);
+	//print_board(*gameboard_p);
 	return true;
 }
 

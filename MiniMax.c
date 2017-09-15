@@ -85,7 +85,6 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 				int promote_to = Empty; /* default */
 				for (int step_index = 0, promotion_option = 0; (step_index < amount_steps) && (alpha < beta); step_index++){
 					Step *step = valid_steps[step_index];
-					//CHESS_BOARD_MESSAGE msg = set_step(board, step->srow, step->scol, step->drow, step->dcol, true);
 					CHESS_BOARD_MESSAGE msg = commit_move(board, step->srow, step->scol, step->drow, step->dcol, true, promotion_option);
 					if (step->src_previous_state == Was_promoted) { /* a pawn can be promoted to only 5 different pieces */
 						promote_to = promotion_option;
@@ -98,7 +97,9 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 					}
 					StepValue *sv = MiniMaxAlgo(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option);
 					if (update_ab(&alpha, &beta, sv->value, node_type, first_option)) {
-						//Step *good_step = ArrayListGetFirst(board->history);
+						if ((current_piece->type == Rock || current_piece->type == Queen) && search_depth == 4) {
+
+						}
 						destroy_step(best_sv->step);
 						best_sv->step = copy_step(step);
 						if (msg == CHESS_BOARD_PROMOTION) { /* it was a promotion move */
@@ -131,7 +132,7 @@ StepValue *find_best_step(Gameboard *board, int search_depth) {
 	return best_sv;
 }
 
-////// -----------------------  old code -----------------
+////// --------------------------  old code ---------------------------
 
 void prune(int *alpha, int *beta, int step_value, int node_type) {
 	if (node_type == 0) { /* it's a min-node */
