@@ -16,23 +16,58 @@
 #include "MiniMax.h"
 #include "Files.h"
 
-/* performs a computer move only in mode 1, and when we start the game it's not the user's turn */
-void begin_game(Gameboard *gameboard) {
+/* presenting the computer's move */
+void present_computer_move(Step *step, Piece *moving_piece, Piece_type promote_to) {
+	char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+	char *pieces_str[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
+	if (IS_CASTLING_STEP(moving_piece, step)) {
+		int rock_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
+		printf("Computer: castle King at <%d,%c> and Rook at <%d,%c>\n",
+				1+step->srow, ABC[step->scol],  1+step->srow, ABC[rock_col]);
+	} else if (step->src_previous_state == Was_promoted) {
+		printf("Computer: move pawn <%d,%c> to <%d,%c> and promote to %s\n",
+				1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol], pieces_str[promote_to]);
+	} else {
+		printf("Computer: move %s at <%d,%c> to <%d,%c>\n",
+				pieces_str[moving_piece->type], 1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol]);
+	}
+}
+
+/* performs a computer move only in mode 1, and when we start the game it's not the user's turn
+ * return false if the game is over (otherwise return true)
+ */
+int begin_game(Gameboard *gameboard, Program_Mode mode) {
+	bool game_stil_on = true;
 	if (gameboard->game_mode == 1 && gameboard->turn == abs(1-gameboard->user_color)) {
 		Gameboard *copy = copy_board(gameboard);
 		StepValue *best_move = find_best_step(copy, copy->difficulty);
 		Step *step = best_move->step;
 		destroy_board(copy);
-		commit_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
+		if (mode == ConsoleMode) {
+			Piece *moving_piece = gameboard->board[step->srow][step->scol];
+			present_computer_move(step, moving_piece, best_move->promote_to);
+			int over = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
+			game_stil_on = (over == 1) ? false : true;
+		} else { /* gui mode */
+			commit_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
+			int over = is_game_over(gameboard);
+			if (over == 2 || over == 1 || over == 0) {
+				game_stil_on = false;
+			}
+		}
 		destroy_step_value(best_move);
 	}
+	return game_stil_on;
 }
 
-void console_begin_game(Gameboard *gameboard) {
+bool console_begin_game(Gameboard *gameboard) {
 	char *colors[] = {"black", "white"};
-	begin_game(gameboard);
-	print_board(gameboard);
-	printf("%s player - enter your move:\n", colors[gameboard->user_color]);
+	bool game_stil_on = begin_game(gameboard, ConsoleMode);
+	if (game_stil_on) {
+		print_board(gameboard);
+		printf("%s player - enter your move:\n", colors[gameboard->user_color]);
+	}
+	return game_stil_on;
 }
 
 void set_game_mode(Gameboard *gameboard, Command *comm) {
@@ -77,6 +112,7 @@ bool load_file(Gameboard **gameboard_p, Command *comm) {
 	}
 	fclose(input_file);
 	free(comm->file_name);
+	print_board(*gameboard_p);
 	return true;
 }
 
@@ -167,24 +203,12 @@ bool make_move(Gameboard *gameboard, Command *comm) {
 				printf("%s player - enter your move:\n", colors[gameboard->turn]);
 				return true;
 			} else { /* it's now the computer turn */
-				char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
-				char *pieces_str[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
 				Gameboard *copy = copy_board(gameboard);
 				StepValue *best_move = find_best_step(copy, copy->difficulty);
 				Step *step = best_move->step;
 				destroy_board(copy); /* we don't need it anymore */
 				Piece *moving_piece = gameboard->board[step->srow][step->scol];
-				if (IS_CASTLING_STEP(moving_piece, step)) {
-					int rock_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
-					printf("Computer: castle King at <%d,%c> and Rook at <%d,%c>\n",
-							1+step->srow, ABC[step->scol],  1+step->srow, ABC[rock_col]);
-				} else if (step->src_previous_state == Was_promoted) {
-					printf("Computer: move pawn <%d,%c> to <%d,%c> and promote to %s\n",
-							1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol], pieces_str[best_move->promote_to]);
-				} else {
-					printf("Computer: move %s at <%d,%c> to <%d,%c>\n",
-							pieces_str[moving_piece->type], 1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol]);
-				}
+				present_computer_move(step, moving_piece, best_move->promote_to);
 				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
 				destroy_step_value(best_move);
 				if (move_consequences == 1) { /* the game is over */
@@ -355,7 +379,7 @@ void manage_console(Gameboard *gameboard) {
 			switch (comm->comm_e) {
 				case Start:
 					console_mode = GameMode;
-					console_begin_game(gameboard);
+					keep_on = console_begin_game(gameboard);
 					break;
 				case Set_GameMode:
 					set_game_mode(gameboard, comm);

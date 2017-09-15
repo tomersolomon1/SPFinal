@@ -18,4 +18,9 @@ typedef enum {
 	Both
 } Mode;
 
+typedef enum {
+	ConsoleMode,
+	GuiMode,
+} Program_Mode;
+
 #endif /* DATADEFINITIONS_H_ */

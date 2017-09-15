@@ -1,1 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?><game>	<current_turn>1</current_turn>	<game_mode>1</game_mode>	<difficulty>3</difficulty>	<user_color>0</user_color>	<board>		<row_8>____RR_K</row_8>		<row_7>____q_MM</row_7>		<row_6>____bB__</row_6>		<row_5>____n___</row_5>		<row_4>________</row_4>		<row_3>________</row_3>		<row_2>______mm</row_2>		<row_1>______q_</row_1>	</board></game>
+<?xml version="1.0" encoding="UTF-8"?>
+<game>
+	<current_turn>1</current_turn>
+	<game_mode>1</game_mode>
+	<difficulty>3</difficulty>
+	<user_color>0</user_color>
+	<board>
+		<row_8>____RR_K</row_8>
+		<row_7>_____qMM</row_7>
+		<row_6>____bB__</row_6>
+		<row_5>____n___</row_5>
+		<row_4>________</row_4>
+		<row_3>________</row_3>
+		<row_2>______mm</row_2>
+		<row_1>______k_</row_1>
+	</board>
+</game>
+<general>
+	<piece_1_15_moved>0</piece_1_15_moved>
+	<piece_1_12_moved>1</piece_1_12_moved>
+	<piece_1_13_moved>0</piece_1_13_moved>
+	<piece_0_15_moved>0</piece_0_15_moved>
+	<piece_0_12_moved>1</piece_0_12_moved>
+	<piece_0_13_moved>0</piece_0_13_moved>
+</general>

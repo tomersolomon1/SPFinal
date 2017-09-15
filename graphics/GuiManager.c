@@ -107,6 +107,6 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 		}
 	}
 	else if(wndw->type == Game){
-		begin_game(*game);
+		begin_game(*game, GuiMode);
 	}
 }
