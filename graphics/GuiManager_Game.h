@@ -18,8 +18,8 @@ typedef enum {
 
 // handle event and related functions
 Window_type handle_game_events(Window *window, SDL_Event* event, Gameboard **board);
-bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol, bool is_user_move, Piece_type computer_promotion);
-bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dcol);
+int graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol, bool is_user_move, Piece_type computer_promotion);
+int graphical_handle_move(Window *window, int srow, int scol, int drow, int dcol);
 void save_game_from_gui(Gameboard *game);
 StayOrLeave suggest_save(Gameboard *game);
 

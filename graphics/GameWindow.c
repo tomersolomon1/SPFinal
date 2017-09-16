@@ -47,7 +47,6 @@ void destory_data(GameData *data) {
 	if (data == NULL) {
 		return;
 	}
-	// freeing the the board
 	destroy_board_widget(data->board_widget);
 	free(data);
 }
@@ -100,7 +99,10 @@ SDL_Texture *create_texure_from_bmp(SDL_Renderer *renderer, const char *bmp_path
 		return NULL;
 	}
 	if (transparent_background) {
-		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255)); // make it's background transparent
+		int success = SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255)); // make it's background transparent
+		if (success == -1) {
+			return NULL;
+		}
 	}
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
@@ -112,6 +114,16 @@ BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location) {
 	assert(board_widget != NULL);
 	board_widget->location = spCopyRect(location);
 	board_widget->board = board;
+
+	// nullifying all the pointers
+	board_widget->board_grid = NULL;
+	board_widget->possible_move_texture = NULL;
+	board_widget->threatened_move_texture = NULL;
+	board_widget->capturing_move_texture = NULL;
+	for (int i = 0; i < 6; i++) {
+		board_widget->piece_textures[1][i] = NULL;
+		board_widget->piece_textures[0][i] = NULL;
+	}
 	return board_widget;
 }
 
@@ -155,7 +167,9 @@ int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim
 		int x_offset = data->board_widget->location->x + (step->dcol * col_dim);
 		int y_offset = data->board_widget->location->y + ((7-step->drow) * row_dim);
 		SDL_Rect step_rec = {.x = x_offset, .y = y_offset, .h = row_dim, .w = col_dim };
-		SDL_RenderDrawRect(renderer, &step_rec);
+		if(SDL_RenderDrawRect(renderer, &step_rec) == -1) { /* some SDL error occurred */
+			return -1;
+		}
 		if (step->is_threatened) {
 			success = SDL_RenderCopy(renderer, data->board_widget->threatened_move_texture, NULL, &step_rec);
 		} else {
@@ -170,7 +184,7 @@ int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim
 			return success;
 		}
 	}
-	return 0;
+	return success;
 }
 
 /* return 0 on success, -1 otherwise */

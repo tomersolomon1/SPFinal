@@ -13,14 +13,6 @@
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
-/*
- * assuming the move is legal
- * set the step, and show a SimpleMessageBox if the game is over
- * return:
- * 		true  - the game is over
- * 		false - the game isn't over
- */
-
 Piece_type choose_promotion() {
 	const SDL_MessageBoxButtonData buttons[] = {
 			{ 0, 0, "Pawn" },
@@ -60,7 +52,15 @@ Piece_type choose_promotion() {
 	return buttonid; /* we leave without saving */
 }
 
-bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol,
+/*
+ * assuming the move is legal
+ * set the step, and show a SimpleMessageBox if the game is over
+ * return:
+ * 		1  	- the game is over
+ * 		0 	- the game isn't over
+ * 		-1 	- if some error occurred
+ */
+int graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol,
 		bool is_user_move, Piece_type computer_promotion) {
 	char *colors[] = {"black", "white"};
 	Gameboard *board = window->data->board_widget->board;
@@ -69,6 +69,8 @@ bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, 
 		Piece_type piece_type = choose_promotion();
 		if (piece_type != Empty)  {
 			make_promotion(board, drow, dcol, piece_type);
+		} else { /* piece_type == empty, means error occurred */
+			return -1;
 		}
 	}
 	drawWindow(window, NULL);
@@ -80,30 +82,33 @@ bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, 
 		} else { /* somebody won the game */
 			sprintf(mssg, "Checkmate! %s player wins the game", colors[game_over]);
 		}
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", mssg, NULL);
-		return true;
+		int success = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", mssg, NULL);
+		int res = (success == 0 ? 1 : -1);
+		return res;
 	} else if (is_under_check(board)) {
-		sprintf(mssg, "Check: %s King is threatend!", colors[board->turn]);
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Check!", mssg, NULL);
+		sprintf(mssg, "Check: %s King is threatened!", colors[board->turn]);
+		return SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Check!", mssg, NULL);
 	}
-	return false;
+	return 0;
 }
 
-/* delete  GAME_DEBUG !!!!!!!!!!!!!!!!!!!!*/
-bool graphical_handle_move(Window *window, int srow, int scol, int drow, int dcol) {
-	bool game_over = graphical_handle_single_move(window, srow, scol, drow, dcol, true, Empty);
-	if (game_over) {
-		return true;
+/* return 0 if the game is still on, 1 if the game is over, and -1 if error occurred */
+int graphical_handle_move(Window *window, int srow, int scol, int drow, int dcol) {
+	int move_result = graphical_handle_single_move(window, srow, scol, drow, dcol, true, Empty);
+	if (move_result == 1) { /* the game is over */
+		return 1;
+	} else if (move_result == -1) { /* some error occurred */
+		return -1;
 	} else if (window->data->board_widget->board->game_mode == 1) { /* the game is not over, and we need to play the computer's turn */
 		Gameboard *copy = copy_board(window->data->board_widget->board);
 		StepValue *best_move = find_best_step(copy, copy->difficulty);
 		Step *best_step = best_move->step;
-		bool game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol, false, best_move->promote_to);
+		int game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol, false, best_move->promote_to);
 		destroy_step_value(best_move);
 		destroy_board(copy);
 		return game_over;
 	}
-	return false; /* the game is not over yet */
+	return 0; /* the game is not over yet */
 }
 
 void save_game_from_gui(Gameboard *game) {
@@ -183,7 +188,7 @@ Window_type handle_game_buttons(Window *window, Button* clicked_button, Gameboar
 				op = suggest_save(*game);
 			}
 			if (op == Error) {
-				return ExitGame; /* we are shutting down in case of error */
+				return SDLErrorWindow; /* we are shutting down in case of error */
 			} else if (op == Stay) {
 				return Game;
 			} else {
@@ -197,7 +202,7 @@ Window_type handle_game_buttons(Window *window, Button* clicked_button, Gameboar
 				op = suggest_save(*game);
 			}
 			if (op == Error) {
-				return ExitGame; /* we are shutting down in case of error */
+				return SDLErrorWindow; /* we are shutting down in case of error */
 			} else if (op == Stay) {
 				return Game;
 			} else {
@@ -230,15 +235,21 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 				if (event->button.button == SDL_BUTTON_LEFT) { /* selecting the piece for moving */
 					window->data->picked_piece  = true;
 				} else if (event->button.button == SDL_BUTTON_RIGHT && ((*game)->game_mode == 1) && ((*game)->difficulty == 1 || (*game)->difficulty == 2)) {
-					window->data->highlight_moves = true; /* selecting the highlight squares feature */
+					window->data->highlight_moves = true; /* turning on the highlight squares feature */
 				}
 			} else if (event->type == SDL_MOUSEBUTTONUP && event->button.button == SDL_BUTTON_LEFT && window->data->picked_piece) {
 				window->data->picked_piece  = false; /* the piece is no longer selected */
 				piece = window->data->board_widget->board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
 				if (is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board) == CHESS_BOARD_SUCCESS) {
-					bool game_over = graphical_handle_move(window, piece->row, piece->col, y_board, x_board);
+					int move_result = graphical_handle_move(window, piece->row, piece->col, y_board, x_board);
 					window->data->saved_game = false;
-					next_window = game_over ? ExitGame : Game; /* if the game is over we are quitting right away */
+					if (move_result == 1) {
+						next_window = ExitGame; /* the game is over */
+					} else if (move_result == 0) {
+						next_window = Game; /* the game is still on */
+					} else {
+						next_window = SDLErrorWindow; /* some SDL related error occurred */
+					}
 				}
 				if (ArrayListSize(window->data->board_widget->board->history) > 1 && window->data->board_widget->board->game_mode == 1) {
 					window->buttons[UndoButtonIndex]->active = true; /* updating the undo button, if necessary */

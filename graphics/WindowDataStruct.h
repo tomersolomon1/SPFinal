@@ -18,7 +18,8 @@ typedef enum window_type_t{
 	Difficulty,
 	ChooseColor,
 	Game,
-	ExitGame
+	ExitGame,
+	SDLErrorWindow,
 } Window_type;
 
 typedef struct board_widget {
