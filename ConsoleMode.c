@@ -397,7 +397,8 @@ void manage_console(Gameboard *gameboard) {
 				case Undo_Move: undo_move(gameboard); break;
 				case Reset:
 					console_mode = SettingsMode;
-					reset_game(&gameboard);
+					//reset_game(&gameboard);
+					reset_board(&gameboard);
 					printf("Restarting...\n");
 					printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 					break;

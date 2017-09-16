@@ -33,12 +33,18 @@ void run_console() {
 void check_get_moves_online() {
 	Gameboard *gameboard = create_board(1, 2, 1);
 	char *commands_str[] = {
+			"start",
+			"get_moves <1,G>",
+			"reset",
 			"load graphics/saved_games/save4.xml",
+			"start",
+			"get_moves <1,G>",
+			"reset",
 			"difficulty 1",
 			"start",
 			"get_moves <1,G>",
 	};
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 10; i++) {
 		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
 		assert(line != NULL);
 		strcpy(line, commands_str[i]);
@@ -49,6 +55,7 @@ void check_get_moves_online() {
 			case Set_Difficulty:  set_difficulty(gameboard, comm); break;
 			case Start: console_begin_game(gameboard); break;
 			case Get_Moves: get_moves(gameboard, comm);	break;
+			case Reset: reset_board(&gameboard); break;
 			default:
 				printf("invalid - something went wrong\n");
 				break;
@@ -57,8 +64,8 @@ void check_get_moves_online() {
 }
 
 void console_tester() {
-	run_console();
-	//check_get_moves_online();
+	//run_console();
+	check_get_moves_online();
 }
 
 void emulate_problem() {
