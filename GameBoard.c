@@ -617,21 +617,6 @@ void print_board(Gameboard *gameboard) {
 	fflush(stdout);
 }
 
-
-void print_board_to_log_file(Gameboard *gameboard) {
-	char* a = malloc(2);
-	a[1] = '\0';
-	write_to_log_file("===========================\n");
-	for(int i = (BOARD_SIZE - 1); i >= 0; i--){
-		for(int j = 0; j < BOARD_SIZE; j++){
-			a[0] =gameboard->board[i][j]->sign;
-			write_to_log_file(a);
-		}
-		write_to_log_file("\n");
-	}
-	free(a);
-}
-
 void print_details_game(Gameboard *gameboard){
 	printf("\n");
 	fflush(stdout);

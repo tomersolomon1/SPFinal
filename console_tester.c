@@ -33,11 +33,12 @@ void run_console() {
 void check_get_moves_online() {
 	Gameboard *gameboard = create_board(1, 2, 1);
 	char *commands_str[] = {
-			"load checking_games/check_check1.xml",
+			"load graphics/saved_games/save4.xml",
+			"difficulty 1",
 			"start",
-			"get_moves <1,E>",
+			"get_moves <1,G>",
 	};
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 4; i++) {
 		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
 		assert(line != NULL);
 		strcpy(line, commands_str[i]);
@@ -45,6 +46,7 @@ void check_get_moves_online() {
 		printf("line[%d]:||%s||END\n", i, line);
 		switch (comm->comm_e) {
 			case Load: load_file(&gameboard, comm);	break;
+			case Set_Difficulty:  set_difficulty(gameboard, comm); break;
 			case Start: console_begin_game(gameboard); break;
 			case Get_Moves: get_moves(gameboard, comm);	break;
 			default:

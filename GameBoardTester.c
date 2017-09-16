@@ -9,6 +9,29 @@
 #include "Files.h"
 
 
+/********************************** FOR DEBUGGING ******************************
+void write_to_log_file(const char *event){
+	FILE *f_log = fopen("log.txt","a");
+	fprintf(f_log, event);
+	fclose(f_log);
+	//printf(event); fflush(stdout);
+}
+
+void print_board_to_log_file(Gameboard *gameboard) {
+	char* a = malloc(2);
+	a[1] = '\0';
+	write_to_log_file("===========================\n");
+	for(int i = (BOARD_SIZE - 1); i >= 0; i--){
+		for(int j = 0; j < BOARD_SIZE; j++){
+			a[0] =gameboard->board[i][j]->sign;
+			write_to_log_file(a);
+		}
+		write_to_log_file("\n");
+	}
+	free(a);
+}
+*******************************/
+
 
 void check_GameBoard() {
 //	FILE *f = fopen("C:\\Users\\sapir\\Desktop\\save0.xml", "r");
@@ -46,7 +69,4 @@ void check_GameBoard() {
 	set_step(game,7,3,4,0,false);
 	print_details_game(game);
 //	print_details_game(game);
-
-
-
 }

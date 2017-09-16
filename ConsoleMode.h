@@ -14,6 +14,7 @@
 
 extern char *colors[];
 bool load_file(Gameboard **gameboard_p, Command *comm);
+void set_difficulty(Gameboard *gameboard, Command *comm);
 void manage_console(Gameboard *gameboard);
 int begin_game(Gameboard *gameboard, Program_Mode mode);
 bool console_begin_game(Gameboard *gameboard);

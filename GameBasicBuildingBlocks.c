@@ -6,15 +6,6 @@
  */
 #include "GameBasicBuildingBlocks.h"
 
-//LOG
-//extern FILE *f_log;
-void write_to_log_file(const char *event){
-//	FILE *f_log = fopen("log.txt","a");
-//	fprintf(f_log, event);
-//	fclose(f_log);
-	printf(event); fflush(stdout);
-}
-
 //-------------------Vectors-------------------
 
 
