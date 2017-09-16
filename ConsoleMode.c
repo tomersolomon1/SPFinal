@@ -277,7 +277,7 @@ int steps_comperator(const void *p, const void *q) {
 	}
 }
 
-void present_moves(Gameboard *gameboard, Piece *piece) {
+void present_all_moves(Gameboard *gameboard, Piece *piece) {
 	char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 	char decimal_numbers[] = { '1', '2', '3', '4', '5', '6', '7', '8'};
 	int opponent_color = 1 - piece->colur;
@@ -317,7 +317,7 @@ void get_moves(Gameboard *gameboard, Command *comm) {
 		printf("The specified position does not contain %s player piece\n", colors[gameboard->user_color]);
 		return;
 	}
-	present_moves(gameboard, gameboard->board[comm->arg1][comm->arg2]);
+	present_all_moves(gameboard, gameboard->board[comm->arg1][comm->arg2]);
 }
 
 void save_game(Gameboard *gameboard, Command *comm) {
