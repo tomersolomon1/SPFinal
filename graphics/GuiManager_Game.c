@@ -16,10 +16,10 @@
 Piece_type choose_promotion() {
 	const SDL_MessageBoxButtonData buttons[] = {
 			{ 0, 0, "Pawn" },
-			{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "Knight" },
-			{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 2, "Bishop" },
-			{ 0, 3, "Rock" },
-			{ 0, 4, "Queen" },
+			{ 0, 1, "Knight" },
+			{ 0, 2, "Bishop" },
+			{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 3, "Rook" },
+			{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 4, "Queen" },
 	};
 	const SDL_MessageBoxColorScheme colorScheme = {
 		{ /* .colors (.r, .g, .b) */
@@ -69,7 +69,7 @@ int graphical_handle_single_move(Window *window, int srow, int scol, int drow, i
 		Piece_type piece_type = choose_promotion();
 		if (piece_type != Empty)  {
 			make_promotion(board, drow, dcol, piece_type);
-		} else { /* piece_type == empty, means error occurred */
+		} else { /* piece_type == empty, means SDL error occurred */
 			return -1;
 		}
 	}
