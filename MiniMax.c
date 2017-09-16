@@ -64,11 +64,12 @@ bool update_ab(int *alpha, int *beta, int step_value, NodeType node_type, bool f
  * 		1 - max-node
  */
 StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, NodeType node_type, int eval_perspective, bool first_option, bool dig_in) {
+	//print_board(board);
 	StepValue *best_sv = (StepValue *) malloc(sizeof(StepValue));
 	assert(best_sv != NULL);
 	best_sv->step = NULL; /* default */
 	best_sv->promote_to = Empty; /* default */
-	bool go_deeper = false;
+	bool go_deeper = false; /* for debugging */
 	int game_over = is_game_over_minimax(board);
 	if (game_over == 1 || game_over == 0) { /* it's a checkmate */
 		best_sv->value = node_type ? INT_MIN : INT_MAX;
@@ -80,6 +81,7 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 		int piece_index = 0;
 		while ((alpha < beta) && (piece_index < 16)) { /* each player has 16 pieces */
 			Piece *current_piece = board->all_pieces[board->turn][piece_index];
+			printf("new piece! type: %d has-moved: %d, index: %d\n", current_piece->type, current_piece->has_moved, current_piece->indexat);
 			if (current_piece->alive) {
 				int amount_steps = 0;
 				Step **valid_steps = get_all_valid_steps_of_piece_minimax(board, current_piece, &amount_steps);
@@ -95,20 +97,6 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 						} else {
 							promotion_option = 0; /* setting it again to be zero */
 						}
-					}
-					if (current_piece->type == Queen && search_depth == 4 && step->dcol == 5) { /* for debugging purposes */
-						go_deeper = true;
-					} else if (search_depth == 3 && current_piece->type == Bishop && step->dcol == 1 && dig_in && current_piece->colur == 1) {
-						go_deeper = true;
-					} else if (current_piece->type == Bishop && search_depth == 1 && step->dcol == 5 && dig_in) {
-						go_deeper = true;
-					} else if (search_depth == 2 && dig_in){
-						go_deeper = true;
-					}  else if (((current_piece->type == Bishop && step->dcol == 2) || (current_piece->type == Rock && step->dcol == 5))
-							&& search_depth == 1 && dig_in){
-						go_deeper = true;
-					} else {
-						go_deeper = false;
 					}
 					StepValue *sv = MiniMaxAlgo(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option, go_deeper);
 					if (go_deeper && search_depth != 2) {
@@ -153,6 +141,13 @@ StepValue *find_best_step(Gameboard *board, int search_depth) {
 	StepValue *best_sv = MiniMaxAlgo(board, alpha, beta, search_depth, MaxNode, eval_perspective, true, false);
 	return best_sv;
 }
+
+
+
+
+
+
+
 
 ////// --------------------------  old code ---------------------------
 

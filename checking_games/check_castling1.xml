@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<game>
+	<current_turn>0</current_turn>
+	<game_mode>1</game_mode>
+	<difficulty>1</difficulty>
+	<user_color>1</user_color>
+	<board>
+		<row_8>k___K__R</row_8>
+		<row_7>____RM__</row_7>
+		<row_6>_____m__</row_6>
+		<row_5>________</row_5>
+		<row_4>________</row_4>
+		<row_3>________</row_3>
+		<row_2>________</row_2>
+		<row_1>________</row_1>
+	</board>
+</game>
+<general>
+	<piece_0_15_moved>0</piece_0_15_moved>
+	<piece_0_14_moved>0</piece_0_14_moved>
+	<piece_0_13_moved>0</piece_0_13_moved>
+	<piece_0_12_moved>0</piece_0_12_moved>
+</general>
