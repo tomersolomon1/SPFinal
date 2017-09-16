@@ -86,7 +86,7 @@ void set_difficulty(Gameboard *gameboard, Command *comm) {
 	} else if (comm->arg1 > 5 || comm->arg1 < 1) {
 		printf("Wrong difficulty level. The value should be between 1 to 5\n");
 	} else { /* arg is in the right range */
-		gameboard->difficulty = comm->arg1;
+		change_game_difficulty(gameboard, comm->arg1);
 	}
 }
 
