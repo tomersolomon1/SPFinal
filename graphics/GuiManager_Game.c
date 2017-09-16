@@ -71,7 +71,6 @@ bool graphical_handle_single_move(Window *window, int srow, int scol, int drow, 
 			make_promotion(board, drow, dcol, piece_type);
 		}
 	}
-	//draw_board(window->data, window->windowRenderer, NULL); /* check the clear-renderer */
 	drawWindow(window, NULL);
 	int game_over = is_game_over(board);
 	char mssg[50];

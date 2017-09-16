@@ -11,12 +11,6 @@
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
-
-const char *white_pieces_images[] = {CHESS_IMAGE(WPawn), CHESS_IMAGE(WKnight), CHESS_IMAGE(WBishop),
-		CHESS_IMAGE(WRock),	CHESS_IMAGE(WQueen), CHESS_IMAGE(WKing)};
-const char *black_pieces_images[] = {CHESS_IMAGE(BPawn), CHESS_IMAGE(BKnight), CHESS_IMAGE(BBishop),
-		CHESS_IMAGE(BRock),	CHESS_IMAGE(BQueen), CHESS_IMAGE(BKing)};
-
 void destroy_game_textures(BoardWidget *board_widget) {
 	SDL_DestroyTexture(board_widget->board_grid);
 	if (board_widget->possible_move_texture != NULL) {
@@ -37,6 +31,15 @@ void destroy_game_textures(BoardWidget *board_widget) {
 	}
 }
 
+void destroy_board_widget(BoardWidget *board_widget) {
+	if (board_widget == NULL) {
+		return;
+	}
+	destroy_game_textures(board_widget);
+	free(board_widget->location);
+	free(board_widget);
+}
+
 /*
  * somebody else is in-charge of destroying the gameboard itself
  */
@@ -44,11 +47,8 @@ void destory_data(GameData *data) {
 	if (data == NULL) {
 		return;
 	}
-	// freeing the textures
-	destroy_game_textures(data->board_widget);
-
-	free(data->board_widget->location);
-	free(data->board_widget);
+	// freeing the the board
+	destroy_board_widget(data->board_widget);
 	free(data);
 }
 
@@ -66,7 +66,8 @@ Button **create_game_buttons(SDL_Renderer* window_renderer) {
 
 	ButtonType types[] = {RestartButton, SaveButton, LoadButton, UndoButton, MenuButton, ExitButton};
 	const char* image[] = {IMG(restart), IMG(save), IMG(load), IMG(undo), IMG(main_menu), IMG(exit)};
-	const char* image_inavtice[] = {IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(undo), IMG_INCTV(white), IMG_INCTV(white)};
+	const char* image_inavtice[] = {IMG_INCTV(white), IMG_INCTV(white), IMG_INCTV(white),
+			IMG_INCTV(undo), IMG_INCTV(white), IMG_INCTV(white)}; /* only the undo is relevant */
 	bool active[] = {true, true, true, false, true, true};
 	bool visible[] = {true, true, true, true, true, true};
 	Button **buttons = create_buttons(window_renderer, types, 6, x_btn_places,
@@ -81,7 +82,7 @@ GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
 			.h = 8*(DEFAULT_BOARD_MAXIMAL_HEIGHT/9), .w = 8*(DEFAULT_BOARD_MAXIMAL_WIDTH/9) };
 	data->board_widget = create_widget_board(renderer, board, &board_rec);
 	if (data->board_widget == NULL) {
-		free(data);
+		destory_data(data);
 		return NULL;
 	}
 	data->picked_piece = false;
@@ -92,53 +93,53 @@ GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
 	return data;
 }
 
-/* return NULL on failure */
-BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location) {
+/* return the texture on success, otherwise return NULL */
+SDL_Texture *create_texure_from_bmp(SDL_Renderer *renderer, const char *bmp_path, bool transparent_background) {
+	SDL_Surface *surface = SDL_LoadBMP(bmp_path); // don't forget to check the board later
+	if (surface == NULL) {
+		return NULL;
+	}
+	if (transparent_background) {
+		SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255)); // make it's background transparent
+	}
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_FreeSurface(surface);
+	return texture;
+}
+
+BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location) {
 	BoardWidget *board_widget = (BoardWidget *) malloc(sizeof(BoardWidget));
+	assert(board_widget != NULL);
 	board_widget->location = spCopyRect(location);
 	board_widget->board = board;
+	return board_widget;
+}
 
-	// create texture for the board
-	SDL_Surface *board_grid = SDL_LoadBMP(IMG(ChessBoard)); // don't forget to check the board later
-	board_widget->board_grid = SDL_CreateTextureFromSurface(window_renderer, board_grid);
-	if (board_grid == NULL || board_widget->board_grid == NULL) {
-		return NULL;
-	}
-	SDL_FreeSurface(board_grid);
-	SDL_Surface *possible_move_surface   = SDL_LoadBMP(IMG(possible square));
-	SDL_Surface *threatened_move_surface   = SDL_LoadBMP(IMG(threatened square));
-	SDL_Surface *capturing_move_surface   = SDL_LoadBMP(IMG(capturing square));
-	if (possible_move_surface == NULL || threatened_move_surface == NULL || capturing_move_surface == NULL) {
-		SDL_FreeSurface(possible_move_surface);
-		SDL_FreeSurface(threatened_move_surface);
-		SDL_FreeSurface(capturing_move_surface);
-		return NULL;
-	}
-	board_widget->possible_move_texture = SDL_CreateTextureFromSurface(window_renderer, possible_move_surface);
-	board_widget->threatened_move_texture = SDL_CreateTextureFromSurface(window_renderer, threatened_move_surface);
-	board_widget->capturing_move_texture = SDL_CreateTextureFromSurface(window_renderer, capturing_move_surface);
-	if (board_widget->possible_move_texture == NULL || board_widget->threatened_move_texture == NULL || board_widget->capturing_move_texture == NULL) {
-		destroy_game_textures(board_widget);
-		return NULL;
+/* return NULL on failure, otherwise return a pointer to BoardWidget */
+BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location) {
+	const char *white_pieces_images[] = {CHESS_IMAGE(WPawn), CHESS_IMAGE(WKnight), CHESS_IMAGE(WBishop),
+			CHESS_IMAGE(WRock),	CHESS_IMAGE(WQueen), CHESS_IMAGE(WKing)}; /* white pieces BMP paths */
+	const char *black_pieces_images[] = {CHESS_IMAGE(BPawn), CHESS_IMAGE(BKnight), CHESS_IMAGE(BBishop),
+			CHESS_IMAGE(BRock),	CHESS_IMAGE(BQueen), CHESS_IMAGE(BKing)}; /* black pieces BMP paths */
+
+	BoardWidget *board_widget = init_widget_board(board, location);
+	char *board_bmps[] = {IMG(ChessBoard), IMG(possible square), IMG(threatened square), IMG(capturing square)};
+	SDL_Texture **board_textures[] = {&(board_widget->board_grid), &(board_widget->possible_move_texture),
+			&(board_widget->threatened_move_texture), &(board_widget->capturing_move_texture)};
+	// create texture for the board and the squares
+	for (int i = 0; i < 4; i++) {
+		*(board_textures[i]) = create_texure_from_bmp(window_renderer, board_bmps[i], false);
+		if (*(board_textures[i]) == NULL) {
+			destroy_board_widget(board_widget);
+			return NULL;
+		}
 	}
 	// create texture for the pieces
 	for (int i = 0; i < 6; i++) {
-		SDL_Surface *white_piece_surface = SDL_LoadBMP(white_pieces_images[i]);
-		SDL_Surface *black_piece_surface = SDL_LoadBMP(black_pieces_images[i]);
-		if(white_piece_surface == NULL || black_piece_surface == NULL) { /* see what's in the manual later */
-			SDL_FreeSurface(white_piece_surface);
-			SDL_FreeSurface(black_piece_surface);
-			destroy_game_textures(board_widget);
-			return NULL;
-		}
-		SDL_SetColorKey(white_piece_surface, SDL_TRUE, SDL_MapRGB(white_piece_surface->format, 255, 0, 255)); // make it's background transparent
-		SDL_SetColorKey(black_piece_surface, SDL_TRUE, SDL_MapRGB(black_piece_surface->format, 255, 0, 255)); // make it's background transparent
-		board_widget->piece_textures[0][i] = SDL_CreateTextureFromSurface(window_renderer, black_piece_surface);
-		board_widget->piece_textures[1][i] = SDL_CreateTextureFromSurface(window_renderer, white_piece_surface);
-		SDL_FreeSurface(white_piece_surface);
-		SDL_FreeSurface(black_piece_surface);
-		if (board_widget->piece_textures[0][i] == NULL || board_widget->piece_textures[1][i] == NULL) { /* see what's in the manual later */
-			destroy_game_textures(board_widget);
+		board_widget->piece_textures[1][i] = create_texure_from_bmp(window_renderer, white_pieces_images[i], true);
+		board_widget->piece_textures[0][i] = create_texure_from_bmp(window_renderer, black_pieces_images[i], true);
+		if (board_widget->piece_textures[0][i] == NULL || board_widget->piece_textures[1][i] == NULL) {
+			destroy_board_widget(board_widget);
 			return NULL;
 		}
 	}
@@ -172,9 +173,12 @@ int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim
 	return 0;
 }
 
-void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
-	//SDL_RenderClear(renderer);
-	SDL_RenderCopy(renderer, data->board_widget->board_grid, NULL, data->board_widget->location);
+/* return 0 on success, -1 otherwise */
+int draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
+	int success = SDL_RenderCopy(renderer, data->board_widget->board_grid, NULL, data->board_widget->location);
+	if (success == -1) {
+		return -1;
+	}
 	int row_rec_dim = data->board_widget->location->h / 9;
 	int col_rec_dim = data->board_widget->location->w / 9;
 	int row_dim = data->board_widget->location->h / 8;
@@ -187,10 +191,14 @@ void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
 	for (int color = 0; color < 2; color++) {
 		for (int i = 0; i < 16; i++) {
 			Piece *piece = data->board_widget->board->all_pieces[color][i];
-			if (piece->alive && (color != data->selected_piece_color || i != data->selected_piece_index || !data->picked_piece)) { /* this piece is alive and not selected, thus need to be drawn in his current place */
+			if (piece->alive && (color != data->selected_piece_color || i != data->selected_piece_index || !data->picked_piece)) {
+				/* this piece is alive and not selected, thus need to be drawn in his current place */
 				piece_rec.x = data->board_widget->location->x + HORIZONTAL_CENTERING + piece->col*col_dim;
 				piece_rec.y = data->board_widget->location->y + VERTICAL_CENTERING + (7 - piece->row)*row_dim;
-				SDL_RenderCopy(renderer, data->board_widget->piece_textures[piece->colur][piece->type], NULL, &piece_rec);
+				success = SDL_RenderCopy(renderer, data->board_widget->piece_textures[piece->colur][piece->type], NULL, &piece_rec);
+			}
+			if (success == -1) {
+				return -1;
 			}
 		}
 	}
@@ -198,62 +206,7 @@ void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
 		piece_rec.x = event->motion.x;
 		piece_rec.y = event->motion.y;
 		Piece *piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
-		SDL_RenderCopy(renderer, data->board_widget->piece_textures[data->selected_piece_color][piece->type], NULL, &piece_rec);
+		success = SDL_RenderCopy(renderer, data->board_widget->piece_textures[data->selected_piece_color][piece->type], NULL, &piece_rec);
 	}
+	return success;
 }
-
-
-
-// ------------------------------- for debugging only --------------------------------------
-// for debugging purposes
-void drawGameWindow(Window* src, SDL_Event* event) {
-	if (src == NULL ) {
-		return;
-	}
-	// draw window:
-	SDL_SetRenderDrawColor(src->windowRenderer, 255, 255, 255, 255);
-	SDL_RenderClear(src->windowRenderer);
-	draw_board(src->data, src->windowRenderer, event); /* no piece was selected */
-	for (int i = 0; i < src->num_buttons; i++) {
-		drawButton(src->buttons[i]);
-	}
-	SDL_RenderPresent(src->windowRenderer);
-}
-
-/* debugging function */
-char *ABC2[] = { "A", "B", "C", "D","E","F", "G","H" };
-void recognize_square(Window *window, int x, int y) {
-	SDL_Point point = {.x = x, .y = y };
-	if(SDL_PointInRect(&point ,window->data->board_widget->location)) { // inside the board
-		int relative_x = x - window->data->board_widget->location->x;
-		int relative_y = y - window->data->board_widget->location->y;
-		int x_board = (8*relative_x / window->data->board_widget->location->w);
-		int y_board = 8 - (8*relative_y / window->data->board_widget->location->h);
-		printf("hit on board:%s%d\n", ABC2[x_board], y_board);
-	} else {
-		printf("outside the window!\n");
-	}
-	fflush(stdout);
-}
-
-/* debugging function */
-Window *create_game_window(Gameboard *board) {
-	Window *game_window = (Window *) malloc(sizeof(Window));
-	//game_window->board = board;
-	SDL_Window* window = SDL_CreateWindow("Chess Game",  // window title
-				SDL_WINDOWPOS_CENTERED,           // initial x position
-				SDL_WINDOWPOS_CENTERED,           // initial y position
-				DEFAULT_GAME_WINDOW_WIDTH,        // width, in pixels
-				DEFAULT_GAME_WINDOW_HEIGHT,       // height, in pixels
-				SDL_WINDOW_OPENGL                 // flags
-				);
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	game_window->window = window;
-	game_window->windowRenderer = renderer;
-	game_window->num_buttons = 6;
-	game_window->buttons = create_game_buttons(renderer);
-	assert(game_window->buttons != NULL);
-	game_window->data = create_game_data(renderer, board);
-	return game_window;
-}
-

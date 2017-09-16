@@ -58,7 +58,7 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 Button **create_game_buttons(SDL_Renderer* window_renderer);
 
 // draw board
-void draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
+int draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event);
 
 ////////////////// debug functions
 Window *create_game_window(Gameboard *board);

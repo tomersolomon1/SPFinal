@@ -58,8 +58,9 @@ Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_
 		SDL_Rect Rec = {.x = x_btn_places[i], .y = y_btn_places[i], .h = btn_height, .w = btn_width};
 		buttons[i] = createButton(renderer, &Rec, image[i], image_inavtice[i], types[i], active[i], visible[i]);
 		if(buttons[i] == NULL){
-			for(int j = 0; j < i; j++)
+			for(int j = 0; j < i; j++) {
 				destroyButton(buttons[j]);
+			}
 			free(buttons);
 			return NULL;
 		}
