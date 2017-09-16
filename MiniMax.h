@@ -32,7 +32,7 @@ typedef struct step_value {
 
 int sumup_pieces(Gameboard *board, int color);
 int eval(Gameboard *board, int eval_perspective);
-void prune(int *alpha, int *beta, int step_value, int node_type);
+bool update_ab(int *alpha, int *beta, int step_value, NodeType node_type, bool first_move);
 Move find_best_move(Gameboard *board, int search_depth); /* old version of the min-max algo*/
 StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth,
 NodeType node_type, int eval_perspective, bool first_option);
