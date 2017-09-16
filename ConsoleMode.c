@@ -275,7 +275,6 @@ int steps_comperator(const void *p, const void *q) {
 			return (*step1)->drow - (*step2)->drow;
 		}
 	}
-
 }
 
 void present_moves(Gameboard *gameboard, Piece *piece) {
@@ -361,18 +360,18 @@ void reset_game(Gameboard **gameboard) {
 	*gameboard = create_board(old_game_mode, old_difficulty, old_user_color);
 }
 
-/* return 1 if we should enter game-mode, and 0 if should quit */
+/* gameboard is a pointer to a Gameboard object, with default values */
 void manage_console(Gameboard *gameboard) {
 	bool keep_on = true;
 	Mode console_mode = SettingsMode;
-	printf("Specify game setting or type 'start' to begin a game with the current setting:\n"); /* !!!!!! to be printed each time we are in settings mode */
+	printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 	fflush(stdout);
-	while (keep_on) {
+	while (keep_on) { /* keep on get new command, until the game is over, or received a 'quit' command */
 		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
 		assert(line != NULL);
-		fgets(line, SP_MAX_LINE_LENGTH, stdin);
-		Command *comm = parser(line);
-		free(line);
+		fgets(line, SP_MAX_LINE_LENGTH, stdin); /* copying the input to line */
+		Command *comm = parser(line); /* parsing the line */
+		free(line); /* we don't need the line as a string anymore */
 		if (comm->comm_e == Invalid_command  || (comm->mode != console_mode && comm->mode != Both)) {
 			printf("ERROR: invalid command\n");
 		} else { /* appropriate command  */
@@ -381,42 +380,25 @@ void manage_console(Gameboard *gameboard) {
 					console_mode = GameMode;
 					keep_on = console_begin_game(gameboard);
 					break;
-				case Set_GameMode:
-					set_game_mode(gameboard, comm);
-					break;
-				case Set_Difficulty:
-					set_difficulty(gameboard, comm);
-					break;
-				case Set_UserColor:
-					set_color(gameboard, comm);
-					break;
-				case Load:
-					load_file(&gameboard, comm);
-					break;
-				case Restore_Default:
-					resore_default_values(gameboard);
-					break;
-				case Print_Settings:
-					print_settings(gameboard);
-					break;
+				case Set_GameMode:    set_game_mode(gameboard, comm); break;
+				case Set_Difficulty:  set_difficulty(gameboard, comm); break;
+				case Set_UserColor:   set_color(gameboard, comm); break;
+				case Load:            load_file(&gameboard, comm);	break;
+				case Restore_Default: resore_default_values(gameboard);	break;
+				case Print_Settings:  print_settings(gameboard);	break;
 				case Make_Move:
 					keep_on = make_move(gameboard, comm); /* so we know if the game is over */
 					break;
 				case Castle:
 					keep_on = castling_move(gameboard, comm); /* so we know if the game is over */
 					break;
-				case Get_Moves:
-					get_moves(gameboard, comm);
-					break;
-				case Save:
-					save_game(gameboard, comm);
-					break;
-				case Undo_Move:
-					undo_move(gameboard);
-					break;
+				case Get_Moves: get_moves(gameboard, comm);	break;
+				case Save: save_game(gameboard, comm); break;
+				case Undo_Move: undo_move(gameboard); break;
 				case Reset:
 					console_mode = SettingsMode;
 					reset_game(&gameboard);
+					printf("Restarting...\n");
 					printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 					break;
 				case Quit:

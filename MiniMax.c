@@ -40,11 +40,9 @@ int eval(Gameboard *board, int eval_perspective) {
 /* return true if found a better option */
 bool update_ab(int *alpha, int *beta, int step_value, NodeType node_type, bool first_move) {
 	if (node_type == MinNode && (*beta > step_value || first_move)) { /* it's a min-node */
-		//*beta = (*beta < step_value) ? *beta : step_value;
 		*beta = step_value;
 		return true; /* found a better option */
 	} else if (node_type == MaxNode && (*alpha < step_value || first_move)) { /* it's a max-node */
-		//*alpha = (*alpha > step_value) ? *alpha : step_value;
 		*alpha = step_value;
 		return true; /* found a better option */
 	}
@@ -53,7 +51,13 @@ bool update_ab(int *alpha, int *beta, int step_value, NodeType node_type, bool f
 	}
 }
 
-
+StepValue *init_step_value() {
+	StepValue *sv = (StepValue *) malloc(sizeof(StepValue));
+	assert(sv != NULL);
+	sv->step = NULL; /* default */
+	sv->promote_to = Empty; /* default */
+	return sv;
+}
 
 /* using the most recent functions of game-board utility
  * assuming we can alter the board as we will
@@ -63,13 +67,9 @@ bool update_ab(int *alpha, int *beta, int step_value, NodeType node_type, bool f
  * 		0 - min-node
  * 		1 - max-node
  */
-StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, NodeType node_type, int eval_perspective, bool first_option, bool dig_in) {
-	//print_board(board);
-	StepValue *best_sv = (StepValue *) malloc(sizeof(StepValue));
-	assert(best_sv != NULL);
-	best_sv->step = NULL; /* default */
-	best_sv->promote_to = Empty; /* default */
-	bool go_deeper = false; /* for debugging */
+StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth,
+		NodeType node_type, int eval_perspective, bool first_option) {
+	StepValue *best_sv = init_step_value();
 	int game_over = is_game_over_minimax(board);
 	if (game_over == 1 || game_over == 0) { /* it's a checkmate */
 		best_sv->value = node_type ? INT_MIN : INT_MAX;
@@ -81,52 +81,42 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
 		int piece_index = 0;
 		while ((alpha < beta) && (piece_index < 16)) { /* each player has 16 pieces */
 			Piece *current_piece = board->all_pieces[board->turn][piece_index];
-			printf("new piece! type: %d has-moved: %d, index: %d\n", current_piece->type, current_piece->has_moved, current_piece->indexat);
 			if (current_piece->alive) {
 				int amount_steps = 0;
 				Step **valid_steps = get_all_valid_steps_of_piece_minimax(board, current_piece, &amount_steps);
 				int promote_to = Empty; /* default */
 				for (int step_index = 0, promotion_option = 0; (step_index < amount_steps) && (alpha < beta); step_index++){
 					Step *step = valid_steps[step_index];
-					CHESS_BOARD_MESSAGE msg = commit_move(board, step->srow, step->scol, step->drow, step->dcol, true, promotion_option);
+					CHESS_BOARD_MESSAGE msg = commit_move(board, step->srow, step->scol,
+							step->drow, step->dcol, true, promotion_option);
 					if (step->src_previous_state == Was_promoted) { /* a pawn can be promoted to only 5 different pieces */
 						promote_to = promotion_option;
 						if (promotion_option < 4) {
 							promotion_option += 1;
 							step_index -= 1; /* we are stalling the enumeration of the steps, so we could check all promotion possibilities */
 						} else {
-							promotion_option = 0; /* setting it again to be zero */
+							promotion_option = 0; /* setting promotion_option to be zero again */
 						}
 					}
-					StepValue *sv = MiniMaxAlgo(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option, go_deeper);
-					if (go_deeper && search_depth != 2) {
-						printf("search_depth: %d, moving piece: %d, to: <%d,%d> \n",search_depth,  current_piece->type, step->drow, step->dcol);
-						printf("go-deeper! move-value %d\n", sv->value);
-						print_board(board);
-					}
+					StepValue *sv = MiniMaxAlgo(board, alpha, beta, search_depth-1, 1-node_type, eval_perspective, first_option);
 					if (update_ab(&alpha, &beta, sv->value, node_type, first_option)) {
-						if (dig_in && search_depth == 1){
-							printf("best move after digging:\n");
-							printf("alpha: %d, beta: %d\n", alpha, beta);
-							print_board(board);
-						}
 						destroy_step(best_sv->step);
 						best_sv->step = copy_step(step);
 						if (msg == CHESS_BOARD_PROMOTION) { /* it was a promotion move */
 							best_sv->promote_to = promote_to; /* saving the piece-type we are promoting to */
 						} else {
-							best_sv->promote_to = Empty;
+							best_sv->promote_to = Empty; /* the new best-move wasn't a promotion */
 						}
 					}
 					first_option = false;
 					destroy_step_value(sv);
 					undo_step(board, true);
 				}
-				free_all_valid_steps_minimax(valid_steps, current_piece->type);
+				free_all_valid_steps_minimax(valid_steps, current_piece->type); /* free all steps */
 			}
 			piece_index++;
 		}
-		best_sv->value = node_type ? alpha : beta; /* to be removed?? */
+		best_sv->value = node_type ? alpha : beta;
 		return best_sv;
 	}
 }
@@ -135,10 +125,11 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth, 
  * we assume the game is not over
  */
 StepValue *find_best_step(Gameboard *board, int search_depth) {
+	//print_board(board);
 	int alpha = INT_MIN;
 	int beta  = INT_MAX;
 	int eval_perspective = board->turn;
-	StepValue *best_sv = MiniMaxAlgo(board, alpha, beta, search_depth, MaxNode, eval_perspective, true, false);
+	StepValue *best_sv = MiniMaxAlgo(board, alpha, beta, search_depth, MaxNode, eval_perspective, true);
 	return best_sv;
 }
 
