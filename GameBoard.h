@@ -74,6 +74,9 @@ Gameboard *copy_board(Gameboard* old);
 /* reset board with same parameters like *gameboard */
 void reset_board(Gameboard** gameboard);
 
+/*change game difficulty*/
+void change_game_difficulty(Gameboard* gameboard, int new_difficulty);
+
 //----------------------------------------Set Step----------------------------------------
 /*make a step
  * gets source and destination coordinates as 0-7 numbers

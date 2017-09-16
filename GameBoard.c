@@ -120,6 +120,14 @@ void reset_board(Gameboard** gameboard){
 	*gameboard = create_board(game_mode, difficulty, user_color);
 }
 
+void change_game_difficulty(Gameboard* gameboard, int new_difficulty){
+	if(new_difficulty < 1 || new_difficulty > 4)
+		return;
+	gameboard->difficulty = new_difficulty;
+	if(new_difficulty == 1 || new_difficulty == 2)
+		set_all_valid_steps(gameboard);
+}
+
 //-----------------------Set Step-----------------------
 
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol, bool is_minimax){
