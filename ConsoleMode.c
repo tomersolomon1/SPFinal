@@ -352,14 +352,6 @@ void undo_move(Gameboard *gameboard) {
 	}
 }
 
-void reset_game(Gameboard **gameboard) {
-	int old_game_mode = (*gameboard)->game_mode;
-	int old_user_color= (*gameboard)->user_color;
-	int old_difficulty = (*gameboard)->difficulty;
-	destroy_board(*gameboard);
-	*gameboard = create_board(old_game_mode, old_difficulty, old_user_color);
-}
-
 /* gameboard is a pointer to a Gameboard object, with default values */
 void manage_console(Gameboard *gameboard) {
 	bool keep_on = true;

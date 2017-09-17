@@ -64,8 +64,8 @@ void check_get_moves_online() {
 }
 
 void console_tester() {
-	//run_console();
-	check_get_moves_online();
+	run_console();
+	//check_get_moves_online();
 }
 
 void emulate_problem() {
