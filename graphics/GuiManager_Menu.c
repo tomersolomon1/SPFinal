@@ -41,15 +41,15 @@ Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game, 
 	else if(btn->type == LoadButton){
 		FILE *f = NULL;
 		if(slot1->active)
-			f = fopen(saved_files[0], "r");
+			f = fopen(SAVED_GAME(0), "r");
 		else if(slot2->active)
-			f = fopen(saved_files[1], "r");
+			f = fopen(SAVED_GAME(1), "r");
 		else if(slot3->active)
-			f = fopen(saved_files[2], "r");
+			f = fopen(SAVED_GAME(2), "r");
 		else if(slot4->active)
-			f = fopen(saved_files[3], "r");
+			f = fopen(SAVED_GAME(3), "r");
 		else if(slot5->active)
-			f = fopen(saved_files[4], "r");
+			f = fopen(SAVED_GAME(4), "r");
 		assert(f != NULL);
 		destroy_board(*game);
 		*game = load_game(f);
@@ -99,13 +99,13 @@ Window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game)
 	Button* hard = get_button_by_type(wndw, HardDiff);
 	if(btn->type == NextButton){
 		if(noob->active)
-			(*game)->difficulty = 1;
+			change_game_difficulty((*game), 1);
 		if(easy->active)
-			(*game)->difficulty = 2;
+			change_game_difficulty((*game), 2);
 		if(moder->active)
-			(*game)->difficulty = 3;
+			change_game_difficulty((*game), 3);
 		if(hard->active)
-			(*game)->difficulty = 4;
+			change_game_difficulty((*game), 4);
 		return ChooseColor;
 	}
 	else if(NoobDiff <= btn->type && btn->type <= HardDiff){

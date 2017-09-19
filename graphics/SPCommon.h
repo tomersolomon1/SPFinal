@@ -18,8 +18,9 @@
 
 #define IMG(x) "./graphics/images/"#x".bmp"
 #define IMG_INCTV(x) "./graphics/images/"#x"_inactive.bmp"
+#define SAVED_GAME(x) "./graphics/saved_games/save"#x".xml"
+#define AMOUNT_GAME_SLOTS 5
 
-extern const char *saved_files[];
 int count_saves();
 void promote_saves();
 SDL_Rect* spCopyRect(SDL_Rect* src);

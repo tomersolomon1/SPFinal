@@ -6,31 +6,24 @@
 #include "SPCommon.h"
 #include <stdlib.h>
 
-const char *saved_files[] = {
-		"./graphics/saved_games/save0.xml",
-		"./graphics/saved_games/save1.xml",
-		"./graphics/saved_games/save2.xml",
-		"./graphics/saved_games/save3.xml",
-		"./graphics/saved_games/save4.xml" };
-
 /* count how many saved-files exist, the first save file that doesn't exist ends the counting */
 int count_saves() {
 	int count = 0;
-	while (count < 5 && (access(saved_files[count], F_OK) == 0)) {
+	while (count < AMOUNT_GAME_SLOTS && (access(SAVED_GAME(count), F_OK) == 0)) {
 		count++;
 	}
 	return count;
 }
 
-void promote_saves() {
+void promote_saves(){
 	int saves = count_saves();
-	int i = saves-1; /* default */
-	if (saves == 5) {
-		remove(saved_files[4]); /* the most old saved file is erased */
-		i = saves-2;
+	int i = saves - 1; /* default */
+	if (saves == AMOUNT_GAME_SLOTS) {
+		remove(SAVED_GAME(AMOUNT_GAME_SLOTS - 1)); /* the most old saved file is erased */
+		i = saves - 2;
 	}
 	for (; i >= 0; i--) {
-		rename(saved_files[i], saved_files[i+1]);
+		rename(SAVED_GAME(i), SAVED_GAME(i+1));
 	}
 }
 

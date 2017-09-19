@@ -14,9 +14,11 @@ void run_gui(){
 	Gameboard* game = create_board(GAME_DEFAULT_MODE, GAME_DEFAULT_DIFFICULTY, GAME_DEFAULT_COLOR);
 	while(1){
 		Window* window = create_window(type_window, game);
-		if(window == NULL)
-			return;
 		type_window = handleEvenet(window, &game, old_type_window);
+		if(type_window == SDLErrorWindow){
+			printf("There was a problem with SDL to to open the window\n");
+			break;
+		}
 		old_type_window = window->type;
 		destroyWindow(window);
 		if(type_window == ExitGame)
@@ -27,7 +29,7 @@ void run_gui(){
 
 Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_window){
 	if(wndw == NULL)
-		return ExitGame;
+		return SDLErrorWindow;
 	Window_type type = Enterance;
 	SDL_Event event;
 	set_buttons_by_game_params(wndw, game);
