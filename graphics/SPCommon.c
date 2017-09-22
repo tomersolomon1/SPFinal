@@ -61,3 +61,21 @@ bool mouse_in_rec(int x, int y, SDL_Rect *rect) {
 	return SDL_PointInRect(&point, rect);
 }
 
+
+/* return the texture on success, otherwise return NULL (the returned texture might be NULL) */
+SDL_Texture *create_texure_from_bmp(SDL_Renderer *renderer, const char *bmp_path, bool transparent_background) {
+	SDL_Surface *surface = SDL_LoadBMP(bmp_path); // don't forget to check the board later
+	if (surface == NULL) {
+		return NULL;
+	}
+	if (transparent_background) {
+		int success = SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 255, 0, 255)); // make it's background transparent
+		if (success == -1) {
+			SDL_FreeSurface(surface);
+			return NULL;
+		}
+	}
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_FreeSurface(surface);
+	return texture;
+}
