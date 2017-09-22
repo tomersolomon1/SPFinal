@@ -19,21 +19,21 @@
 #define AMOUNT_VECTORS_PAWN 3
 #define AMOUNT_VECTORS_KNIGHT 8
 #define AMOUNT_VECTORS_BISHOP 4
-#define AMOUNT_VECTORS_ROCK 4
+#define AMOUNT_VECTORS_ROOK 4
 #define AMOUNT_VECTORS_QUEEN 8
 #define AMOUNT_VECTORS_KING 8
 
 #define AMOUNT_STEPS_PAWN 4
 #define AMOUNT_STEPS_KNIGHT 8
 #define AMOUNT_STEPS_BISHOP 14
-#define AMOUNT_STEPS_ROCK 14
+#define AMOUNT_STEPS_ROOK 14
 #define AMOUNT_STEPS_QUEEN 27
 #define AMOUNT_STEPS_KING 10
 
 #define SIGN_PAWN 'M'
 #define SIGN_KNIGHT 'N'
 #define SIGN_BISHOP 'B'
-#define SIGN_ROCK 'R'
+#define SIGN_ROOK 'R'
 #define SIGN_QUEEN 'Q'
 #define SIGN_KING 'K'
 #define SIGN_EMPTY '_'
@@ -45,7 +45,7 @@ typedef enum {
 	Pawn,
 	Knight,
 	Bishop,
-	Rock,
+	Rook,
 	Queen,
 	King,
 	Empty
@@ -140,6 +140,9 @@ void change_piece_type(Piece *piece, Piece_type new_type);
 
 /*get sign of piece by piece type and color*/
 char sign_of_piece(Piece_type type, int colur);
+
+/*get type of piece by its sign*/
+Piece_type get_piece_type_by_sign(char sign);
 
 /*get amount of progressing vectors by piece type*/
 int amount_vectors_of_piece_type(Piece_type type);

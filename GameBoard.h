@@ -163,7 +163,7 @@ bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step);
 void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, int *amount_steps);
 
 /* helping function for set_castling_steps */
-bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock);
+bool is_castling_valid_per_rook(Gameboard * gameboard, Piece* king, Piece* rook);
 
 //-------------------------------------Undo-------------------------------------
 

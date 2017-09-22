@@ -18,9 +18,12 @@
 
 #define IMG(x) "./graphics/images/"#x".bmp"
 #define IMG_INCTV(x) "./graphics/images/"#x"_inactive.bmp"
-#define SAVED_GAME(x) "./graphics/saved_games/save"#x".xml"
+#define SAVED_GAME_PATH() "./graphics/saved_games/save%d.xml"
+#define SAVED_GAME_PATH_LENGTH 33
+
 #define AMOUNT_GAME_SLOTS 5
 
+void set_game_path(char* game_path, int i);
 int count_saves();
 void promote_saves();
 SDL_Rect* spCopyRect(SDL_Rect* src);

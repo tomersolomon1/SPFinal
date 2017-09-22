@@ -237,7 +237,7 @@ void set_vectors(Piece_type type, int colur, Vector **vectors){
 		vectors[2] = create_vector(1, 1, 8, true, true);
 		vectors[3] = create_vector(-1, -1, 8, true, true);
 	}
-	else if(type == Rock){
+	else if(type == Rook){
 		vectors[0] = create_vector(1, 0, 8, true, true);
 		vectors[1] = create_vector(-1, 0, 8, true, true);
 		vectors[2] = create_vector(0, 1, 8, true, true);
@@ -273,8 +273,8 @@ int amount_vectors_of_piece_type(Piece_type type){
 			return AMOUNT_VECTORS_KNIGHT;
 		case Bishop:
 			return AMOUNT_VECTORS_BISHOP;
-		case Rock:
-			return AMOUNT_VECTORS_ROCK;
+		case Rook:
+			return AMOUNT_VECTORS_ROOK;
 		case Queen:
 			return AMOUNT_VECTORS_QUEEN;
 		case King:
@@ -292,8 +292,8 @@ int amount_steps_of_piece_type(Piece_type type){
 			return AMOUNT_STEPS_KNIGHT;
 		case Bishop:
 			return AMOUNT_STEPS_BISHOP;
-		case Rock:
-			return AMOUNT_STEPS_ROCK;
+		case Rook:
+			return AMOUNT_STEPS_ROOK;
 		case Queen:
 			return AMOUNT_STEPS_QUEEN;
 		case King:
@@ -312,8 +312,8 @@ char sign_of_piece(Piece_type type, int colur){
 			return SIGN_KNIGHT + add;
 		case Bishop:
 			return SIGN_BISHOP + add;
-		case Rock:
-			return SIGN_ROCK + add;
+		case Rook:
+			return SIGN_ROOK + add;
 		case Queen:
 			return SIGN_QUEEN + add;
 		case King:
@@ -322,6 +322,26 @@ char sign_of_piece(Piece_type type, int colur){
 			return SIGN_EMPTY;
 	}
 	return ' ';
+}
+
+Piece_type get_piece_type_by_sign(char sign){
+	if('a' <= sign && sign <= 'z')
+		sign = sign + 'A' - 'a';
+	switch(sign){
+		case SIGN_PAWN:
+			return Pawn;
+		case SIGN_KNIGHT:
+			return Knight;
+		case SIGN_BISHOP:
+			return Bishop;
+		case SIGN_ROOK:
+			return Rook;
+		case SIGN_QUEEN:
+			return Queen;
+		case SIGN_KING:
+			return King;
+	}
+	return Empty;
 }
 
 void print_all_steps(Piece *piece){

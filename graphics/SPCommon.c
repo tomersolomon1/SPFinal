@@ -7,23 +7,35 @@
 #include <stdlib.h>
 
 /* count how many saved-files exist, the first save file that doesn't exist ends the counting */
+void set_game_path(char* game_path, int i){
+	sprintf(game_path, SAVED_GAME_PATH(), i);
+}
+
 int count_saves() {
 	int count = 0;
-	while (count < AMOUNT_GAME_SLOTS && (access(SAVED_GAME(count), F_OK) == 0)) {
+	char game_path[SAVED_GAME_PATH_LENGTH];
+	set_game_path(game_path, count);
+	while (count < AMOUNT_GAME_SLOTS && (access(game_path, F_OK) == 0)) {
 		count++;
+		set_game_path(game_path, count);
 	}
 	return count;
 }
 
 void promote_saves(){
 	int saves = count_saves();
+	char game_path_old[SAVED_GAME_PATH_LENGTH];
+	char game_path_new[SAVED_GAME_PATH_LENGTH];
 	int i = saves - 1; /* default */
 	if (saves == AMOUNT_GAME_SLOTS) {
-		remove(SAVED_GAME(AMOUNT_GAME_SLOTS - 1)); /* the most old saved file is erased */
+		set_game_path(game_path_old, AMOUNT_GAME_SLOTS - 1);
+		remove(game_path_old); /* the most old saved file is erased */
 		i = saves - 2;
 	}
 	for (; i >= 0; i--) {
-		rename(SAVED_GAME(i), SAVED_GAME(i+1));
+		set_game_path(game_path_old, i);
+		set_game_path(game_path_new, i + 1);
+		rename(game_path_old, game_path_new);
 	}
 }
 

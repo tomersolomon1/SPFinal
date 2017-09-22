@@ -13,13 +13,20 @@
 #define MAX_LEN_ROW 50
 #define MAX_DATA_LENGTH 8
 
-/*load game from *f */
+/* load game from *f */
 Gameboard *load_game(FILE* f);
 
-/*save game in xml format to *f */
+/* save game in xml format to *f */
 void save_xml(FILE *f, Gameboard* game);
 
-/*helping function for load_game - set the row by data from the xml data*/
+/* helping function for load_game - set the row by data from the xml data*/
 void set_row(Gameboard* game, int row_number, char* str);
+
+/* helping function for load_game
+ * set true or false to piece->has_moved by their first position
+ * for the pieces involved in castling:
+ * we assume that if there isn't castling information in the xml,
+ * then the pieces who are in their beginning positions were not moved*/
+void set_has_moved_by_position(Gameboard* game);
 
 #endif /* FILES_H_ */

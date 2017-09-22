@@ -20,8 +20,8 @@ Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	add_piece(newBoard, Bishop, black, 7, 5, i++);
 	add_piece(newBoard, Knight, black, 7, 1, i++);
 	add_piece(newBoard, Knight, black, 7, 6, i++);
-	add_piece(newBoard, Rock, black, 7, 0, i++);
-	add_piece(newBoard, Rock, black, 7, 7, i++);
+	add_piece(newBoard, Rook, black, 7, 0, i++);
+	add_piece(newBoard, Rook, black, 7, 7, i++);
 	add_piece(newBoard, Queen, black, 7, 3, i++);
 	add_piece(newBoard, King, black, 7, 4, i++);
 	i = 0;
@@ -37,8 +37,8 @@ Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	add_piece(newBoard, Bishop, white, 0, 5, i++);
 	add_piece(newBoard, Knight, white, 0, 1, i++);
 	add_piece(newBoard, Knight, white, 0, 6, i++);
-	add_piece(newBoard, Rock, white, 0, 0, i++);
-	add_piece(newBoard, Rock, white, 0, 7, i++);
+	add_piece(newBoard, Rook, white, 0, 0, i++);
+	add_piece(newBoard, Rook, white, 0, 7, i++);
 	add_piece(newBoard, Queen, white, 0, 3, i++);
 	add_piece(newBoard, King, white, 0, 4, i++);
 	newBoard->empty = (Piece *) create_piece(Empty, -1, -1, -1, -1);
@@ -184,17 +184,17 @@ CHESS_BOARD_MESSAGE commit_move(Gameboard *gameboard, int srow,
 }
 
 void set_castling_move(Gameboard *gameboard, int row, int scol, int dcol){
-	int side_rock = ((scol < dcol) ? 1 : -1); // -1 = rock is left to king, 1 = rock is right to king,
-	int scol_rock = ((scol < dcol) ? 7 : 0);
-	Piece *rock = gameboard->board[row][scol_rock];
+	int side_rook = ((scol < dcol) ? 1 : -1); // -1 = rook is left to king, 1 = rook is right to king,
+	int scol_rook = ((scol < dcol) ? 7 : 0);
+	Piece *rook = gameboard->board[row][scol_rook];
 	Piece *king = gameboard->board[row][scol];
 	gameboard->board[row][scol] = gameboard->empty;
 	gameboard->board[row][dcol] = king;
 	king->col = dcol;
-	gameboard->board[row][scol_rock] = gameboard->empty;
-	gameboard->board[row][dcol - side_rock] = rock;
-	rock->col = dcol - side_rock;
-	rock->has_moved = true;
+	gameboard->board[row][scol_rook] = gameboard->empty;
+	gameboard->board[row][dcol - side_rook] = rook;
+	rook->col = dcol - side_rook;
+	rook->has_moved = true;
 	king->has_moved = true;
 }
 
@@ -474,12 +474,12 @@ void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, i
 	if(king->has_moved) return;
 	if(is_under_check(gameboard)) return;
 	if(!king->alive) return;
-	Piece *rock;
+	Piece *rook;
 	int delta_col;
-	for(int i = 0; i <= 1; i++){ //go over the two rocks
-		rock = gameboard->all_pieces[turn][12 + i]; //12 is the 1st place of rock in all_pieces
-		if(is_castling_valid_per_rock(gameboard, king, rock)){
-			delta_col = (king->col < rock->col) ? 2 : -2;
+	for(int i = 0; i <= 1; i++){ //go over the two rooks
+		rook = gameboard->all_pieces[turn][12 + i]; //12 is the 1st place of rook in all_pieces
+		if(is_castling_valid_per_rook(gameboard, king, rook)){
+			delta_col = (king->col < rook->col) ? 2 : -2;
 			Step *new_step = create_step(king->row, king->col, king->row, king->col + delta_col, gameboard->empty, Castling_Move, false);
 			steps_list[*amount_steps] = new_step;
 			(*amount_steps)++;
@@ -488,18 +488,18 @@ void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, i
 
 }
 
-bool is_castling_valid_per_rock(Gameboard * gameboard, Piece* king, Piece* rock){
-	if(rock->has_moved) return false;
-	if(!rock->alive) return false;
+bool is_castling_valid_per_rook(Gameboard * gameboard, Piece* king, Piece* rook){
+	if(rook->has_moved) return false;
+	if(!rook->alive) return false;
 	int row = king->row;
-	int left_col = MIN(king->col, rock->col);
-	int right_col = MAX(king->col, rock->col);
-	for(int i = left_col + 1; i < right_col; i++){//there's no tool between rock and king
+	int left_col = MIN(king->col, rook->col);
+	int right_col = MAX(king->col, rook->col);
+	for(int i = left_col + 1; i < right_col; i++){//there's no tool between rook and king
 		if(gameboard->board[row][i]->type != Empty){
 			return false;
 		}
 	}
-	int delta_col = (king->col < rock->col) ? 1 : -1;
+	int delta_col = (king->col < rook->col) ? 1 : -1;
 	int col = king->col;
 	int new_col;
 	bool result = true;
@@ -576,18 +576,18 @@ CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard) {
 void undo_step_castling(Gameboard *gameboard, Step *step){
 	int row = step->drow;
 	int king_dcol = step->dcol;
-	int rock_dcol = (king_dcol == 2 ? 3 : 5);
-	int rock_scol = (king_dcol == 2 ? 0 : 7);
+	int rook_dcol = (king_dcol == 2 ? 3 : 5);
+	int rook_scol = (king_dcol == 2 ? 0 : 7);
 	Piece *king = gameboard->board[row][king_dcol];
-	Piece *rock = gameboard->board[row][rock_dcol];
+	Piece *rook = gameboard->board[row][rook_dcol];
 	gameboard->board[row][king_dcol] = gameboard->empty;
-	gameboard->board[row][rock_dcol] = gameboard->empty;
+	gameboard->board[row][rook_dcol] = gameboard->empty;
 
 	gameboard->board[row][step->scol] = king;
 	king->col = step->scol;
-	gameboard->board[row][rock_scol] = rock;
-	rock->col = rock_scol;
-	rock->has_moved = false;
+	gameboard->board[row][rook_scol] = rook;
+	rook->col = rook_scol;
+	rook->has_moved = false;
 	king->has_moved = false;
 }
 

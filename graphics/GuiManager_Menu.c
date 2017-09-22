@@ -40,16 +40,18 @@ Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game, 
 	}
 	else if(btn->type == LoadButton){
 		FILE *f = NULL;
+		char game_path[SAVED_GAME_PATH_LENGTH];
 		if(slot1->active)
-			f = fopen(SAVED_GAME(0), "r");
+			set_game_path(game_path, 0);
 		else if(slot2->active)
-			f = fopen(SAVED_GAME(1), "r");
+			set_game_path(game_path, 1);
 		else if(slot3->active)
-			f = fopen(SAVED_GAME(2), "r");
+			set_game_path(game_path, 2);
 		else if(slot4->active)
-			f = fopen(SAVED_GAME(3), "r");
+			set_game_path(game_path, 3);
 		else if(slot5->active)
-			f = fopen(SAVED_GAME(4), "r");
+			set_game_path(game_path, 4);
+		f = fopen(game_path, "r");
 		assert(f != NULL);
 		destroy_board(*game);
 		*game = load_game(f);
