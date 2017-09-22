@@ -25,7 +25,7 @@
 #define MAX(A,B) (((A) > (B)) ? (A) : (B))
 #define SWITCHED(x) abs(1 - (x))
 #define IS_CASTLING_STEP(X, Y) (((X)->type == King) && (abs((Y)->dcol - (Y)->scol) > 1) && ((Y)->srow == (Y)->drow))
-
+#define CHECK_COMPUTER_START(X) (((X)->game_mode) == 1 && ((X)->turn) == abs(1-((X)->user_color)))
 
 
 typedef struct gameboard_t  {

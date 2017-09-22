@@ -7,8 +7,8 @@
 
 #ifndef CONSOLEMODE_H_
 #define CONSOLEMODE_H_
+#include "ConsoleDataDefinitions.h"
 #include "GameBoard.h"
-#include "DataDefinitions.h"
 #include "Parser.h"
 #define in_range(x) (((x) > -1) && ((x) < (8)))
 

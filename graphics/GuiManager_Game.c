@@ -14,7 +14,7 @@
 #include "../Files.h"
 
 Window_type gui_begin_game(Window *window, Gameboard *gameboard) {
-	if (gameboard->game_mode == 1 && gameboard->turn == abs(1-gameboard->user_color)) {
+	if (CHECK_COMPUTER_START(gameboard)) { /* checks if it's the computer's turn */
 		Gameboard *copy = copy_board(gameboard);
 		StepValue *best_move = find_best_step(copy, copy->difficulty);
 		Step *step = best_move->step;

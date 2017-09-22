@@ -5,8 +5,8 @@
  *      Author: User
  */
 
-#ifndef DATADEFINITIONS_H_
-#define DATADEFINITIONS_H_
+#ifndef CONSOLEDATADEFINITIONS_H_
+#define CONSOLEDATADEFINITIONS_H_
 
 #define SP_MAX_LINE_LENGTH 1024
 #define SP_MAX_LINE_LENGTH_STRING "1024"
@@ -18,9 +18,4 @@ typedef enum {
 	Both
 } Mode;
 
-typedef enum {
-	ConsoleMode,
-	GuiMode,
-} Program_Mode;
-
-#endif /* DATADEFINITIONS_H_ */
+#endif /* CONSOLEDATADEFINITIONS_H_ */
