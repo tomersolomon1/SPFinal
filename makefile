@@ -40,7 +40,7 @@ Test.o: GameBoardTester.h ParserTester.h FilesTester.h ConsoleTester.h Game_Wind
 # console & general-objects & minimax rules
 ArrayList.o: ArrayList.h
 	$(CC) $(CC_COMP_FLAG) -c $*.c
-ConsoleMode.o: Parser.h DataDefinitions.h GameBoard.h MiniMax.h Files.h
+ConsoleMode.o: Parser.h ConsoleDataDefinitions.h GameBoard.h MiniMax.h Files.h
 	$(CC) $(CC_COMP_FLAG) -c $*.c
 Files.o: Files.h
 	$(CC) $(CC_COMP_FLAG) -c $*.c
