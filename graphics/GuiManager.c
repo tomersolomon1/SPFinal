@@ -30,11 +30,17 @@ void run_gui(){
 Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_window){
 	if(wndw == NULL)
 		return SDLErrorWindow;
-	Window_type type = Enterance;
+	Window_type type = Enterance; /* default value */
 	SDL_Event event;
 	set_buttons_by_game_params(wndw, game);
+	if (wndw->type == Game) {
+		type = gui_begin_game(wndw, *game);
+		if (type != Game) { /* either the game is over, or we had problem with SDL */
+			return type;
+		}
+	}
 	while(1){
-		SDL_WaitEvent(&event);
+		SDL_WaitEvent(&event); /* should catch errors */
 		if (event.type == SDL_QUIT)
 			return ExitGame;
 		else if (wndw->type == Game) {
@@ -107,8 +113,5 @@ void set_buttons_by_game_params(Window* wndw, Gameboard** game){
 			wite->active = false;
 			blck->active = true;
 		}
-	}
-	else if(wndw->type == Game){
-		begin_game(*game, GuiMode);
 	}
 }

@@ -43,7 +43,7 @@ void present_computer_move(Step *step, Piece *moving_piece, Piece_type promote_t
 }
 
 /* performs a computer move only in mode 1, and when we start the game it's not the user's turn
- * return false if the game is over (otherwise return true)
+ * return false if the game is over and (otherwise return true)
  */
 int begin_game(Gameboard *gameboard, Program_Mode mode) {
 	bool game_stil_on = true;
