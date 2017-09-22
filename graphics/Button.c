@@ -11,19 +11,18 @@
 #include "Button.h"
 #include "SPCommon.h"
 
-Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
-		const char *active_image, const char *inactive_image, ButtonType type, bool active, bool visibility) {
+Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location, const char *active_image,
+		const char *inactive_image, ButtonType type, bool active, bool visibility) {
 	if (windowRender == NULL || location == NULL || active_image == NULL || inactive_image == NULL) {
 		return NULL ;
 	}
-	// Allocate data create_texure_from_bmp
-	Button *button = (Button*) malloc(sizeof(Button));
+	Button *button = (Button*) malloc(sizeof(Button)); /* allocate the button*/
 	assert(button != NULL);
 	button->active_buttonTexture   = create_texure_from_bmp(windowRender, active_image, false);
 	button->inactive_buttonTexture = create_texure_from_bmp(windowRender, inactive_image, false);
-	if (button->active_buttonTexture == NULL || button->inactive_buttonTexture == NULL) { /* had problem in creating textures */
+	if (button->active_buttonTexture == NULL || button->inactive_buttonTexture == NULL) {
 		free(button);
-		return NULL;
+		return NULL; /* we had had problem in creating textures one of the textures, so we return NULL */
 	}
 	button->location = spCopyRect(location);
 	button->windowRenderer = windowRender;
@@ -55,7 +54,6 @@ Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_
 	}
 	return buttons;
 }
-
 
 void destroyButton(Button* button) {
 	if (button == NULL ) {
