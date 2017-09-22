@@ -92,6 +92,8 @@ GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
 	return data;
 }
 
+/* create a BoardWidget
+ * nullify all it's fields, so it'll be safe to use destroy_board_widget after wards */
 BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location) {
 	BoardWidget *board_widget = (BoardWidget *) malloc(sizeof(BoardWidget));
 	assert(board_widget != NULL);
