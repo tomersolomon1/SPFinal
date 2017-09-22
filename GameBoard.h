@@ -138,31 +138,52 @@ Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, 
 void free_all_valid_steps_minimax(Step** all_steps, Piece_type type);
 
 int is_game_over_minimax(Gameboard *gameboard);
+
 bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece);
-bool is_step_causes_check_minimax(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece);
+
 bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v);
 
 //---------------------------------Set all Valid Steps---------------------------------
 
-/* set all valid steps, for all pieces of current turn */
+/* set all valid steps for all pieces of current turn
+ * we call this function after a turn was made
+ * every piece contains list of all its valid steps
+ * we chose to update all the valid moves in the beginning of a turn
+ * so we won't need to calculate it each time the player
+ * asks for a piece's valid moves, or asks to move a piece
+ *  */
 void set_all_valid_steps(Gameboard *gameboard);
 
-/* helping function for set_all_valid_steps*/
+/* helping function for set_all_valid_steps:
+ * set all valid steps per piece*/
 void set_all_valid_steps_per_piece(Gameboard *gameboard, Piece *piece);
 
-/* helping function for set_all_valid_steps*/
+/* helping function for set_all_valid_steps:
+ * set all valid steps per vector*/
 void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *amount_steps, Step **steps_list, bool check_is_threatened);
 
-/* helping function for set_all_valid_steps*/
+/* helping function for set_all_valid_steps:
+ * check if step causes check */
 bool is_step_causes_check(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece);
 
-/* helping function for set_all_valid_steps*/
+/* helping function for set_all_valid_steps:
+ * set the game as if piece was moved to [drow][dcol] and "eat" prevPiece, used to check what happens if the step is made*/
+void make_step_to_check_what_happens(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece);
+
+/* helping function for set_all_valid_steps:
+ * undo the step we did in make_step_to_check_what_happens function*/
+void undo_step_to_check_what_happens(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece);
+
+/* helping function for set_all_valid_steps:
+ * check if the step is threatened*/
 bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step);
 
-/* set all castling setps: */
+/* helping function for set_all_valid_steps:
+ * set all castling setps */
 void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, int *amount_steps);
 
-/* helping function for set_castling_steps */
+/* helping function for set_castling_steps:
+ * check if castling set is valid for rook */
 bool is_castling_valid_per_rook(Gameboard * gameboard, Piece* king, Piece* rook);
 
 //-------------------------------------Undo-------------------------------------

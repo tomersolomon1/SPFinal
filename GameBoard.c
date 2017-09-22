@@ -307,9 +307,7 @@ void free_all_valid_steps_minimax(Step** all_steps, Piece_type type){
 	free(all_steps);
 }
 
-
 int is_game_over_minimax(Gameboard *gameboard){
-//	write_to_log_file("is_game_over\n");
 	for(int i = AMOUNT_PIECES_PER_COLOR - 1; i >= 0 ; i--){ // is there any piece that has legal move?
 		Piece *p = gameboard->all_pieces[gameboard->turn][i];
 		if(p->alive){
@@ -317,7 +315,6 @@ int is_game_over_minimax(Gameboard *gameboard){
 				return -1;
 		}
 	}
-//	write_to_log_file("game_over_minimax != -1\n");
 	if(is_check(gameboard, SWITCHED(gameboard->turn))){ // is my king under check?
 		return SWITCHED(gameboard->turn);
 	}
@@ -325,7 +322,6 @@ int is_game_over_minimax(Gameboard *gameboard){
 }
 
 bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece){
-//	write_to_log_file("is_piece_having_legal_move_minimax\n");
 	for(int i = 0; i < piece->amount_vectors; i++){
 		if(is_piece_having_legal_move_per_vector_minimax(gameboard, piece, piece->vectors[i])){
 			return true;
@@ -335,26 +331,22 @@ bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece){
 }
 
 bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v){
-	int delta_row = v->delta_row;
-	int delta_col = v->delta_col;
 	int amount_going = v->vector_size;
-	bool can_eat = v->can_eat;
-	bool can_go_to_empty_spot = v->can_go_to_empty_spot;
 	int row = piece->row;
 	int col = piece->col;
 	while(amount_going > 0){
 		amount_going --;
-		row = row + delta_row;
-		col = col + delta_col;
+		row = row + v->delta_row;
+		col = col + v->delta_col;
 		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)) //out of board
 			break;
-		if(gameboard->board[row][col]->type == Empty && can_go_to_empty_spot){ // can go, empty
+		if(gameboard->board[row][col]->type == Empty && v->can_go_to_empty_spot){ // can go, empty
 			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->empty)){
 				return true;
 			}
 		}
 		else if(gameboard->board[row][col]->type != Empty &&
-				gameboard->board[row][col]->colur != piece->colur && can_eat){ //eating opponent's piece
+				gameboard->board[row][col]->colur != piece->colur && v->can_eat){ //eating opponent's piece
 			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->board[row][col])){
 				return true;
 			}
@@ -439,33 +431,33 @@ void add_steps_per_vector(Gameboard *gameboard, Piece *piece, Vector *v, int *am
 
 bool is_step_causes_check(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece){
 	bool answer = false;
+	make_step_to_check_what_happens(gameboard, piece, drow, dcol, prevPiece);
+	if(is_check_curr_player(gameboard))
+		answer = true;
+	undo_step_to_check_what_happens(gameboard, piece, drow, dcol, prevPiece);
+	return answer;
+}
+
+void make_step_to_check_what_happens(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece){
 	gameboard->board[drow][dcol] = piece;
 	gameboard->board[piece->row][piece->col] = gameboard->empty;
 	prevPiece->alive = false;
 	gameboard->turn = SWITCHED(gameboard->turn);
-	if(is_check_curr_player(gameboard)){
-		answer = true;
-	}
+}
+
+void undo_step_to_check_what_happens(Gameboard* gameboard, Piece* piece, int drow, int dcol, Piece *prevPiece){
 	gameboard->turn = SWITCHED(gameboard->turn);
 	prevPiece->alive = true;
 	gameboard->board[drow][dcol] = prevPiece;
 	gameboard->board[piece->row][piece->col] = piece;
-	return answer;
 }
 
 bool is_step_threatened(Gameboard* gameboard, Piece* piece, Step* step){
 	bool answer = false;
-	gameboard->board[step->drow][step->dcol] = piece;
-	gameboard->board[piece->row][piece->col] = gameboard->empty;
-	step->prevPiece->alive = false;
-	gameboard->turn = SWITCHED(gameboard->turn);
-	if(is_threatening_piece(gameboard, piece)){
+	make_step_to_check_what_happens(gameboard, piece, step->drow, step->dcol, step->prevPiece);
+	if(is_threatening_piece(gameboard, piece))
 		answer = true;
-	}
-	gameboard->turn = SWITCHED(gameboard->turn);
-	step->prevPiece->alive = true;
-	gameboard->board[step->drow][step->dcol] = step->prevPiece;
-	gameboard->board[piece->row][piece->col] = piece;
+	undo_step_to_check_what_happens(gameboard, piece, step->drow, step->dcol, step->prevPiece);
 	return answer;
 }
 

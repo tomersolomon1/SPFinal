@@ -6,9 +6,8 @@
  */
 #include "GameBasicBuildingBlocks.h"
 
+
 //-------------------Vectors-------------------
-
-
 Vector *create_vector(int delta_row, int delta_col, int vector_size, bool can_eat, bool can_go_to_empty_spot){
 	Vector *v = (Vector*) malloc(sizeof(Vector));
 	//write_to_log_file("malloc vector\n"); fflush(stdout);
