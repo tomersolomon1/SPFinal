@@ -35,15 +35,6 @@ void save_xml(FILE *f, Gameboard* game){
 	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 12, game->all_pieces[black][12]->has_moved, black, 12); //12 is the place of 1st rook in all_pieces
 	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 13, game->all_pieces[black][13]->has_moved, black, 13); //13 is the place of 2nd rook in all_pieces
 	fprintf(f, "</castling_data>\n");
-	//data for promotion:
-	fprintf(f, "<promotion_data>\n");
-	for(int i = 0; i < 2 ; i++){
-		for(int j = 0; j < 7; j++){
-			if(game->all_pieces[i][j]->type != Pawn)
-				fprintf(f, "<piece_%d_%d_promoted>%c</piece_%d_%d_promoted>\n", i, j, game->all_pieces[i][j]->sign, i, j);
-		}
-	}
-	fprintf(f, "</promotion_data>\n");
 	fprintf(f, "</general>");
 }
 

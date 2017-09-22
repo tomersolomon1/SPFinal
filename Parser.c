@@ -56,7 +56,7 @@ Piece_type get_promotion_type_parser(const char *line) {
 	case 'p': promote_to = get_piece(line, "pawn", offset, Pawn); break;
 	case 'b': promote_to = get_piece(line, "bishop", offset, Bishop); break;
 	case 'k': promote_to = get_piece(line, "knight", offset, Knight); break;
-	case 'r': promote_to = get_piece(line, "rook", offset, Rock); break;
+	case 'r': promote_to = get_piece(line, "rook", offset, Rook); break;
 	case 'q': promote_to = get_piece(line, "queen", offset, Queen); break;
 	}
 	return promote_to;

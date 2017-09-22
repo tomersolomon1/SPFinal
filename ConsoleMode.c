@@ -30,9 +30,9 @@ void present_computer_move(Step *step, Piece *moving_piece, Piece_type promote_t
 	char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 	char *pieces_str[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
 	if (IS_CASTLING_STEP(moving_piece, step)) {
-		int rock_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
+		int rook_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
 		printf("Computer: castle King at <%d,%c> and Rook at <%d,%c>\n",
-				1+step->srow, ABC[step->scol],  1+step->srow, ABC[rock_col]);
+				1+step->srow, ABC[step->scol],  1+step->srow, ABC[rook_col]);
 	} else if (step->src_previous_state == Was_promoted) {
 		printf("Computer: move pawn <%d,%c> to <%d,%c> and promote to %s\n",
 				1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol], pieces_str[promote_to]);
@@ -240,15 +240,15 @@ int castling_move(Gameboard *gameboard, Command *comm) {
 	} else if (gameboard->board[comm->arg1][comm->arg2]->colur != gameboard->turn) {
 		printf("The specified position does not contain your piece\n");
 		return -1;
-	} else if (gameboard->board[comm->arg1][comm->arg2]->type != Rock) {
+	} else if (gameboard->board[comm->arg1][comm->arg2]->type != Rook) {
 		printf("Wrong position for a rook\n");
 		return -1;
 	} else if (gameboard->board[comm->arg1][comm->arg2]->has_moved
 			|| gameboard->all_pieces[gameboard->turn][KING_INDEX]->has_moved) {
-		printf("Illegal castling move\n"); /* we can't have castling if the rock or the king has moved */
+		printf("Illegal castling move\n"); /* we can't have castling if the rook or the king has moved */
 		return -1;
 	} else {
-		// the rock is fine, we to check the king is in the right place
+		// the rook is fine, we to check the king is in the right place
 		int base_row = gameboard->turn ? WHITE_ROW : BLACK_ROW;
 		int dcol = (comm->arg2 == 7) ? 6 : 2; /* the king should move to <row,G> or <row,C> */
 		comm->arg1 = base_row;
@@ -303,8 +303,8 @@ void present_all_moves(Gameboard *gameboard, Piece *piece) {
 		for (int i = 0; i < piece->amount_steps; i++) {
 			Step *step = piece->steps[i];
 			if (step->src_previous_state == Castling_Move) {
-				int rock_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
-				printf("castle <%c,%c>\n", decimal_numbers[step->srow], ABC[rock_col]);
+				int rook_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
+				printf("castle <%c,%c>\n", decimal_numbers[step->srow], ABC[rook_col]);
 			} else { /* no castling, so can't be threatened, and can't capture any piece */
 				printf("<%c,%c>", decimal_numbers[step->drow], ABC[step->dcol]);
 				if (step->is_threatened) {
