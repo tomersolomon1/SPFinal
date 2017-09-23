@@ -10,8 +10,9 @@
 #include <string.h>
 #include <stdio.h>
 #include "ConsoleMode.h"
+
+#include "ConsoleDataDefinitions.h"
 #include "Parser.h"
-#include "DataDefinitions.h"
 #include "GameBoard.h"
 #include "MiniMax.h"
 #include "Files.h"
@@ -45,32 +46,20 @@ void present_computer_move(Step *step, Piece *moving_piece, Piece_type promote_t
 /* performs a computer move only in mode 1, and when we start the game it's not the user's turn
  * return false if the game is over (otherwise return true)
  */
-int begin_game(Gameboard *gameboard, Program_Mode mode) {
-	bool game_stil_on = true;
-	if (gameboard->game_mode == 1 && gameboard->turn == abs(1-gameboard->user_color)) {
+
+bool console_begin_game(Gameboard *gameboard) {
+	bool game_stil_on = true; /* let's be optimistic */
+	if (CHECK_COMPUTER_START(gameboard)) { /* checks if it's the computer's turn */
 		Gameboard *copy = copy_board(gameboard);
 		StepValue *best_move = find_best_step(copy, copy->difficulty);
 		Step *step = best_move->step;
 		destroy_board(copy);
-		if (mode == ConsoleMode) {
-			Piece *moving_piece = gameboard->board[step->srow][step->scol];
-			present_computer_move(step, moving_piece, best_move->promote_to);
-			int over = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
-			game_stil_on = (over == 1) ? false : true;
-		} else { /* gui mode */
-			commit_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
-			int over = is_game_over(gameboard);
-			if (over == 2 || over == 1 || over == 0) {
-				game_stil_on = false;
-			}
-		}
+		Piece *moving_piece = gameboard->board[step->srow][step->scol];
+		present_computer_move(step, moving_piece, best_move->promote_to);
+		int over = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
+		game_stil_on = (over == 1) ? false : true; /* make_single_move returns either 0, 1 or 2, only 1 is end-of-game*/
 		destroy_step_value(best_move);
 	}
-	return game_stil_on;
-}
-
-bool console_begin_game(Gameboard *gameboard) {
-	bool game_stil_on = begin_game(gameboard, ConsoleMode);
 	if (game_stil_on) {
 		ask_move(gameboard, true);
 	}
@@ -379,7 +368,7 @@ void manage_console(Gameboard *gameboard) {
 	Mode console_mode = SettingsMode;
 	printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 	fflush(stdout);
-	while (keep_on) { /* keep on get new command, until the game is over, or received a 'quit' command */
+	while (keep_on) { /* keep on getting new commands, until the game is over, or received a 'quit' command */
 		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
 		assert(line != NULL);
 		fgets(line, SP_MAX_LINE_LENGTH, stdin); /* copying the input to line */

@@ -11,32 +11,19 @@
 #include "Button.h"
 #include "SPCommon.h"
 
-Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
-		const char *active_image, const char *inactive_image, ButtonType type, bool active, bool visibility) {
+Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location, const char *active_image,
+		const char *inactive_image, ButtonType type, bool active, bool visibility) {
 	if (windowRender == NULL || location == NULL || active_image == NULL || inactive_image == NULL) {
 		return NULL ;
 	}
-	// Allocate data
-	Button *button = (Button*) malloc(sizeof(Button));
+	Button *button = (Button*) malloc(sizeof(Button)); /* allocate the button*/
 	assert(button != NULL);
-	SDL_Surface* loadingSurface1        = SDL_LoadBMP(active_image); // We use the surface as a temp var;
-	SDL_Surface* loadingSurface2        = SDL_LoadBMP(inactive_image); // We use the surface as a temp var;
-	SDL_Texture* active_buttonTexture   = SDL_CreateTextureFromSurface(windowRender, loadingSurface1);
-	SDL_Texture* inactive_buttonTexture = SDL_CreateTextureFromSurface(windowRender, loadingSurface2);
-
-	if (loadingSurface1 == NULL || loadingSurface2 == NULL
-			|| active_buttonTexture == NULL || inactive_buttonTexture == NULL) {
+	button->active_buttonTexture   = create_texure_from_bmp(windowRender, active_image, false);
+	button->inactive_buttonTexture = create_texure_from_bmp(windowRender, inactive_image, false);
+	if (button->active_buttonTexture == NULL || button->inactive_buttonTexture == NULL) {
 		free(button);
-		SDL_FreeSurface(loadingSurface1); // It's safe to pass NULL
-		SDL_FreeSurface(loadingSurface2); // It's safe to pass NULL
-		SDL_DestroyTexture(active_buttonTexture); // It's safe to pass NULL
-		SDL_DestroyTexture(inactive_buttonTexture); // It's safe to pass NULL
-		return NULL ;
+		return NULL; /* we had had problem in creating textures one of the textures, so we return NULL */
 	}
-	SDL_FreeSurface(loadingSurface1);
-	SDL_FreeSurface(loadingSurface2);
-	button->active_buttonTexture   = active_buttonTexture;
-	button->inactive_buttonTexture = inactive_buttonTexture;
 	button->location = spCopyRect(location);
 	button->windowRenderer = windowRender;
 	button->type = type;
@@ -67,7 +54,6 @@ Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_
 	}
 	return buttons;
 }
-
 
 void destroyButton(Button* button) {
 	if (button == NULL ) {

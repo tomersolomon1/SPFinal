@@ -13,6 +13,26 @@
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
+Window_type gui_begin_game(Window *window, Gameboard *gameboard) {
+	if (CHECK_COMPUTER_START(gameboard)) { /* checks if it's the computer's turn */
+		Gameboard *copy = copy_board(gameboard);
+		StepValue *best_move = find_best_step(copy, copy->difficulty);
+		Step *step = best_move->step;
+		destroy_board(copy);
+		int move_consequences = graphical_handle_single_move(window, step->srow, step->scol, step->drow, step->dcol,
+		false, best_move->promote_to);
+		destroy_step_value(best_move);
+		if (move_consequences == 1) { /* the game is over */
+			return ExitGame;
+		} else if (move_consequences == 0) { /* the game isn't over */
+			return Game;
+		} else { /* move_consequences == -1, which means we had some problem with SDL along the way */
+			return SDLErrorWindow;
+		}
+	}
+	return Game;
+}
+
 Piece_type choose_promotion() {
 	const SDL_MessageBoxButtonData buttons[] = {
 			{ 0, 0, "Pawn" },

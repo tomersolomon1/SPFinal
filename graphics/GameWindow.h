@@ -18,7 +18,6 @@
 
 #define CHESS_IMAGE(x) IMG(ChessPieces/x)
 
-/* to be changed later onnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn */
 #define DEFAULT_GAME_WINDOW_WIDTH 700
 #define DEFAULT_GAME_WINDOW_HEIGHT 600
 

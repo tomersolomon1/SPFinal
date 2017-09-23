@@ -28,4 +28,5 @@ int count_saves();
 void promote_saves();
 SDL_Rect* spCopyRect(SDL_Rect* src);
 bool mouse_in_rec(int x, int y, SDL_Rect *rect);
+SDL_Texture *create_texure_from_bmp(SDL_Renderer *renderer, const char *bmp_path, bool transparent_background);
 #endif /* GRAPHICS_SPCOMMON_H_ */

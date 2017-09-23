@@ -10,7 +10,8 @@
 
 #include <stdbool.h>
 #include <string.h>
-#include "DataDefinitions.h"
+
+#include "ConsoleDataDefinitions.h"
 #include "GameBasicBuildingBlocks.h"
 
 typedef enum {
