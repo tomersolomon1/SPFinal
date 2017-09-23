@@ -368,7 +368,7 @@ void manage_console(Gameboard *gameboard) {
 	Mode console_mode = SettingsMode;
 	printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 	fflush(stdout);
-	while (keep_on) { /* keep on get new command, until the game is over, or received a 'quit' command */
+	while (keep_on) { /* keep on getting new commands, until the game is over, or received a 'quit' command */
 		char *line = (char *) malloc(sizeof(char)*(SP_MAX_LINE_LENGTH+1));
 		assert(line != NULL);
 		fgets(line, SP_MAX_LINE_LENGTH, stdin); /* copying the input to line */
