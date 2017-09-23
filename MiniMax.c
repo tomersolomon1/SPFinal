@@ -124,7 +124,6 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth,
  * we assume the game is not over
  */
 StepValue *find_best_step(Gameboard *board, int search_depth) {
-	//print_board(board);
 	int alpha = INT_MIN;
 	int beta  = INT_MAX;
 	int eval_perspective = board->turn;
