@@ -176,7 +176,6 @@ void make_promotion(Gameboard *gameboard, int row, int col, Piece_type new_type)
 
 CHESS_BOARD_MESSAGE commit_move(Gameboard *gameboard, int srow,
 		int scol, int drow, int dcol, bool is_minimax, Piece_type promote_to) {
-	//is_minimax = true;
 	CHESS_BOARD_MESSAGE msg = set_step(gameboard, srow, scol, drow, dcol, is_minimax);
 	if (msg == CHESS_BOARD_PROMOTION && promote_to != Empty) { /* Empty signals that the promotion was made by the user */
 		make_promotion(gameboard, drow, dcol, promote_to);
