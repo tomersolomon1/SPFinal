@@ -50,10 +50,8 @@ void present_computer_move(Step *step, Piece *moving_piece, Piece_type promote_t
 bool console_begin_game(Gameboard *gameboard) {
 	bool game_stil_on = true; /* let's be optimistic */
 	if (CHECK_COMPUTER_START(gameboard)) { /* checks if it's the computer's turn */
-		Gameboard *copy = copy_board(gameboard);
-		StepValue *best_move = find_best_step(copy, copy->difficulty);
+		StepValue *best_move = find_best_step(gameboard, gameboard->difficulty);
 		Step *step = best_move->step;
-		destroy_board(copy);
 		Piece *moving_piece = gameboard->board[step->srow][step->scol];
 		present_computer_move(step, moving_piece, best_move->promote_to);
 		int over = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);
@@ -197,10 +195,8 @@ int make_move(Gameboard *gameboard, Command *comm) {
 				ask_move(gameboard, true);
 				return 1;
 			} else { /* it's now the computer turn */
-				Gameboard *copy = copy_board(gameboard);
-				StepValue *best_move = find_best_step(copy, copy->difficulty);
+				StepValue *best_move = find_best_step(gameboard, gameboard->difficulty);
 				Step *step = best_move->step;
-				destroy_board(copy); /* we don't need it anymore */
 				Piece *moving_piece = gameboard->board[step->srow][step->scol];
 				present_computer_move(step, moving_piece, best_move->promote_to);
 				move_consequences = make_single_move(gameboard, step->srow, step->scol, step->drow, step->dcol, false, best_move->promote_to);

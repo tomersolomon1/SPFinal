@@ -120,13 +120,15 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth,
 	}
 }
 
-/* assuming we can alter the board as we will
- * we assume the game is not over
+/* we assume the game is not over
+ * a wrapper function for the mini-max algo
  */
 StepValue *find_best_step(Gameboard *board, int search_depth) {
+	Gameboard *copy = copy_board(board);
 	int alpha = INT_MIN;
 	int beta  = INT_MAX;
 	int eval_perspective = board->turn;
-	StepValue *best_sv = MiniMaxAlgo(board, alpha, beta, search_depth, MaxNode, eval_perspective, true);
+	StepValue *best_sv = MiniMaxAlgo(copy, alpha, beta, search_depth, MaxNode, eval_perspective, true);
+	destroy_board(copy);
 	return best_sv;
 }
