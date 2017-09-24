@@ -149,7 +149,6 @@ void handle_user_promotion(Gameboard *gameboard, int drow, int dcol) {
 int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dcol,
 		bool user_turn, Piece_type computer_promotion) {
 	char *colors[] = {"black", "white"};
-	//CHESS_BOARD_MESSAGE move_message = set_step(gameboard, srow, scol, drow, dcol, false);
 	CHESS_BOARD_MESSAGE move_message = commit_move(gameboard, srow, scol, drow, dcol, false, computer_promotion);
 	if (move_message != CHESS_BOARD_SUCCESS && move_message != CHESS_BOARD_PROMOTION) {
 		if (move_message == CHESS_BOARD_INVALID_MOVE_NO_PIECE) {

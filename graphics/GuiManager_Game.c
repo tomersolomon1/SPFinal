@@ -10,7 +10,6 @@
 #include "WindowDataStruct.h"
 #include "GuiManager_Game.h"
 #include "Windows.h"
-#include "../ConsoleMode.h"
 #include "../Files.h"
 
 Window_type gui_begin_game(Window *window) {
@@ -76,7 +75,7 @@ Piece_type choose_promotion() {
  * return:
  * 		1  	- the game is over
  * 		0 	- the game isn't over
- * 		-1 	- if some error occurred
+ * 	   -1 	- if some error occurred
  */
 int graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol,
 		bool is_user_move, Piece_type computer_promotion) {
