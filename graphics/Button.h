@@ -20,41 +20,33 @@
 #include <SDL.h>
 #include <SDL_video.h>
 
-//.y = position_buttons + DEFAULT_BTN_GAP*(i++)
-
 typedef enum {
 	/* general button */
 	NoButton,
 	BackButton,
 	StartButton,
 	NextButton,
-
 	/* main window */
 	NewGameButton,
 	LoadButton,
 	ExitButton,
-
 	/* load buttons */
 	GameSlot1,
 	GameSlot2,
 	GameSlot3,
 	GameSlot4,
 	GameSlot5,
-
 	/* game mode */
 	OnePlayer,
 	TwoPlayer,
-
 	/* difficulty buttons */
 	NoobDiff,
 	EasyDiff,
 	ModerateDiff,
 	HardDiff,
-
 	/* set color buttons */
 	SetBlack,
 	SetWhite,
-
 	/* game buttons */
 	RestartButton,
 	SaveButton,
@@ -72,16 +64,31 @@ typedef struct button_t {
 	bool visibility;
 } Button;
 
-ButtonType which_button_clicked(SDL_Event *event, Button **buttons, int buttons_number);
-Button *get_button_clicked(SDL_Event* event, Button** buttons, int buttons_number);
+/* create Button and returns a pointer to it
+ * returns NULL on failure*/
 Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location,
 		const char *active_image, const char *inactive_image, ButtonType type, bool active, bool visibility);
+
+/* helper function, for creating list of buttons to a window by the parameters given
+ * return:
+ * on success - array of pointer to buttons
+ * on failure - NULL*/
 Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_number, int x_btn_places[],
 		int y_btn_places[],	const char* image[], const char* image_inavtice[], bool active[], bool visible[], int btn_height, int btn_width);
-// this function is in charge of destroying all the data Associated with a button
+
+/* returns the Button Type of the Button that was clicked in the event
+ * returns NoButton if no Button was clicked */
+ButtonType which_button_clicked(SDL_Event *event, Button **buttons, int buttons_number);
+
+/* returns a pointer to the Button that was clicked in the event
+ * returns NULL if no Button was clicked */
+Button *get_button_clicked(SDL_Event* event, Button** buttons, int buttons_number);
+
+/* this function is in charge of destroying all the data Associated with a button */
 void destroyButton(Button *);
 
-void drawButton(Button *);
-
+/* draw the button
+ * in failure returns -1, in success returns 0*/
+int drawButton(Button *);
 
 #endif /* GRAPHICS_BUTTON_H_ */

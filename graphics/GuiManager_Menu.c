@@ -113,7 +113,7 @@ Window_type handleEvenet_difficulty(Window* wndw, Button* btn, Gameboard** game)
 			change_game_difficulty((*game), 4);
 		return ChooseColor;
 	}
-	else if(NoobDiff <= btn->type && btn->type <= HardDiff){
+	else if(NoobDiff <= btn->type && btn->type <= HardDiff){ //change difficulty chose
 		noob->active = false;
 		easy->active = false;
 		moder->active = false;
@@ -128,7 +128,8 @@ Window_type handleEvenet_choose_color(Window* wndw, Button* btn, Gameboard** gam
 		return Difficulty;
 	Button* wite = get_button_by_type(wndw, SetWhite);
 	Button* blck = get_button_by_type(wndw, SetBlack);
-	if(SetBlack <= btn->type && btn->type <= SetWhite){
+
+	if(SetBlack <= btn->type && btn->type <= SetWhite){ //change color chose
 		wite->active = false;
 		blck->active = false;
 		btn->active = true;

@@ -1,9 +1,3 @@
-/*
- * WindowDataStruct.h
- *
- *  Created on: 2 בספט׳ 2017
- *      Author: User
- */
 
 #ifndef GRAPHICS_WINDOWDATASTRUCT_H_
 #define GRAPHICS_WINDOWDATASTRUCT_H_

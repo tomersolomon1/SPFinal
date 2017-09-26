@@ -14,7 +14,7 @@
 #include "graphics/GuiManager.h"
 
 //FILE *f_log;
-int main(int argc, char *argv[]){
+int main2(int argc, char *argv[]){
 	if (argc == 2) {
 		if (strcmp(argv[1], "0") == 0) { /* console test  */
 			console_tester();

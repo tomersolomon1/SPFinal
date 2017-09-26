@@ -10,19 +10,19 @@
 
 void run_gui(){
 	SDL_Init(SDL_INIT_VIDEO);
-	Window_type type_window = Enterance;
-	Window_type old_type_window = Enterance;
+	Window_type type_new_window = Enterance;
+	Window_type type_old_window = Enterance;
 	Gameboard* game = create_board(GAME_DEFAULT_MODE, GAME_DEFAULT_DIFFICULTY, GAME_DEFAULT_COLOR);
 	while(1){
-		Window* window = create_window(type_window, game);
-		type_window = handleEvenet(window, &game, old_type_window);
-		if(type_window == SDLErrorWindow){
+		Window* window = create_window(type_new_window, game); //we check if the window is NULL inside handleEvent
+		type_new_window = handleEvenet(window, &game, type_old_window);
+		if(type_new_window == SDLErrorWindow){
 			printf("There was a problem with SDL along the way, we are sorry \n");
 			break;
 		}
-		old_type_window = window->type;
+		type_old_window = window->type;
 		destroyWindow(window);
-		if(type_window == ExitGame)
+		if(type_new_window == ExitGame)
 			break;
 	}
 	destroy_board(game);
@@ -34,6 +34,7 @@ Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_wi
 		return SDLErrorWindow;
 	Window_type type = Enterance; /* default value */
 	SDL_Event event;
+	int success;
 	set_buttons_by_game_params(wndw, game);
 	if (wndw->type == Game) {
 		type = gui_begin_game(wndw);
@@ -42,9 +43,8 @@ Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_wi
 		}
 	}
 	while(1){
-		if (SDL_WaitEvent(&event) == 0) { /* catches error in SDL_WaitEvent */
+		if (SDL_WaitEvent(&event) == 0) /* catches error in SDL_WaitEvent */
 			return SDLErrorWindow;
-		}
 		if (event.type == SDL_QUIT)
 			return ExitGame;
 		else if (wndw->type == Game) {
@@ -71,7 +71,9 @@ Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_wi
 				return type;
 			}
 		}
-		drawWindow(wndw, &event);
+		success = drawWindow(wndw, &event);
+		if(success == -1)
+			return SDLErrorWindow;
 	}
 }
 

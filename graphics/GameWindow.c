@@ -1,48 +1,35 @@
-/*
- * GameWindow.c
- *
- *  Created on: 28 баев„ 2017
- *      Author: User
- */
-
 #include <stdlib.h>
 #include "GameWindow.h"
 #include "SPCommon.h"
 #include "../ConsoleMode.h"
 #include "../Files.h"
 
-void destroy_game_textures(BoardWidget *board_widget) {
-	SDL_DestroyTexture(board_widget->board_grid);
-	if (board_widget->possible_move_texture != NULL) {
-		SDL_DestroyTexture(board_widget->possible_move_texture);
-	}
-	if (board_widget->threatened_move_texture != NULL) {
-		SDL_DestroyTexture(board_widget->threatened_move_texture);
-	}
-	if (board_widget->capturing_move_texture != NULL) {
-		SDL_DestroyTexture(board_widget->capturing_move_texture);
-	}
-	for (int color = 0; color < 2; color++) {
-		for (int i = 0; i < 6; i++) {
-			if(board_widget->piece_textures[color][i] != NULL) {
-				SDL_DestroyTexture(board_widget->piece_textures[color][i]);
-			}
-		}
-	}
-}
 
 void destroy_board_widget(BoardWidget *board_widget) {
-	if (board_widget == NULL) {
+	if (board_widget == NULL)
 		return;
-	}
 	destroy_game_textures(board_widget);
 	free(board_widget->location);
 	free(board_widget);
 }
 
-/*
- * somebody else is in-charge of destroying the gameboard itself
- */
+void destroy_game_textures(BoardWidget *board_widget) {
+	if(board_widget->board_grid != NULL)
+		SDL_DestroyTexture(board_widget->board_grid);
+	if(board_widget->possible_move_texture != NULL)
+		SDL_DestroyTexture(board_widget->possible_move_texture);
+	if(board_widget->threatened_move_texture != NULL)
+		SDL_DestroyTexture(board_widget->threatened_move_texture);
+	if(board_widget->capturing_move_texture != NULL)
+		SDL_DestroyTexture(board_widget->capturing_move_texture);
+	for(int color = 0; color < 2; color++) {
+		for (int i = 0; i < 6; i++) {
+			if(board_widget->piece_textures[color][i] != NULL)
+				SDL_DestroyTexture(board_widget->piece_textures[color][i]);
+		}
+	}
+}
+
 void destory_data(GameData *data) {
 	if (data == NULL) {
 		return;
@@ -92,27 +79,6 @@ GameData *create_game_data(SDL_Renderer* renderer, Gameboard *board) {
 	return data;
 }
 
-/* create a BoardWidget
- * nullify all it's fields, so it'll be safe to use destroy_board_widget after wards */
-BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location) {
-	BoardWidget *board_widget = (BoardWidget *) malloc(sizeof(BoardWidget));
-	assert(board_widget != NULL);
-	board_widget->location = spCopyRect(location);
-	board_widget->board = board;
-
-	// nullifying all the pointers
-	board_widget->board_grid = NULL;
-	board_widget->possible_move_texture = NULL;
-	board_widget->threatened_move_texture = NULL;
-	board_widget->capturing_move_texture = NULL;
-	for (int i = 0; i < 6; i++) {
-		board_widget->piece_textures[1][i] = NULL;
-		board_widget->piece_textures[0][i] = NULL;
-	}
-	return board_widget;
-}
-
-/* return NULL on failure, otherwise return a pointer to BoardWidget */
 BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board, SDL_Rect* location) {
 	const char *white_pieces_images[] = {CHESS_IMAGE(WPawn), CHESS_IMAGE(WKnight), CHESS_IMAGE(WBishop),
 			CHESS_IMAGE(WRock),	CHESS_IMAGE(WQueen), CHESS_IMAGE(WKing)}; /* white pieces BMP paths */
@@ -143,7 +109,24 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 	return board_widget;
 }
 
-/* returns 0 on success, -1 otherwise */
+BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location) {
+	BoardWidget *board_widget = (BoardWidget *) malloc(sizeof(BoardWidget));
+	assert(board_widget != NULL);
+	board_widget->location = spCopyRect(location);
+	board_widget->board = board;
+
+	// nullifying all the pointers
+	board_widget->board_grid = NULL;
+	board_widget->possible_move_texture = NULL;
+	board_widget->threatened_move_texture = NULL;
+	board_widget->capturing_move_texture = NULL;
+	for (int i = 0; i < 6; i++) {
+		board_widget->piece_textures[1][i] = NULL;
+		board_widget->piece_textures[0][i] = NULL;
+	}
+	return board_widget;
+}
+
 int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim, int col_dim) {
 	Piece *selected_piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
 	int success = 0; /* so far so good */
@@ -153,6 +136,7 @@ int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim
 		int y_offset = data->board_widget->location->y + ((7-step->drow) * row_dim);
 		SDL_Rect step_rec = {.x = x_offset, .y = y_offset, .h = row_dim, .w = col_dim };
 		if(SDL_RenderDrawRect(renderer, &step_rec) == -1) { /* some SDL error occurred */
+			printf("Error: There was a problem with SDL_RenderDrawRect\n");
 			return -1;
 		}
 		if (step->is_threatened) {
@@ -165,7 +149,8 @@ int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim
 				success = SDL_RenderCopy(renderer, data->board_widget->capturing_move_texture, NULL, &step_rec);
 			}
 		}
-		if (success != 0) {
+		if (success == -1) {
+			printf("Error: There was a problem with SDL_RenderCopy\n");
 			return success;
 		}
 	}
@@ -176,6 +161,7 @@ int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim
 int draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
 	int success = SDL_RenderCopy(renderer, data->board_widget->board_grid, NULL, data->board_widget->location);
 	if (success == -1) {
+		printf("Error: There was a problem with SDL_RenderCopy\n");
 		return -1;
 	}
 	int row_rec_dim = data->board_widget->location->h / 9;
@@ -195,9 +181,10 @@ int draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
 				piece_rec.x = data->board_widget->location->x + HORIZONTAL_CENTERING + piece->col*col_dim;
 				piece_rec.y = data->board_widget->location->y + VERTICAL_CENTERING + (7 - piece->row)*row_dim;
 				success = SDL_RenderCopy(renderer, data->board_widget->piece_textures[piece->colur][piece->type], NULL, &piece_rec);
-			}
-			if (success == -1) {
-				return -1;
+				if (success == -1) {
+					printf("Error: There was a problem with SDL_RenderCopy\n");
+					return -1;
+				}
 			}
 		}
 	}
@@ -206,6 +193,10 @@ int draw_board(GameData *data, SDL_Renderer *renderer, SDL_Event* event) {
 		piece_rec.y = event->motion.y;
 		Piece *piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
 		success = SDL_RenderCopy(renderer, data->board_widget->piece_textures[data->selected_piece_color][piece->type], NULL, &piece_rec);
+		if (success == -1) {
+			printf("Error: There was a problem with SDL_RenderCopy\n");
+			return -1;
+		}
 	}
-	return success;
+	return 0;
 }

@@ -28,15 +28,6 @@ Window* create_window(Window_type type, Gameboard* game){
 	}
 	src->windowRenderer = renderer;
 	src->num_buttons = num_buttons_by_window_type(type);
-	src->data = NULL;
-	if(type == Game){
-		src->data = create_game_data(renderer, game);
-		if(src->data == NULL){
-			free(src);
-			SDL_DestroyWindow(window);
-			SDL_DestroyRenderer(renderer);
-		}
-	}
 	src->buttons = (*(button_creator_by_window_type(type)))(renderer);
 	if(src->buttons == NULL){
 		free(src);
@@ -44,20 +35,27 @@ Window* create_window(Window_type type, Gameboard* game){
 		SDL_DestroyRenderer(renderer);
 		return NULL;
 	}
+	src->data = NULL;
+	if(type == Game){ //if it's the game window, create game data
+		src->data = create_game_data(renderer, game);
+		if(src->data == NULL){
+			free(src);
+			SDL_DestroyWindow(window);
+			SDL_DestroyRenderer(renderer);
+			return NULL;
+		}
+	}
 	return src;
 }
 
 void destroyWindow(Window* src) {
-	if (src == NULL ) {
+	if (src == NULL )
 		return;
-	}
 	int i = 0;
-	for (; i < src->num_buttons; i++) {
+	for (; i < src->num_buttons; i++)
 		destroyButton(src->buttons[i]);
-	}
-	if(src->type == Game){
+	if(src->type == Game)
 		destory_data(src->data);
-	}
 	SDL_DestroyRenderer(src->windowRenderer);
 	SDL_DestroyWindow(src->window);
 	free(src->buttons);
@@ -70,19 +68,23 @@ int drawWindow(Window* src, SDL_Event* event) {
 	int success;
 	success = SDL_SetRenderDrawColor(src->windowRenderer, 255, 255, 255, 255);
 	if(success == -1){
-		printf ("Error: There was a problem with SDL_SetRenderDrawColor");
+		printf ("Error: There was a problem with SDL_SetRenderDrawColor\n");
 		return -1;
 	}
 	success = SDL_RenderClear(src->windowRenderer);
 	if(success == -1){
-		printf ("Error: There was a problem with SDL_RenderClear");
+		printf ("Error: There was a problem with SDL_RenderClear\n");
 		return -1;
 	}
 	if(src->type == Game){
-		draw_board(src->data, src->windowRenderer, event);
+		success = draw_board(src->data, src->windowRenderer, event);
+		if(success == -1)
+			return -1;
 	}
 	for (int i = 0; i < src->num_buttons; i++) {
-		drawButton(src->buttons[i]);
+		success = drawButton(src->buttons[i]);
+		if(success == -1)
+			return -1;
 	}
 	SDL_RenderPresent(src->windowRenderer);
 	return 0;
@@ -93,7 +95,7 @@ Button *get_button_by_type(Window* wndw, ButtonType type){
 		if(wndw->buttons[i]->type == type)
 			return wndw->buttons[i];
 	}
-	return NoButton;
+	return NULL;
 }
 
 int num_buttons_by_window_type(Window_type type){
@@ -131,7 +133,7 @@ buttons_creator button_creator_by_window_type(Window_type type){
 			return create_game_buttons;
 		default:
 			return NULL;
-		}
+	}
 }
 
 const char *name_by_window_type(Window_type type){
@@ -150,5 +152,5 @@ const char *name_by_window_type(Window_type type){
 			return "Chess: Game";
 		default:
 			return NULL;
-		}
+	}
 }

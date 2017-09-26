@@ -60,13 +60,11 @@ Button** create_game_mode_buttons(SDL_Renderer* renderer){
 			horiz_center_for_two,
 			horiz_center_for_two,
 			horiz_center_for_two + DEFAULT_BTN_GAP_HORIZONTAL};
-
 	int y_btn_places[] = {DEFAULT_GAP_WINDOW,
 			DEFAULT_GAP_WINDOW,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5};
-
 	ButtonType types[] = {OnePlayer, TwoPlayer, StartButton, NextButton, BackButton};
 	const char* image[] = {IMG(one_player), IMG(two_players), IMG(start), IMG(next), IMG(back)};
 	const char* image_inavtice[] = {IMG_INCTV(one_player), IMG_INCTV(two_players), IMG_INCTV(start), IMG_INCTV(next), IMG_INCTV(back)};
@@ -111,12 +109,10 @@ Button** create_choose_color_buttons(SDL_Renderer* renderer){
 			horiz_center_for_two + DEFAULT_BTN_GAP_HORIZONTAL,
 			horiz_center_for_two,
 			horiz_center_for_two + DEFAULT_BTN_GAP_HORIZONTAL};
-
 	int y_btn_places[] = {DEFAULT_GAP_WINDOW,
 			DEFAULT_GAP_WINDOW,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5,
 			DEFAULT_GAP_WINDOW + DEFAULT_BTN_GAP_VERTICAL * 5};
-
 	ButtonType types[] = {SetWhite, SetBlack, StartButton, BackButton};
 	const char* image[] = {IMG(white), IMG(black), IMG(start), IMG(back)};
 	const char* image_inavtice[] = {IMG_INCTV(white), IMG_INCTV(black), IMG_INCTV(start), IMG_INCTV(back)};

@@ -18,7 +18,7 @@ Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location, const char 
 	}
 	Button *button = (Button*) malloc(sizeof(Button)); /* allocate the button*/
 	assert(button != NULL);
-	button->active_buttonTexture   = create_texure_from_bmp(windowRender, active_image, false);
+	button->active_buttonTexture = create_texure_from_bmp(windowRender, active_image, false);
 	if(button->active_buttonTexture == NULL){
 		free(button);
 		return NULL;
@@ -37,11 +37,6 @@ Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location, const char 
 	return button;
 }
 
-/* helper function, for creating list of buttons
- * return:
- * 		on success - array of pointer to buttons
- * 		on failure - NULL
- */
 Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_number, int x_btn_places[],
 		int y_btn_places[],	const char* image[], const char* image_inavtice[], bool active[], bool visible[], int btn_height, int btn_width) {
 	Button** buttons = (Button **) malloc(sizeof(Button*) * buttons_number);
@@ -61,24 +56,27 @@ Button **create_buttons(SDL_Renderer* renderer, ButtonType types[], int buttons_
 }
 
 void destroyButton(Button* button) {
-	if (button == NULL ) {
+	if (button == NULL )
 		return;
-	}
 	free(button->location);
 	SDL_DestroyTexture(button->active_buttonTexture);
 	SDL_DestroyTexture(button->inactive_buttonTexture);
 	free(button);
 }
 
-void drawButton(Button* button) {
-	if (button == NULL || !(button->visibility)) {
-		return; /* not drawing the button at all */
+int drawButton(Button* button) {
+	int success;
+	if (button == NULL || !(button->visibility))
+		return 0; /* not drawing the button at all */
+	if (button->active)
+		success = SDL_RenderCopy(button->windowRenderer, button->active_buttonTexture, NULL, button->location);
+	else
+		success = SDL_RenderCopy(button->windowRenderer, button->inactive_buttonTexture, NULL, button->location);
+	if(success == -1){
+		printf("Error: There was a problem with SDL_RenderCopy\n");
+		return -1;
 	}
-	if (button->active) {
-		SDL_RenderCopy(button->windowRenderer, button->active_buttonTexture, NULL, button->location);
-	} else {
-		SDL_RenderCopy(button->windowRenderer, button->inactive_buttonTexture, NULL, button->location);
-	}
+	return 0;
 }
 
 ButtonType which_button_clicked(SDL_Event* event, Button** buttons, int buttons_number) {

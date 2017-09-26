@@ -16,15 +16,29 @@
 #define AMOUNT_BUTTONS_DIFFICULTY 6
 #define AMOUNT_BUTTONS_CHOOSE_COLOR 4
 
-/*create buttons by window type*/
+/* create buttons to "enterance" window
+ * sets all parameters and create the buttons
+ * returns NULL on failure */
 Button** create_enterance_buttons(SDL_Renderer* renderer);
 
+/* create buttons to "load game" window
+ * sets all parameters and create the buttons
+ * returns NULL on failure */
 Button** create_load_game_buttons(SDL_Renderer* renderer);
 
+/* create buttons to "game mode" window
+ * sets all parameters and create the buttons
+ * returns NULL on failure */
 Button** create_game_mode_buttons(SDL_Renderer* renderer);
 
+/* create buttons to "difficulty" window
+ * sets all parameters and create the buttons
+ * returns NULL on failure */
 Button** create_difficulty_buttons(SDL_Renderer* renderer);
 
+/* create buttons to "choose color" window
+ * sets all parameters and create the buttons
+ * returns NULL on failure */
 Button** create_choose_color_buttons(SDL_Renderer* renderer);
 
 #endif /* GRAPHICS_WINDOWS_MENU_H_ */
