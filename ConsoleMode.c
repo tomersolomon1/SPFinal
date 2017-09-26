@@ -26,7 +26,6 @@ void ask_move(Gameboard *gameboard, bool to_print) {
 	fflush(stdout);
 }
 
-/* presenting the computer's move */
 void present_computer_move(Step *step, Piece *moving_piece, Piece_type promote_to) {
 	char ABC[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 	char *pieces_str[] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
@@ -42,10 +41,6 @@ void present_computer_move(Step *step, Piece *moving_piece, Piece_type promote_t
 				pieces_str[moving_piece->type], 1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol]);
 	}
 }
-
-/* performs a computer move only in mode 1, and when we start the game it's not the user's turn
- * return false if the game is over (otherwise return true)
- */
 
 bool console_begin_game(Gameboard *gameboard) {
 	bool game_stil_on = true; /* let's be optimistic */
@@ -94,7 +89,6 @@ void set_color(Gameboard *gameboard, Command *comm) {
 	}
 }
 
-/* return true if succeeded in loading the file, otherwise return false */
 bool load_file(Gameboard **gameboard_p, Command *comm) {
 	FILE *input_file = fopen(comm->file_name, "r");
 	if (input_file == NULL) {

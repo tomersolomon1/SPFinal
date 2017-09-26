@@ -11,32 +11,16 @@ VPATH = graphics
 
 EXEC = prog
 # for now our "main" is in Test.c, to be changed later
-GENERAL_OBJECTS = ArrayList.o Files.o GameBoard.o GameBasicBuildingBlocks.o MiniMax.o
+GENERAL_OBJECTS = ArrayList.o Files.o GameBoard.o GameBasicBuildingBlocks.o MiniMax.o Main.o
 CONSOLE_OBJECTS = ConsoleMode.o Parser.o
 GUI_OBJECTS     =  Button.o GameWindow.o GuiManager_Game.o GuiManager_Menu.o \
 GuiManager.o SPCommon.o Windows_Menu.o Windows.o
-TEST_OBJECTS = console_tester.o FilesTester.o GameBoardTester.o Game_Window_Tester.o ParserTester.o Test.o
 ALL_OBJECTS := $(GENERAL_OBJECTS) $(CONSOLE_OBJECTS) $(GUI_OBJECTS) $(MINIMAX_OBJECT) 
 
 # the executable file
-$(EXEC): $(ALL_OBJECTS) $(TEST_OBJECTS)
-	$(CC) $(ALL_OBJECTS) $(TEST_OBJECTS) $(SDL_LIB) -o $@
+$(EXEC): $(ALL_OBJECTS)
+	$(CC) $(ALL_OBJECTS) $(SDL_LIB) -o $@
 
-# tester rules
-console_tester.o: ConsoleMode.h GameBoard.h
-	$(CC) $(CC_COMP_FLAG) -c $*.c
-FilesTester.o: FilesTester.h
-	$(CC) $(CC_COMP_FLAG) -c $*.c
-GameBoardTester.o: GameBoard.h Files.h
-	$(CC) $(CC_COMP_FLAG) -c $*.c
-graphics/Game_Window_Tester.o: GameBoard.h Windows.h GameWindow.h GuiManager_Game.h
-	$(CC) $(CC_COMP_FLAG) $(SDL_COMP_FLAG) -c $*.c
-ParserTester.o: Parser.h
-		$(CC) $(CC_COMP_FLAG) -c $*.c
-Test.o: GameBoardTester.h ParserTester.h FilesTester.h ConsoleTester.h Game_Window_Tester.h GuiManager.h
-	$(CC) $(CC_COMP_FLAG) $(SDL_COMP_FLAG) -c $*.c
-
-		
 # console & general-objects & minimax rules
 ArrayList.o: ArrayList.h
 	$(CC) $(CC_COMP_FLAG) -c $*.c
@@ -51,6 +35,8 @@ GameBoard.o: GameBoard.h
 MiniMax.o: MiniMax.h GameBoard.h
 	$(CC) $(CC_COMP_FLAG) -c $*.c
 Parser.o: Parser.h
+	$(CC) $(CC_COMP_FLAG) -c $*.c
+Main.o: ConsoleMode.h GuiManager.h GameBoard.h
 	$(CC) $(CC_COMP_FLAG) -c $*.c
 
 # graphic related rules
