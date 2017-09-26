@@ -35,9 +35,8 @@ void promote_saves(){
 }
 
 SDL_Rect* spCopyRect(SDL_Rect* src){
-	if(src == NULL){
+	if(src == NULL)
 		return NULL;
-	}
 	SDL_Rect* res = malloc(sizeof(SDL_Rect));
 	assert(res != NULL);
 	res->h = src->h;
