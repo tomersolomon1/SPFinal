@@ -87,15 +87,18 @@ int graphical_handle_single_move(Window *window, int srow, int scol, int drow, i
 		else /* somebody won the game */
 			sprintf(mssg, "Checkmate! %s player wins the game", colors[game_over]);
 		success = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Game Over", mssg, NULL);
-		if(success == -1)
+		if(success == -1){
 			printf("Error: There was a problem with SDL_ShowSimpleMessageBox\n");
-		return success;
+			return -1;
+		}
+		return 1;
 	} else if (is_under_check(board)) {
 		sprintf(mssg, "Check: %s King is threatened!", colors[board->turn]);
 		success =  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Check!", mssg, NULL);
-		if(success == -1)
+		if(success == -1){
 			printf("Error: There was a problem with SDL_ShowSimpleMessageBox\n");
-		return success;
+			return -1;
+		}
 	}
 	return 0;
 }
