@@ -9,6 +9,7 @@
 #include "../ConsoleMode.h"
 
 void run_gui(){
+	SDL_Init(SDL_INIT_VIDEO);
 	Window_type type_window = Enterance;
 	Window_type old_type_window = Enterance;
 	Gameboard* game = create_board(GAME_DEFAULT_MODE, GAME_DEFAULT_DIFFICULTY, GAME_DEFAULT_COLOR);
@@ -25,6 +26,7 @@ void run_gui(){
 			break;
 	}
 	destroy_board(game);
+	SDL_Quit();
 }
 
 Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_window){

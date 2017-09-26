@@ -134,7 +134,7 @@ int graphical_handle_move(Window *window, int srow, int scol, int drow, int dcol
 void save_game_from_gui(Gameboard *game) {
 	promote_saves();
 	char game_path[SAVED_GAME_PATH_LENGTH];
-	set_game_path(game_path, 0);
+	set_i_th_game_path(game_path, 0);
 	FILE *file = fopen(game_path, "w");
 	assert(file != NULL);
 	save_xml(file, game);

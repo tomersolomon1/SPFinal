@@ -13,16 +13,20 @@ Window* create_window(Window_type type, Gameboard* game){
 	src->type = type;
 	SDL_Window* window = SDL_CreateWindow(name_by_window_type(type), SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, DEFAULT_MENU_WINDOW_WIDTH, DEFAULT_MENU_WINDOW_HIGHT, SDL_WINDOW_OPENGL);
-	src->window = window;
-	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	src->windowRenderer = renderer;
-
-	if(window == NULL || renderer == NULL){
+	if(window == NULL){
 		free(src);
-		SDL_DestroyWindow(window);
-		SDL_DestroyRenderer(renderer);
+		printf("Error: There was a problem with SDL_CreateWindow\n");
 		return NULL;
 	}
+	src->window = window;
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if(renderer == NULL){
+		free(src);
+		SDL_DestroyWindow(window);
+		printf("Error: There was a problem with SDL_CreateRenderer\n");
+		return NULL;
+	}
+	src->windowRenderer = renderer;
 	src->num_buttons = num_buttons_by_window_type(type);
 	src->data = NULL;
 	if(type == Game){
@@ -60,13 +64,20 @@ void destroyWindow(Window* src) {
 	free(src);
 }
 
-void drawWindow(Window* src, SDL_Event* event) {
-	if (src == NULL ){
-		return;
+int drawWindow(Window* src, SDL_Event* event) {
+	if (src == NULL )
+		return 0;
+	int success;
+	success = SDL_SetRenderDrawColor(src->windowRenderer, 255, 255, 255, 255);
+	if(success == -1){
+		printf ("Error: There was a problem with SDL_SetRenderDrawColor");
+		return -1;
 	}
-	//draw window:
-	SDL_SetRenderDrawColor(src->windowRenderer, 255, 255, 255, 255);
-	SDL_RenderClear(src->windowRenderer);
+	success = SDL_RenderClear(src->windowRenderer);
+	if(success == -1){
+		printf ("Error: There was a problem with SDL_RenderClear");
+		return -1;
+	}
 	if(src->type == Game){
 		draw_board(src->data, src->windowRenderer, event);
 	}
@@ -74,6 +85,7 @@ void drawWindow(Window* src, SDL_Event* event) {
 		drawButton(src->buttons[i]);
 	}
 	SDL_RenderPresent(src->windowRenderer);
+	return 0;
 }
 
 Button *get_button_by_type(Window* wndw, ButtonType type){

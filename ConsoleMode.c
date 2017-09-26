@@ -100,7 +100,7 @@ void set_color(Gameboard *gameboard, Command *comm) {
 bool load_file(Gameboard **gameboard_p, Command *comm) {
 	FILE *input_file = fopen(comm->file_name, "r");
 	if (input_file == NULL) {
-		printf("File cannot be created or modified\n");
+		printf("Error: File doesn’t exist or cannot be opened\n");
 		return false;
 	} else {
 		destroy_board(*gameboard_p);

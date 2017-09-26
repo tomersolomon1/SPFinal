@@ -42,17 +42,20 @@ Window_type handleEvenet_load_game(Window* wndw, Button* btn, Gameboard** game, 
 		FILE *f = NULL;
 		char game_path[SAVED_GAME_PATH_LENGTH];
 		if(slot1->active)
-			set_game_path(game_path, 0);
+			set_i_th_game_path(game_path, 0);
 		else if(slot2->active)
-			set_game_path(game_path, 1);
+			set_i_th_game_path(game_path, 1);
 		else if(slot3->active)
-			set_game_path(game_path, 2);
+			set_i_th_game_path(game_path, 2);
 		else if(slot4->active)
-			set_game_path(game_path, 3);
+			set_i_th_game_path(game_path, 3);
 		else if(slot5->active)
-			set_game_path(game_path, 4);
+			set_i_th_game_path(game_path, 4);
 		f = fopen(game_path, "r");
-		assert(f != NULL);
+		if(f == NULL){
+			printf("ERROR: There was a problem with opening the file\n");
+			return wndw->type;
+		}
 		destroy_board(*game);
 		*game = load_game(f);
 		fclose(f);

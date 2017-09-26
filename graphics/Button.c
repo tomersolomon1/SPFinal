@@ -19,8 +19,13 @@ Button *createButton(SDL_Renderer* windowRender, SDL_Rect* location, const char 
 	Button *button = (Button*) malloc(sizeof(Button)); /* allocate the button*/
 	assert(button != NULL);
 	button->active_buttonTexture   = create_texure_from_bmp(windowRender, active_image, false);
+	if(button->active_buttonTexture == NULL){
+		free(button);
+		return NULL;
+	}
 	button->inactive_buttonTexture = create_texure_from_bmp(windowRender, inactive_image, false);
-	if (button->active_buttonTexture == NULL || button->inactive_buttonTexture == NULL) {
+	if (button->inactive_buttonTexture == NULL) {
+		SDL_DestroyTexture(button->active_buttonTexture);
 		free(button);
 		return NULL; /* we had had problem in creating textures one of the textures, so we return NULL */
 	}

@@ -20,8 +20,10 @@ Window* create_window(Window_type type, Gameboard* game);
 /*destroy window:*/
 void destroyWindow(Window* src);
 
-/*draw window:*/
-void drawWindow(Window* src, SDL_Event* event);
+/*draw window:
+ * return 0 if success
+ * return -1 if fail, and prints a relevant error message*/
+int drawWindow(Window* src, SDL_Event* event);
 
 /*get pointer to the button on the window by its type*/
 Button* get_button_by_type(Window* wndw, ButtonType type);
