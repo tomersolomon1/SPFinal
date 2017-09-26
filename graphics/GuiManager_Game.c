@@ -10,15 +10,13 @@
 #include "WindowDataStruct.h"
 #include "GuiManager_Game.h"
 #include "Windows.h"
-#include "../ConsoleMode.h"
 #include "../Files.h"
 
-Window_type gui_begin_game(Window *window, Gameboard *gameboard) {
-	if (CHECK_COMPUTER_START(gameboard)) { /* checks if it's the computer's turn */
-		Gameboard *copy = copy_board(gameboard);
-		StepValue *best_move = find_best_step(copy, copy->difficulty);
+Window_type gui_begin_game(Window *window) {
+	Gameboard *board = window->data->board_widget->board;
+	if (CHECK_COMPUTER_START(board)) { /* checks if it's the computer's turn */
+		StepValue *best_move = find_best_step(board, board->difficulty);
 		Step *step = best_move->step;
-		destroy_board(copy);
 		int move_consequences = graphical_handle_single_move(window, step->srow, step->scol, step->drow, step->dcol,
 		false, best_move->promote_to);
 		destroy_step_value(best_move);
@@ -66,7 +64,6 @@ Piece_type choose_promotion() {
 	};
 	int buttonid;
 	if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
-		SDL_Log("error displaying message box");
 		return Empty; /* signaling error */
 	}
 	return buttonid; /* we leave without saving */
@@ -78,7 +75,7 @@ Piece_type choose_promotion() {
  * return:
  * 		1  	- the game is over
  * 		0 	- the game isn't over
- * 		-1 	- if some error occurred
+ * 	   -1 	- if some error occurred
  */
 int graphical_handle_single_move(Window *window, int srow, int scol, int drow, int dcol,
 		bool is_user_move, Piece_type computer_promotion) {
@@ -120,12 +117,10 @@ int graphical_handle_move(Window *window, int srow, int scol, int drow, int dcol
 	} else if (move_result == -1) { /* some error occurred */
 		return -1;
 	} else if (window->data->board_widget->board->game_mode == 1) { /* the game is not over, and we need to play the computer's turn */
-		Gameboard *copy = copy_board(window->data->board_widget->board);
-		StepValue *best_move = find_best_step(copy, copy->difficulty);
+		StepValue *best_move = find_best_step(window->data->board_widget->board, window->data->board_widget->board->difficulty);
 		Step *best_step = best_move->step;
 		int game_over = graphical_handle_single_move(window, best_step->srow, best_step->scol, best_step->drow, best_step->dcol, false, best_move->promote_to);
 		destroy_step_value(best_move);
-		destroy_board(copy);
 		return game_over;
 	}
 	return 0; /* the game is not over yet */

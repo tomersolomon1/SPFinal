@@ -24,5 +24,5 @@ void save_game_from_gui(Gameboard *game);
 StayOrLeave suggest_save(Gameboard *game);
 
 // for setting the first move
-Window_type gui_begin_game(Window *window, Gameboard *gameboard);
+Window_type gui_begin_game(Window *window);
 #endif /* GRAPHICS_GUIMANAGER_GAME_H_ */

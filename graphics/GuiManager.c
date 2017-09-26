@@ -36,7 +36,7 @@ Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_wi
 	SDL_Event event;
 	set_buttons_by_game_params(wndw, game);
 	if (wndw->type == Game) {
-		type = gui_begin_game(wndw, *game);
+		type = gui_begin_game(wndw);
 		if (type != Game) { /* either the game is over, or we had problem with SDL */
 			return type;
 		}
