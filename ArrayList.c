@@ -69,9 +69,7 @@ void ArrayListDestroy(ArrayList* src)
 			destroy_step(src->elements[i]);
 		}
 		free(src->elements);
-		//write_to_log_file("free array_elements\n"); fflush(stdout);
 		free(src);
-		//write_to_log_file("free array\n"); fflush(stdout);
 	}
 }
 

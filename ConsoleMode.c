@@ -210,7 +210,6 @@ int make_move(Gameboard *gameboard, Command *comm) {
 	}
 }
 
-/* return -1 if illegal move, 0 if the game is over, and 1 otherwise */
 int castling_move(Gameboard *gameboard, Command *comm) {
 	if (!comm->args_in_range) {
 		printf("Invalid position on the board\n");
@@ -252,7 +251,6 @@ bool op_handler(Gameboard *gameboard, Command *comm, Op op) {
 	}
 }
 
-/* used for sorting the steps by qsort function */
 int steps_comperator(const void *p, const void *q) {
 	Step **step1 = (Step **) p;
 	Step **step2 = (Step **) q;

@@ -13,7 +13,6 @@ int main(int argc, char *argv[]){
 		else if(argv[1][1] == 'c')
 			manage_console(gameboard);
 	}
-	destroy_board(gameboard);
 	return 0;
 }
 
