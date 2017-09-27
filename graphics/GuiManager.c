@@ -8,11 +8,10 @@
 #include "GuiManager.h"
 #include "../ConsoleMode.h"
 
-void run_gui(){
+void run_gui(Gameboard *game){
 	SDL_Init(SDL_INIT_VIDEO);
 	Window_type type_new_window = Enterance;
 	Window_type type_old_window = Enterance;
-	Gameboard* game = create_board(GAME_DEFAULT_MODE, GAME_DEFAULT_DIFFICULTY, GAME_DEFAULT_COLOR);
 	while(1){
 		Window* window = create_window(type_new_window, game); //we check if the window is NULL inside handleEvent
 		type_new_window = handleEvenet(window, &game, type_old_window);
@@ -25,8 +24,8 @@ void run_gui(){
 		if(type_new_window == ExitGame)
 			break;
 	}
-	destroy_board(game);
 	SDL_Quit();
+	destroy_board(game);
 }
 
 Window_type handleEvenet(Window* wndw, Gameboard** game, Window_type old_type_window){

@@ -11,14 +11,11 @@
 #include "GuiManager_Menu.h"
 #include "GuiManager_Game.h"
 
-#define GAME_DEFAULT_DIFFICULTY 1
-#define GAME_DEFAULT_MODE 1
-#define GAME_DEFAULT_COLOR white
 
 /* run the gui while the user didn't ask to quit
  * if a problem occurred with SDL during the running,
  * the function destroys the game and closes it*/
-void run_gui();
+void run_gui(Gameboard *game);
 
 /* initialize the window and handle events while the window is open
  * in case of problem returns SDLErrorWindow

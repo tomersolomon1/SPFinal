@@ -20,7 +20,7 @@ int main2(int argc, char *argv[]){
 			console_tester();
 		} else if (strcmp(argv[1], "1") == 0) { /* Sapir's tests */
 //			console_tester();
-			run_gui();
+//			run_gui();
 		} else if (strcmp(argv[1], "g") == 0) { /* game window (gui) test  */
 			check_game_window();
 		} else if (strcmp(argv[1], "p") == 0) { /* parser test */
