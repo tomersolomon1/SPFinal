@@ -9,7 +9,8 @@ SDL_LIB = -L/usr/local/lib/sdl_2.0.5/lib -Wl,-rpath,/usr/local/lib/sdl_2.0.5/lib
 # vriables and adding graphics to the makefile's path
 VPATH = graphics
 
-EXEC = prog
+# name of program
+EXEC = chessprog
 # for now our "main" is in Test.c, to be changed later
 GENERAL_OBJECTS = ArrayList.o Files.o GameBoard.o GameBasicBuildingBlocks.o MiniMax.o Main.o
 CONSOLE_OBJECTS = ConsoleMode.o Parser.o

@@ -61,6 +61,8 @@ int make_move(Gameboard *gameboard, Command *comm);
  * return -1 if illegal move, 0 if the game is over, and 1 otherwise */
 int castling_move(Gameboard *gameboard, Command *comm);
 
+/* execute op (a function that is getting gameboard and command)
+ * return true if we continue the game*/
 bool op_handler(Gameboard *gameboard, Command *comm, Op op);
 
 /* used for sorting the steps by qsort function */
@@ -69,7 +71,7 @@ int steps_comperator(const void *p, const void *q);
 /* present all the moves */
 void present_all_moves(Gameboard *gameboard, Piece *piece);
 
-/*  */
+/* show all valid moves of the piece in the coordinates specified in comm */
 int get_moves(Gameboard *gameboard, Command *comm);
 
 /* save game in console mode */

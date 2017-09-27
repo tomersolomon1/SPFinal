@@ -387,10 +387,9 @@ void manage_console(Gameboard *gameboard) {
 				case Get_Moves: op_handler(gameboard, comm, get_moves); break;
 				case Save: save_game(gameboard, comm); break;
 				case Undo_Move:
-					if (undo_move(gameboard) < 0) {
+					if (undo_move(gameboard) < 0)
 						ask_move(gameboard, false);
-					}
-						break;
+					break;
 				case Reset:
 					console_mode = SettingsMode;
 					reset_board(&gameboard);

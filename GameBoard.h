@@ -43,7 +43,7 @@ typedef struct gameboard_t  {
 	int turn; // current turn
 	ArrayList *history; //array list for saving history
 	Piece *empty; // the game's "empty piece"
-	int game_mode; // 1 for 1-player, =2 for 2-player
+	int game_mode; // 1 for 1-player, 2 for 2-player
 	int difficulty; // range: 1-4, the difficulty level
 	int user_color; // the user color: black = 0, white = 1
 } Gameboard;
