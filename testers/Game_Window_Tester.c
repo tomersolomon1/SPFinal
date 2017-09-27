@@ -7,9 +7,9 @@
 
 
 #include "../GameBoard.h"
-#include "Windows.h"
-#include "GameWindow.h"
-#include "GuiManager_Game.h"
+#include "../graphics/Windows.h"
+#include "../graphics/GameWindow.h"
+#include "../graphics/GuiManager_Game.h"
 
 /* debugging function */
 Window *create_game_window(Gameboard *board) {

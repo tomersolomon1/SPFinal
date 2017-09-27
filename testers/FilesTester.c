@@ -28,13 +28,13 @@ void check_Files(){
 
 	print_details_game(game);
 	//write:
-	FILE *fw = fopen(my_path, "w");
+	FILE *fw = fopen("", "w");
 	save_xml(fw,game);
 	fclose(fw);
 	destroy_board(game);
 	//read:
 	Gameboard * game2 = NULL;
-	FILE *fr = fopen(my_path, "r");
+	FILE *fr = fopen("", "r");
 
 	game2 = load_game(fr);
 	fclose(fr);

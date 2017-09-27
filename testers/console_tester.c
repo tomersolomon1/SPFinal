@@ -7,11 +7,11 @@
 
 #include <stdio.h>
 
-#include "ConsoleMode.h"
-#include "GameBoard.h"
-#include "Parser.h"
-#include "Files.h"
-#include "MiniMax.h"
+#include "../ConsoleMode.h"
+#include "../GameBoard.h"
+#include "../Parser.h"
+#include "../Files.h"
+#include "../MiniMax.h"
 #define LEN 100
 #define LEN_s "100"
 

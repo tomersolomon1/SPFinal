@@ -5,8 +5,8 @@
  *      Author: User
  */
 
-#include "GameBoard.h"
-#include "Files.h"
+#include "../GameBoard.h"
+#include "../Files.h"
 
 
 /********************************** FOR DEBUGGING ******************************

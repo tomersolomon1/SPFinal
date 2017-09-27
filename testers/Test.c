@@ -10,8 +10,8 @@
 #include "ParserTester.h"
 #include "FilesTester.h"
 #include "ConsoleTester.h"
-#include "graphics/Game_Window_Tester.h"
-#include "graphics/GuiManager.h"
+#include "Game_Window_Tester.h"
+#include "../graphics/GuiManager.h"
 
 //FILE *f_log;
 int main2(int argc, char *argv[]){

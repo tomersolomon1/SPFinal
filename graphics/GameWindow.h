@@ -8,8 +8,6 @@
 #ifndef GRAPHICS_GAMEWINDOW_H_
 #define GRAPHICS_GAMEWINDOW_H_
 
-#include <SDL.h>
-#include <SDL_video.h>
 #include "../GameBoard.h"
 #include "../MiniMax.h"
 #include "Button.h"

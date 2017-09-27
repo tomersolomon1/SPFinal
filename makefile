@@ -38,7 +38,7 @@ MiniMax.o: MiniMax.h GameBoard.h
 Parser.o: Parser.h
 	$(CC) $(CC_COMP_FLAG) -c $*.c
 Main.o: ConsoleMode.h GuiManager.h GameBoard.h
-	$(CC) $(CC_COMP_FLAG) -c $*.c
+	$(CC) $(CC_COMP_FLAG) $(SDL_COMP_FLAG) -c $*.c
 
 # graphic related rules
 graphics/Button.o: Button.h SPCommon.h

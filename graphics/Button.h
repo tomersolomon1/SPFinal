@@ -17,8 +17,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <SDL.h>
-#include <SDL_video.h>
+#include "SPCommon.h"
 
 typedef enum {
 	/* general button */
