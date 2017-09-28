@@ -127,6 +127,18 @@ BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location) {
 	return board_widget;
 }
 
+//int highlight_castling_rook(GameData *data, SDL_Renderer *renderer, Piece* selected_piece, int row_dim, int col_dim){
+//	//check if king has castling
+//	int x_offset = data->board_widget->location->x + (4 * col_dim);
+//	int y_offset = data->board_widget->location->y + (7 * selected_piece->colur * row_dim);
+//	SDL_Rect step_rec = {.x = x_offset, .y = y_offset, .h = row_dim, .w = col_dim };
+//	if(SDL_RenderDrawRect(renderer, &step_rec) == -1) { /* some SDL error occurred */
+//		printf("Error: There was a problem with SDL_RenderDrawRect\n");
+//		return -1;
+//	}
+//}
+
+
 int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim, int col_dim) {
 	Piece *selected_piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
 	int success = 0; /* so far so good */

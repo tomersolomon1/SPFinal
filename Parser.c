@@ -69,8 +69,7 @@ void free_command(Command *comm) {
 	free(comm);
 }
 
-/* line[offset] is the first char to be checked
- */
+/* line[offset] is the first char to be checked */
 void valid_commands_tail(Command *comm, const char *line, int offset) {
 	bool tail_validity = check_tail_validity(line, offset);
 	if (!tail_validity) {
@@ -78,9 +77,6 @@ void valid_commands_tail(Command *comm, const char *line, int offset) {
 	}
 }
 
-/* make sure this is the right command
- * return true if and only if line starts with the comm_s
- */
 bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len) {
 	int actual_len = 0;
 	for (; (actual_len < comm_len && offset < SP_MAX_LINE_LENGTH); actual_len++, offset++) {
@@ -140,14 +136,6 @@ void get_command_with_file_name(Command *comm, const char *line, int offset, con
 	}
 }
 
-/* new get-number func!!!!!
- * line[offset] is assumed to be non-whitespace char
- * read line[*offset], store it inside arg, and check it's within the proper bounds.
- * advances offset by one after reading the number (offset = offset + 1)
- * checks that the following char is either a whitespace, '\0', or a "valid following char"
- * return true if and only if the number is within the proper bounds and has proper following char
- * according to Moav, we can ignore pathological cases such as -1, 00001 etc
- */
 bool get_number(const char *line, int *offset, int *arg, char range_offset, int lower_bound,
 		int upper_bound, char valid_following, bool end_command) {
 	*arg = line[*offset] - range_offset;
@@ -185,10 +173,6 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
 	}
 }
 
-/* get XY coordinates in the form of <X,Y>, where X is in range 1-8, and Y is in range A-H
- * return true if and only if managed to read the coordinates
- * after calling the function, line[offset] is the first char after the coordinate (after <X,Y>)
- */
 bool getXY(Command *comm, const char *line, int *offset, int *row, int *col, int needed_space, bool first_coordinate) {
 	if (*offset > SP_MAX_LINE_LENGTH - needed_space) { /* */
 		comm->comm_e = Invalid_command; /* not enough room for parameters, treat the command as illegal */

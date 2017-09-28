@@ -181,6 +181,13 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 /* return -1 if illegal move, 0 if the game is over, and 1 otherwise */
 int make_move(Gameboard *gameboard, Command *comm) {
 	if (comm->args_in_range) { /* the move coordinates represent a valid squares on the board */
+		//if the user asks to castle as a regular move of the king, it is not legal
+		if(comm->comm_e == Make_Move
+				&& gameboard->board[comm->arg1][comm->arg2]->type == King
+				&& abs(comm->arg2 - comm->arg4) > 1){
+			printf("Illegal move\n");
+			return -1;
+		}
 		int move_consequences = make_single_move(gameboard, comm->arg1, comm->arg2, comm->arg3, comm->arg4, true, Empty);
 		if (move_consequences == 1) { /* the game is over */
 			return 0;
