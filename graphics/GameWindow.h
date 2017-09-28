@@ -58,7 +58,7 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 
 /* helping function for create_widget_board
  * initialize widget board*/
-BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location);
+BoardWidget *init_widget_board(Gameboard *board , SDL_Rect* location);
 
 /* create buttons to game window
  * sets all parameters and create the buttons
