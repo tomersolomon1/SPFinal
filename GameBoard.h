@@ -62,7 +62,7 @@ typedef enum chess_board_message_t {
 } CHESS_BOARD_MESSAGE;
 
 
-//-------------------------------Game Board General functions-------------------------------
+//------------------------------------Game Board General functions------------------------------------
 /* create board */
 Gameboard *create_board(int game_mode, int difficulty, int user_color);
 
@@ -81,7 +81,7 @@ void reset_board(Gameboard** gameboard);
 /*change game difficulty*/
 void change_game_difficulty(Gameboard* gameboard, int new_difficulty);
 
-//----------------------------------------Set Step----------------------------------------
+//---------------------------------------------Set Step-----------------------------------------------
 /*make a step
  * gets source and destination coordinates as 0-7 numbers
  * returns CHESS_BOARD_SUCCESS if legal move
@@ -108,11 +108,10 @@ void set_castling_move(Gameboard *gameboard, int row, int scol, int dcol);
 /* checks if a step is valid
  * returns CHESS_BOARD_SUCCESS if legal move
  * returns CHESS_BOARD_INVALID_MOVE_<error-type> if move is NOT legal
- * gets source and destination coordinates as 0-7 numbers
- * */
+ * gets source and destination coordinates as 0-7 numbers */
 CHESS_BOARD_MESSAGE is_valid_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol);
 
-//-----------------------Is (the other player) threatening piece-----------------------
+//-----------------------------Is (the other player) threatening piece---------------------------
 
 /* is (Piece *threatened) threatened by the other player?
  * when the "other player" is the one with the other color of (Piece *threatened)*/
@@ -130,24 +129,7 @@ bool is_under_check(Gameboard * gameboard);
 /* is the player with color "colur" threatening the other player's king? */
 bool is_check(Gameboard *gameboard, int colur);
 
-//-----------------------MINIMAX-----------------------
-
-/* get all valid steps of piece in gameboard,
- * and update amount_steps to be the amount of steps of the piece
- * step ** is malloced inside the function
- * */
-Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps);
-
-/* free all_valid_steps */
-void free_all_valid_steps_minimax(Step** all_steps, Piece_type type);
-
-int is_game_over_minimax(Gameboard *gameboard);
-
-bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece);
-
-bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v);
-
-//---------------------------------Set all Valid Steps---------------------------------
+//----------------------------------------Set all Valid Steps-----------------------------------------
 
 /* set all valid steps for all pieces of current turn
  * we call this function after a turn was made
@@ -190,7 +172,7 @@ void set_castling_steps(Gameboard * gameboard, Piece *king, Step** steps_list, i
  * check if castling set is valid for rook */
 bool is_castling_valid_per_rook(Gameboard * gameboard, Piece* king, Piece* rook);
 
-//-------------------------------------Undo-------------------------------------
+//--------------------------------------------Undo-----------------------------------------
 
 /* undo step
  * returns CHESS_BOARD_INVALID_ARGUMENT if game is null
@@ -208,19 +190,44 @@ CHESS_BOARD_MESSAGE double_undo(Gameboard *gameboard);
 /* helping function for undo_step, doing undo to castling step */
 void undo_step_castling(Gameboard *gameboard, Step* step);
 
-//----------------------------------Is Game Over----------------------------------
+//---------------------------------------Is Game Over----------------------------------
 
 /* return the winner's color
  * if tie return 2
  * if not game over return -1*/
 int is_game_over(Gameboard *gameboard);
 
-//----------------------------------Print Board----------------------------------
+//------------------------------------Print Board---------------------------------------
 
 /* print board for in console format */
 void print_board(Gameboard *gameboard);
 
 /* for debugging - print board and details */
 void print_details_game(Gameboard *gameboard);
+
+//----------------------------------FOR MINIMAX---------------------------------------
+
+/* get all valid steps of piece in gameboard,
+ * and update amount_steps to be the amount of steps of the piece
+ * step ** is malloced inside the function */
+Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps);
+
+/* free all_valid_steps of a piece */
+void free_all_valid_steps_minimax(Step** all_steps, Piece_type type);
+
+/* return the winner's color
+ * if tie return 2
+ * if not game over return -1
+ * we use a different function than is_game_over to make
+ * the checking much cheaper for the minimax recursion
+ * the helping functions return true when it detects a first valid move
+ * and not waiting to calculate all of them*/
+int is_game_over_minimax(Gameboard *gameboard);
+
+/* helping function for is_game_over_minimax */
+bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece);
+
+/* helping function for is_game_over_minimax */
+bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v);
 
 #endif /* GAMEBOARD_H_ */

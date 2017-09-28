@@ -1,7 +1,7 @@
 
 #include "GameBoard.h"
 
-//-----------------------Game Board General functions-----------------------
+//-----------------------------------Game Board General functions-----------------------------------
 
 Gameboard *create_board(int game_mode, int difficulty, int user_color) {
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
@@ -127,7 +127,7 @@ void change_game_difficulty(Gameboard* gameboard, int new_difficulty){
 		set_all_valid_steps(gameboard);
 }
 
-//-----------------------Set Step-----------------------
+//-----------------------------------Set Step-----------------------------------
 
 CHESS_BOARD_MESSAGE set_step(Gameboard *gameboard, int srow, int scol, int drow, int dcol, bool is_minimax){
 	if(!is_minimax){
@@ -218,7 +218,7 @@ CHESS_BOARD_MESSAGE is_valid_step(Gameboard *gameboard, int srow, int scol, int 
 	return CHESS_BOARD_INVALID_MOVE_RULES_VIOLATION;
 }
 
-//-----------------------Is (the other player) threatening piece-----------------------
+//-----------------------------------Is (the other player) threatening piece-----------------------------------
 
 bool is_threatening_piece(Gameboard* gameboard, Piece *threatened){
 	for(int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++){
@@ -273,92 +273,12 @@ bool is_under_check(Gameboard * gameboard){
 }
 
 bool is_check(Gameboard *gameboard, int colur) {
-	Piece* king_threatened = gameboard->all_pieces[SWITCHED(colur)][15]; //15 is the place of king in all_pieces
+	Piece* king_threatened = gameboard->all_pieces[SWITCHED(colur)][KING_INDEX];
 	return is_threatening_piece(gameboard, king_threatened);
 }
 
 
-//-----------------------MINIMAX-----------------------
-
-Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps){
-	*amount_steps = 0;
-	int max_amount_steps = amount_steps_of_piece_type(piece->type);
-
-	Step **all_piece_steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
-	assert(all_piece_steps != NULL);
-	for(int i = 0; i < max_amount_steps; i++){
-		all_piece_steps[i] = NULL;
-	}
-	if(piece->type == King){
-		set_castling_steps(gameboard, piece, all_piece_steps, amount_steps);
-	}
-	for(int i = 0; i < piece->amount_vectors; i++){
-		add_steps_per_vector(gameboard, piece, piece->vectors[i], amount_steps, all_piece_steps, false);
-	}
-	return all_piece_steps;
-}
-
-void free_all_valid_steps_minimax(Step** all_steps, Piece_type type){
-	int max_amount_steps = amount_steps_of_piece_type(type);
-	for(int i = 0; i < max_amount_steps; i++){
-		destroy_step(all_steps[i]);
-	}
-	free(all_steps);
-}
-
-int is_game_over_minimax(Gameboard *gameboard){
-	for(int i = AMOUNT_PIECES_PER_COLOR - 1; i >= 0 ; i--){ // is there any piece that has legal move?
-		Piece *p = gameboard->all_pieces[gameboard->turn][i];
-		if(p->alive){
-			if(is_piece_having_legal_move_minimax(gameboard, p))
-				return -1;
-		}
-	}
-	if(is_check(gameboard, SWITCHED(gameboard->turn))){ // is my king under check?
-		return SWITCHED(gameboard->turn);
-	}
-	return 2;
-}
-
-bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece){
-	for(int i = 0; i < piece->amount_vectors; i++){
-		if(is_piece_having_legal_move_per_vector_minimax(gameboard, piece, piece->vectors[i])){
-			return true;
-		}
-	}
-	return false;
-}
-
-bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v){
-	int amount_going = v->vector_size;
-	int row = piece->row;
-	int col = piece->col;
-	while(amount_going > 0){
-		amount_going --;
-		row = row + v->delta_row;
-		col = col + v->delta_col;
-		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)) //out of board
-			break;
-		if(gameboard->board[row][col]->type == Empty && v->can_go_to_empty_spot){ // can go, empty
-			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->empty)){
-				return true;
-			}
-		}
-		else if(gameboard->board[row][col]->type != Empty &&
-				gameboard->board[row][col]->colur != piece->colur && v->can_eat){ //eating opponent's piece
-			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->board[row][col])){
-				return true;
-			}
-			break;
-		}
-		else{ // seeing your color piece
-			break;
-		}
-	}
-	return false;
-}
-
-//-----------------------Set all Valid Steps-----------------------
+//-----------------------------------Set all Valid Steps-----------------------------------
 
 void set_all_valid_steps(Gameboard *gameboard){
 	for(int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++){
@@ -367,7 +287,7 @@ void set_all_valid_steps(Gameboard *gameboard){
 			set_all_valid_steps_per_piece(gameboard, piece);
 		}
 	}
-	Piece *king = gameboard->all_pieces[gameboard->turn][15]; //15 is the place of king in all_pieces
+	Piece *king = gameboard->all_pieces[gameboard->turn][KING_INDEX];
 	set_castling_steps(gameboard, king, king->steps, &(king->amount_steps));
 }
 
@@ -507,8 +427,7 @@ bool is_castling_valid_per_rook(Gameboard * gameboard, Piece* king, Piece* rook)
 	return result;
 }
 
-//-----------------------Undo-----------------------
-
+//-----------------------------------Undo-----------------------------------
 
 CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard, bool is_minimax) {
 	if (gameboard == NULL) {
@@ -582,7 +501,7 @@ void undo_step_castling(Gameboard *gameboard, Step *step){
 	king->has_moved = false;
 }
 
-//-----------------------Is Game Over-----------------------
+//-----------------------------------Is Game Over-----------------------------------
 
 int is_game_over(Gameboard *gameboard) {
 	for(int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++){ // is there any piece that has legal move?
@@ -597,7 +516,7 @@ int is_game_over(Gameboard *gameboard) {
 	return 2;
 }
 
-//-----------------------Print Board-----------------------
+//-----------------------------------Print Board-----------------------------------
 
 
 void print_board(Gameboard *gameboard) {
@@ -633,3 +552,84 @@ void print_details_game(Gameboard *gameboard){
 		fflush(stdout);
 	}
 }
+
+//-----------------------------------FOR MINIMAX-----------------------------------
+
+Step **get_all_valid_steps_of_piece_minimax(Gameboard *gameboard, Piece *piece, int *amount_steps){
+	*amount_steps = 0;
+	int max_amount_steps = amount_steps_of_piece_type(piece->type);
+
+	Step **all_piece_steps = (Step**) malloc(sizeof(Step*) * max_amount_steps);
+	assert(all_piece_steps != NULL);
+	for(int i = 0; i < max_amount_steps; i++){
+		all_piece_steps[i] = NULL;
+	}
+	if(piece->type == King){
+		set_castling_steps(gameboard, piece, all_piece_steps, amount_steps);
+	}
+	for(int i = 0; i < piece->amount_vectors; i++){
+		add_steps_per_vector(gameboard, piece, piece->vectors[i], amount_steps, all_piece_steps, false);
+	}
+	return all_piece_steps;
+}
+
+void free_all_valid_steps_minimax(Step** all_steps, Piece_type type){
+	int max_amount_steps = amount_steps_of_piece_type(type);
+	for(int i = 0; i < max_amount_steps; i++){
+		destroy_step(all_steps[i]);
+	}
+	free(all_steps);
+}
+
+int is_game_over_minimax(Gameboard *gameboard){
+	for(int i = AMOUNT_PIECES_PER_COLOR - 1; i >= 0 ; i--){ // is there any piece that has legal move?
+		Piece *p = gameboard->all_pieces[gameboard->turn][i];
+		if(p->alive){
+			if(is_piece_having_legal_move_minimax(gameboard, p))
+				return -1;
+		}
+	}
+	if(is_check(gameboard, SWITCHED(gameboard->turn))){ // is my king under check?
+		return SWITCHED(gameboard->turn);
+	}
+	return 2;
+}
+
+bool is_piece_having_legal_move_minimax(Gameboard *gameboard, Piece *piece){
+	for(int i = 0; i < piece->amount_vectors; i++){
+		if(is_piece_having_legal_move_per_vector_minimax(gameboard, piece, piece->vectors[i])){
+			return true;
+		}
+	}
+	return false;
+}
+
+bool is_piece_having_legal_move_per_vector_minimax(Gameboard *gameboard, Piece *piece, Vector *v){
+	int amount_going = v->vector_size;
+	int row = piece->row;
+	int col = piece->col;
+	while(amount_going > 0){
+		amount_going --;
+		row = row + v->delta_row;
+		col = col + v->delta_col;
+		if(row < 0 || row > (BOARD_SIZE - 1) || col < 0 || col > (BOARD_SIZE - 1)) //out of board
+			break;
+		if(gameboard->board[row][col]->type == Empty && v->can_go_to_empty_spot){ // can go, empty
+			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->empty)){
+				return true;
+			}
+		}
+		else if(gameboard->board[row][col]->type != Empty &&
+				gameboard->board[row][col]->colur != piece->colur && v->can_eat){ //eating opponent's piece
+			if(!is_step_causes_check(gameboard, piece, row, col, gameboard->board[row][col])){
+				return true;
+			}
+			break;
+		}
+		else{ // seeing your color piece
+			break;
+		}
+	}
+	return false;
+}
+
