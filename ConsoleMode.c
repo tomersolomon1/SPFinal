@@ -19,10 +19,9 @@
 
 void ask_move(Gameboard *gameboard, bool to_print) {
 	char *colors[] = {"black", "white"};
-	if (to_print) {
+	if (to_print)
 		print_board(gameboard);
-	}
-	printf("%s player - enter your move:\n", colors[gameboard->user_color]);
+	printf("%s player - enter your move:\n", colors[gameboard->turn]);
 	fflush(stdout);
 }
 
@@ -70,7 +69,9 @@ void set_game_mode(Gameboard *gameboard, Command *comm) {
 }
 
 void set_difficulty(Gameboard *gameboard, Command *comm) {
-	if (comm->arg1 == 5) { /* we are not supporting expert level */
+	if (gameboard->game_mode == 2) { //the command is not legal in 2-player mode
+		printf("ERROR: invalid command\n");
+	} else if (comm->arg1 == 5) { /* we are not supporting expert level */
 		printf("Expert level not supported, please choose a value between 1 to 4:\n"); /* the ':' in the end of the string appears in the instructions PDF */
 	} else if (comm->arg1 > 5 || comm->arg1 < 1) {
 		printf("Wrong difficulty level. The value should be between 1 to 5\n");
@@ -80,8 +81,8 @@ void set_difficulty(Gameboard *gameboard, Command *comm) {
 }
 
 void set_color(Gameboard *gameboard, Command *comm) {
-	if (gameboard->game_mode == 2) {
-		printf("ERROR: invalid command when GAME-MODE = 2\n");
+	if (gameboard->game_mode == 2) { //the command is not legal in 2-player mode
+		printf("ERROR: invalid command\n");
 	} else if (comm->arg1 > 1 || comm->arg1 < 0) {
 		printf("ERROR: no such color. color values are either 1 or 0.\n");
 	} else {
@@ -105,9 +106,9 @@ bool load_file(Gameboard **gameboard_p, Command *comm) {
 }
 
 void resore_default_values(Gameboard *gameboard) {
-	gameboard->game_mode  = 1;
-	gameboard->difficulty = 2;
-	gameboard->user_color = 1;
+	gameboard->game_mode  = GAME_DEFAULT_MODE;
+	gameboard->difficulty = GAME_DEFAULT_DIFFICULTY;
+	gameboard->user_color = GAME_DEFAULT_COLOR;
 }
 
 void print_settings(Gameboard *gameboard) {
@@ -391,9 +392,10 @@ void manage_console(Gameboard *gameboard) {
 						ask_move(gameboard, false);
 					break;
 				case Reset:
+					printf("Restarting...\n");
 					console_mode = SettingsMode;
 					reset_board(&gameboard);
-					printf("Restarting...\n");
+					resore_default_values(gameboard);
 					printf("Specify game setting or type 'start' to begin a game with the current setting:\n");
 					break;
 				case Quit:

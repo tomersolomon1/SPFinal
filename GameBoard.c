@@ -4,7 +4,6 @@
 //-----------------------Game Board General functions-----------------------
 
 Gameboard *create_board(int game_mode, int difficulty, int user_color) {
-	printf("create board\n"); fflush(stdout);
 	Gameboard *newBoard = (Gameboard*) malloc(sizeof(Gameboard));
 	assert(newBoard != NULL);
 	newBoard->history = ArrayListCreate(HISTORY_SIZE * 2);
@@ -73,7 +72,6 @@ void destroy_board(Gameboard *gameboard) {
 	}
 	destroy_piece(gameboard->empty);
 	free(gameboard);
-	printf("destroy board\n"); fflush(stdout);
 }
 
 Gameboard *copy_board(Gameboard* old) {
@@ -614,7 +612,7 @@ void print_board(Gameboard *gameboard) {
 		fflush(stdout);
 	}
 	printf("  -----------------\n");
-	printf("   A B C D E F G H\n\n");
+	printf("   A B C D E F G H\n");
 	fflush(stdout);
 }
 

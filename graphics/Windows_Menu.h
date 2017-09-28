@@ -9,6 +9,7 @@
 #define GRAPHICS_WINDOWS_MENU_H_
 #include "SPCommon.h"
 #include "Button.h"
+#include "WindowDataStruct.h"
 
 #define AMOUNT_BUTTONS_ENTERANCE 3
 #define AMOUNT_BUTTONS_LOAD_GAME 7

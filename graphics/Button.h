@@ -7,13 +7,13 @@
 
 #ifndef GRAPHICS_BUTTON_H_
 #define GRAPHICS_BUTTON_H_
-#define DEFAULT_MENU_WINDOW_WIDTH 700
-#define DEFAULT_MENU_WINDOW_HIGHT 650
+
 #define DEFAULT_BTN_HIGHT 50
 #define DEFAULT_BTN_WIDTH 150
 #define DEFAULT_BTN_GAP_VERTICAL 60
 #define DEFAULT_BTN_GAP_HORIZONTAL 170
 #define DEFAULT_GAP_WINDOW 100
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>

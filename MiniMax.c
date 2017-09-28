@@ -16,11 +16,10 @@ void destroy_step_value(StepValue *sv) {
 	}
 }
 
-/* sum-up all the pieces of the specified color */
 int sumup_pieces(Gameboard *board, int color) {
-	int pieces_value[] = {1, 3, 3, 5, 9, 100 };
+	int pieces_value[] = {PAWN_VALUE, KNIGHT_VALUE, BISHOP_VALUE, ROOK_VALUE, QUEEN_VALUE, KING_VALUE};
 	int sumup = 0;
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < AMOUNT_PIECES_PER_COLOR; i++) {
 		if (board->all_pieces[color][i]->alive) {
 			sumup += pieces_value[board->all_pieces[color][i]->type];
 		}
@@ -28,9 +27,6 @@ int sumup_pieces(Gameboard *board, int color) {
 	return sumup;
 }
 
-/* scoring function for the mini-max algorithm
- * eval_pespective is the color of the root of the mini-max tree
- */
 int eval(Gameboard *board, int eval_perspective) {
 	int white_pieces = sumup_pieces(board, 1);
 	int black_pieces = sumup_pieces(board, 0);
@@ -38,7 +34,6 @@ int eval(Gameboard *board, int eval_perspective) {
 	return result;
 }
 
-/* return true if found a better option, and update alpha or beta if needed */
 bool update_ab(int *alpha, int *beta, int step_value, NodeType node_type, bool first_move) {
 	if (node_type == MinNode && (*beta > step_value || first_move)) { /* it's a min-node */
 		*beta = step_value;
@@ -60,12 +55,6 @@ StepValue *init_step_value() {
 	return sv;
 }
 
-/* implementation of the MiniMax algorithm, using alpha-beta pruning
- * assuming we can alter the board as we will, and that the game is not over
- * node-types:
- * 		0 - min-node
- * 		1 - max-node
- */
 StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth,
 		NodeType node_type, int eval_perspective, bool first_option) {
 	StepValue *best_sv = init_step_value();
@@ -78,7 +67,7 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth,
 		return best_sv;
 	} else { /* the game is still on */
 		int piece_index = 0;
-		while ((alpha < beta) && (piece_index < 16)) { /* each player has 16 pieces, some of them might not be alive */
+		while ((alpha < beta) && (piece_index < AMOUNT_PIECES_PER_COLOR)) { /* each player has 16 pieces, some of them might not be alive */
 			Piece *current_piece = board->all_pieces[board->turn][piece_index];
 			if (current_piece->alive) {
 				int amount_steps = 0;
@@ -120,9 +109,6 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth,
 	}
 }
 
-/* we assume the game is not over
- * a wrapper function for the mini-max algo
- */
 StepValue *find_best_step(Gameboard *board, int search_depth) {
 	Gameboard *copy = copy_board(board);
 	int alpha = INT_MIN;

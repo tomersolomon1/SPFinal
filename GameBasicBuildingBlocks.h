@@ -123,7 +123,10 @@ void print_step(Step *step);
 /*create piece*/
 Piece *create_piece(Piece_type type, int colur, int row, int col, int indexat);
 
-/*helping function for create piece, adds progressing vectors by piece type*/
+/* helping function for create piece
+ * adds progressing vectors by piece type
+ * The function assumes that the piece is in its initial position
+ * therefore the Movement vector size of Pawn is set to 2*/
 void set_vectors(Piece_type type, int colur, Vector **vectors);
 
 /*copy_piece, steps will be null*/
@@ -132,7 +135,7 @@ Piece *copy_piece(Piece *old);
 /*destroy piece*/
 void destroy_piece(Piece *piece);
 
-/*print all valid steps of a piece*/
+/*print all valid steps of a piece (for debugging)*/
 void print_all_steps(Piece *piece);
 
 /*change piece type, for promotion and undo promotion*/

@@ -3,9 +3,6 @@
 #include "graphics/GuiManager.h"
 #include "GameBoard.h"
 
-#define GAME_DEFAULT_DIFFICULTY 1
-#define GAME_DEFAULT_MODE 1
-#define GAME_DEFAULT_COLOR white
 
 int main(int argc, char *argv[]){
 	//the game will be destroyed inside manage_console and run_gui

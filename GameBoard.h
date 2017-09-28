@@ -21,6 +21,10 @@
 #define KING_INDEX 15
 #define KING_SIDE_CASTLING_COL 6
 
+#define GAME_DEFAULT_DIFFICULTY 2
+#define GAME_DEFAULT_MODE 1
+#define GAME_DEFAULT_COLOR white
+
 #define MIN(A,B) (((A) < (B)) ? (A) : (B))
 #define MAX(A,B) (((A) > (B)) ? (A) : (B))
 #define SWITCHED(x) abs(1 - (x))

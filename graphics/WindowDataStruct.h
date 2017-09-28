@@ -5,6 +5,12 @@
 #include <SDL.h>
 #include <SDL_video.h>
 
+#define DEFAULT_MENU_WINDOW_WIDTH 650
+#define DEFAULT_MENU_WINDOW_HIGHT 600
+
+#define DEFAULT_GAME_WINDOW_WIDTH 800
+#define DEFAULT_GAME_WINDOW_HEIGHT 600
+
 typedef enum window_type_t{
 	Enterance,
 	LoadGame,

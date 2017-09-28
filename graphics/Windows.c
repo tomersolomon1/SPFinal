@@ -11,8 +11,10 @@ Window* create_window(Window_type type, Gameboard* game){
 	Window* src = (Window*) malloc(sizeof(Window));
 	assert(src != NULL);
 	src->type = type;
+	int window_width = (type == Game ? DEFAULT_GAME_WINDOW_WIDTH: DEFAULT_MENU_WINDOW_WIDTH);
+	int window_hight = (type == Game ? DEFAULT_GAME_WINDOW_HEIGHT: DEFAULT_MENU_WINDOW_HIGHT);
 	SDL_Window* window = SDL_CreateWindow(name_by_window_type(type), SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED, DEFAULT_MENU_WINDOW_WIDTH, DEFAULT_MENU_WINDOW_HIGHT, SDL_WINDOW_OPENGL);
+			SDL_WINDOWPOS_CENTERED, window_width, window_hight, SDL_WINDOW_OPENGL);
 	if(window == NULL){
 		free(src);
 		printf("Error: There was a problem with SDL_CreateWindow\n");

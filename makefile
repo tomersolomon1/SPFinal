@@ -10,7 +10,8 @@ VPATH = graphics
 
 # name of program
 EXEC = chessprog
-# for now our "main" is in Test.c, to be changed later
+
+# Objects
 GENERAL_OBJECTS = ArrayList.o Files.o GameBoard.o GameBasicBuildingBlocks.o MiniMax.o Main.o
 CONSOLE_OBJECTS = ConsoleMode.o Parser.o
 GUI_OBJECTS     =  Button.o GameWindow.o GuiManager_Game.o GuiManager_Menu.o \

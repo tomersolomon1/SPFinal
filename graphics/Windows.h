@@ -12,6 +12,7 @@
 #include "Windows_Menu.h"
 #include "GameWindow.h"
 #include "WindowDataStruct.h"
+
 typedef Button** (*buttons_creator)(SDL_Renderer*);
 
 /*create window and returns a pointer to it
