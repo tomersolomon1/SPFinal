@@ -65,6 +65,19 @@ BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location);
  * returns NULL on failure */
 Button **create_game_buttons(SDL_Renderer* window_renderer);
 
+/* highlight the squares of possible moves of the chosen selected_piece (in data)*/
+int highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim, int col_dim);
+
+/* helping function for highlight_moves_feature
+ * highlight a specific square with texture
+ * delta_x, delta_y, specify the square position in the board*/
+int highlight_square(GameData* data, SDL_Renderer *renderer, SDL_Texture* texture, int delta_x, int delta_y, int row_dim, int col_dim);
+
+/* helping function for highlight_moves_feature
+ * if the selected_piece is rook, we want to check if castling is possible,
+ * and if so - highlight the king's position*/
+int highlight_king_for_castling(GameData *data, SDL_Renderer *renderer, Piece* selected_piece, int row_dim, int col_dim);
+
 /* draw board the board
  * on success return 0
  * on failure returns -1 */

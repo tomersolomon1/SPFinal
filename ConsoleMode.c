@@ -32,7 +32,7 @@ void present_computer_move(Step *step, Piece *moving_piece, Piece_type promote_t
 		int rook_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
 		printf("Computer: castle King at <%d,%c> and Rook at <%d,%c>\n",
 				1+step->srow, ABC[step->scol],  1+step->srow, ABC[rook_col]);
-	} else if (step->src_previous_state == Was_promoted) {
+	} else if (step->step_info == Was_promoted) {
 		printf("Computer: move pawn <%d,%c> to <%d,%c> and promote to %s\n",
 				1+step->srow, ABC[step->scol],  1+step->drow, ABC[step->dcol], pieces_str[promote_to]);
 	} else {
@@ -262,11 +262,11 @@ bool op_handler(Gameboard *gameboard, Command *comm, Op op) {
 int steps_comperator(const void *p, const void *q) {
 	Step **step1 = (Step **) p;
 	Step **step2 = (Step **) q;
-	if ((*step1)->src_previous_state == Castling_Move && (*step2)->src_previous_state == Castling_Move) {
+	if ((*step1)->step_info == Castling_Move && (*step2)->step_info == Castling_Move) {
 		return (*step1)->dcol - (*step2)->dcol; /* dcol */
-	} else if ((*step1)->src_previous_state == Castling_Move && (*step2)->src_previous_state != Castling_Move) {
+	} else if ((*step1)->step_info == Castling_Move && (*step2)->step_info != Castling_Move) {
 		return 1;
-	} else if ((*step1)->src_previous_state != Castling_Move && (*step2)->src_previous_state == Castling_Move) {
+	} else if ((*step1)->step_info != Castling_Move && (*step2)->step_info == Castling_Move) {
 		return -1;
 	} else { /* neither of the steps is castling move */
 		if ((*step1)->drow == (*step2)->drow) {
@@ -286,7 +286,7 @@ void present_all_moves(Gameboard *gameboard, Piece *piece) {
 		qsort((void*) piece->steps, piece->amount_steps, step_size, steps_comperator);
 		for (int i = 0; i < piece->amount_steps; i++) {
 			Step *step = piece->steps[i];
-			if (step->src_previous_state == Castling_Move) {
+			if (step->step_info == Castling_Move) {
 				int rook_col = (step->dcol == KING_SIDE_CASTLING_COL) ? BOARD_SIZE-1 : 0;
 				printf("castle <%c,%c>\n", decimal_numbers[step->srow], ABC[rook_col]);
 			} else { /* no castling, so can't be threatened, and can't capture any piece */

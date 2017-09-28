@@ -40,7 +40,7 @@ Step *create_step(int srow, int scol, int drow, int dcol, Piece *prevPiece, Piec
 	newStep->drow = drow;
 	newStep->scol = scol;
 	newStep->prevPiece = prevPiece;
-	newStep->src_previous_state = src_prev_state;
+	newStep->step_info = src_prev_state;
 	newStep->is_threatened = is_threatened;
 	return newStep;
 }
@@ -53,7 +53,7 @@ Step *copy_step(Step *old){
 	new->drow = old->drow;
 	new->dcol = old->dcol;
 	new->prevPiece = NULL;
-	new->src_previous_state = old->src_previous_state;
+	new->step_info = old->step_info;
 	new->is_threatened = old->is_threatened;
 	return new;
 }

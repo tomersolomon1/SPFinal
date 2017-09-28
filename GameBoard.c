@@ -447,10 +447,10 @@ CHESS_BOARD_MESSAGE undo_step(Gameboard *gameboard, bool is_minimax) {
 		gameboard->board[step->drow][step->dcol] = dest_p;
 		gameboard->board[step->srow][step->scol] = source_p;
 		dest_p->alive = true;
-		if (step->src_previous_state == Was_not_moved) {
+		if (step->step_info == Was_not_moved) {
 			source_p->has_moved = false;
 		}
-		else if (step->src_previous_state == Was_promoted) { // this step was a promotion step
+		else if (step->step_info == Was_promoted) { // this step was a promotion step
 			change_piece_type(source_p, Pawn);
 		}
 		source_p->row = step->srow;

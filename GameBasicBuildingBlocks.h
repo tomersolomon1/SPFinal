@@ -74,7 +74,7 @@ typedef struct step_t {
 	int drow; // dest row
 	int dcol; // dest col
 	struct piece_t *prevPiece; //pointer to the piece that was killed in this step
-	Piece_state src_previous_state; //remember the piece state before the move: was moved before? was pawn and promoted?
+	Piece_state step_info; //remember the piece state before the move: was moved before? was pawn and promoted?
 	bool is_threatened;  //will the source piece be threatened by the other player if it goes with this step?
 } Step;
 

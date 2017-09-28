@@ -22,6 +22,8 @@ void destroy_game_textures(BoardWidget *board_widget) {
 		SDL_DestroyTexture(board_widget->threatened_move_texture);
 	if(board_widget->capturing_move_texture != NULL)
 		SDL_DestroyTexture(board_widget->capturing_move_texture);
+	if(board_widget->castling_texture != NULL)
+			SDL_DestroyTexture(board_widget->castling_texture);
 	for(int color = 0; color < 2; color++) {
 		for (int i = 0; i < 6; i++) {
 			if(board_widget->piece_textures[color][i] != NULL)
@@ -86,11 +88,11 @@ BoardWidget *create_widget_board(SDL_Renderer *window_renderer, Gameboard *board
 			CHESS_IMAGE(BRock),	CHESS_IMAGE(BQueen), CHESS_IMAGE(BKing)}; /* black pieces BMP paths */
 
 	BoardWidget *board_widget = init_widget_board(board, location);
-	char *board_bmps[] = {IMG(ChessBoard), IMG(possible square), IMG(threatened square), IMG(capturing square)};
+	char *board_bmps[] = {IMG(ChessBoard), IMG(possible square), IMG(threatened square), IMG(capturing square), IMG(castling square)};
 	SDL_Texture **board_textures[] = {&(board_widget->board_grid), &(board_widget->possible_move_texture),
-			&(board_widget->threatened_move_texture), &(board_widget->capturing_move_texture)};
+			&(board_widget->threatened_move_texture), &(board_widget->capturing_move_texture), &(board_widget->castling_texture)};
 	// create texture for the board and the squares
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 5; i++) {
 		*(board_textures[i]) = create_texure_from_bmp(window_renderer, board_bmps[i], false);
 		if (*(board_textures[i]) == NULL) {
 			destroy_board_widget(board_widget);
@@ -120,6 +122,7 @@ BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location) {
 	board_widget->possible_move_texture = NULL;
 	board_widget->threatened_move_texture = NULL;
 	board_widget->capturing_move_texture = NULL;
+	board_widget->castling_texture = NULL;
 	for (int i = 0; i < 6; i++) {
 		board_widget->piece_textures[1][i] = NULL;
 		board_widget->piece_textures[0][i] = NULL;
@@ -127,45 +130,71 @@ BoardWidget *init_widget_board(Gameboard *board, SDL_Rect* location) {
 	return board_widget;
 }
 
-//int highlight_castling_rook(GameData *data, SDL_Renderer *renderer, Piece* selected_piece, int row_dim, int col_dim){
-//	//check if king has castling
-//	int x_offset = data->board_widget->location->x + (4 * col_dim);
-//	int y_offset = data->board_widget->location->y + (7 * selected_piece->colur * row_dim);
-//	SDL_Rect step_rec = {.x = x_offset, .y = y_offset, .h = row_dim, .w = col_dim };
-//	if(SDL_RenderDrawRect(renderer, &step_rec) == -1) { /* some SDL error occurred */
-//		printf("Error: There was a problem with SDL_RenderDrawRect\n");
-//		return -1;
-//	}
-//}
 
+int highlight_square(GameData* data, SDL_Renderer *renderer, SDL_Texture* texture, int delta_x, int delta_y, int row_dim, int col_dim){
+	int x_offset = data->board_widget->location->x + (delta_x * col_dim);
+	int y_offset = data->board_widget->location->y + (delta_y * row_dim);
+	SDL_Rect step_rec = {.x = x_offset, .y = y_offset, .h = row_dim, .w = col_dim };
+	if(SDL_RenderDrawRect(renderer, &step_rec) == -1) { /* some SDL error occurred */
+		printf("Error: There was a problem with SDL_RenderDrawRect\n");
+		return -1;
+	}
+	if ((SDL_RenderCopy(renderer, texture, NULL, &step_rec)) == -1) {
+		printf("Error: There was a problem with SDL_RenderCopy\n");
+		return -1;
+	}
+	return 0;
+}
 
-int  highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim, int col_dim) {
-	Piece *selected_piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
-	int success = 0; /* so far so good */
-	for (int step_index = 0; step_index < selected_piece->amount_steps; step_index++) {
-		Step *step = selected_piece->steps[step_index];
-		int x_offset = data->board_widget->location->x + (step->dcol * col_dim);
-		int y_offset = data->board_widget->location->y + ((7-step->drow) * row_dim);
-		SDL_Rect step_rec = {.x = x_offset, .y = y_offset, .h = row_dim, .w = col_dim };
-		if(SDL_RenderDrawRect(renderer, &step_rec) == -1) { /* some SDL error occurred */
-			printf("Error: There was a problem with SDL_RenderDrawRect\n");
-			return -1;
-		}
-		if (step->is_threatened) {
-			success = SDL_RenderCopy(renderer, data->board_widget->threatened_move_texture, NULL, &step_rec);
-		} else {
-			Piece *dest_occupier = data->board_widget->board->board[step->drow][step->dcol];
-			if (dest_occupier->type == Empty) {
-				success = SDL_RenderCopy(renderer, data->board_widget->possible_move_texture, NULL, &step_rec);
-			} else { /* has to be capturing move */
-				success = SDL_RenderCopy(renderer, data->board_widget->capturing_move_texture, NULL, &step_rec);
-			}
-		}
-		if (success == -1) {
-			printf("Error: There was a problem with SDL_RenderCopy\n");
-			return success;
+int highlight_king_for_castling(GameData *data, SDL_Renderer *renderer, Piece* selected_piece, int row_dim, int col_dim){
+	int success = 0;
+	Piece *king = data->board_widget->board->all_pieces[selected_piece->colur][KING_INDEX];
+	for(int i = 0; i < king->amount_steps; i++){
+		Step *s = king->steps[i];
+		if(s->step_info == Castling_Move && abs(s->dcol - selected_piece->col) < 3){
+			SDL_Texture* txtr = data->board_widget->castling_texture;
+			success = highlight_square(data, renderer, txtr, 4, 7 - selected_piece->row, row_dim, col_dim);
+			break;
 		}
 	}
+	return success;
+}
+
+
+int highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim, int col_dim) {
+	Piece *selected_piece = data->board_widget->board->all_pieces[data->selected_piece_color][data->selected_piece_index];
+	int success = 0; /* so far so good */
+	SDL_Texture* txtr;
+	for (int step_index = 0; step_index < selected_piece->amount_steps; step_index++) {
+		Step *step = selected_piece->steps[step_index];
+		if (step->is_threatened) {
+			txtr = data->board_widget->threatened_move_texture;
+			success = highlight_square(data, renderer, txtr, step->dcol, (7-step->drow), row_dim, col_dim);
+		}
+		else{
+			Piece *dest_occupier = data->board_widget->board->board[step->drow][step->dcol];
+			if(step->step_info == Castling_Move){
+				txtr = data->board_widget->castling_texture;
+				success = highlight_square(data, renderer, txtr, step->dcol, (7-step->drow), row_dim, col_dim);
+				if(success == 0){
+					int delta_y = (step->dcol > step->scol ? 7 : 0);
+					success = highlight_square(data, renderer, txtr , delta_y, (7-step->drow), row_dim, col_dim);
+				}
+			}
+			else if (dest_occupier->type == Empty) {
+				txtr = data->board_widget->possible_move_texture;
+				success = highlight_square(data, renderer, txtr, step->dcol, (7-step->drow), row_dim, col_dim);
+			}
+			else { /* has to be capturing move */
+				txtr = data->board_widget->capturing_move_texture;
+				success = highlight_square(data, renderer, txtr, step->dcol, (7-step->drow), row_dim, col_dim);
+			}
+		}
+		if (success == -1)
+			return success;
+	}
+	if(selected_piece->type == Rook)
+		success = highlight_king_for_castling(data, renderer, selected_piece, row_dim, col_dim);
 	return success;
 }
 
