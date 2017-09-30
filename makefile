@@ -61,3 +61,7 @@ graphics/Windows.o: Windows.h
 # clean rule
 clean:
 	rm -f *.o $(EXEC)
+
+# all rule
+all: $(EXEC)
+	
