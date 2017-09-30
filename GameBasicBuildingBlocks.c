@@ -205,11 +205,11 @@ void set_vectors(Piece_type type, int colur, Vector **vectors){
 		vectors[0] = create_vector(1, 2, 1, true, true);
 		vectors[1] = create_vector(1, -2, 1, true, true);
 		vectors[2] = create_vector(-1, 2, 1, true, true);
-		vectors[3] = create_vector(-1, -2, 1, true, true);
+		vectors[3] = create_vector(-2, -1, 1, true, true);
 		vectors[4] = create_vector(2, 1, 1, true, true);
 		vectors[5] = create_vector(2, -1, 1, true, true);
 		vectors[6] = create_vector(-2, 1, 1, true, true);
-		vectors[7] = create_vector(-2, -1, 1, true, true);
+		vectors[7] = create_vector(-1, -2, 1, true, true);
 	}
 	else if(type == Bishop){ //diag: delta_x * delta_y = (+-)1
 		vectors[0] = create_vector(1, -1, 8, true, true);

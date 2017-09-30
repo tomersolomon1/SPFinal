@@ -84,23 +84,25 @@ void set_color(Gameboard *gameboard, Command *comm) {
 	if (gameboard->game_mode == 2) { //the command is not legal in 2-player mode
 		printf("ERROR: invalid command\n");
 	} else if (comm->arg1 > 1 || comm->arg1 < 0) {
-		printf("ERROR: no such color. color values are either 1 or 0.\n");
+		//printf("ERROR: no such color. color values are either 1 or 0.\n");
 	} else {
 		gameboard->user_color = comm->arg1;
 	}
 }
 
+
+
 bool load_file(Gameboard **gameboard_p, Command *comm) {
 	FILE *input_file = fopen(comm->file_name, "r");
+	free(comm->file_name);
 	if (input_file == NULL) {
-		printf("Error: File doesn’t exist or cannot be opened\n");
+		printf("Error: File doesn't exist or cannot be opened\n");
 		return false;
 	} else {
 		destroy_board(*gameboard_p);
 		*gameboard_p = load_game(input_file);
 	}
 	fclose(input_file);
-	free(comm->file_name);
 	//print_board(*gameboard_p);
 	return true;
 }
@@ -169,7 +171,7 @@ int make_single_move(Gameboard *gameboard, int srow, int scol, int drow, int dco
 	} else { /* the game is still on! */
 		if(is_under_check(gameboard)) {
 			if (user_turn) {
-				printf("Check: %s King is threatened!\n\n", colors[gameboard->turn]);
+				printf("Check: %s King is threatened!\n", colors[gameboard->turn]);
 			} else { /* it was the computer's turn */
 				printf("Check!\n");
 			}
@@ -325,11 +327,11 @@ void save_game(Gameboard *gameboard, Command *comm) {
 	FILE *output_file = fopen(comm->file_name, "w");
 	if (output_file == NULL) {
 		printf("File cannot be created or modified\n");
-		ask_move(gameboard, false);
 	} else {
 		save_xml(output_file, gameboard);
+		fclose(output_file);
 	}
-	fclose(output_file);
+	ask_move(gameboard, false);
 	free(comm->file_name);
 }
 
