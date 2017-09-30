@@ -18,7 +18,13 @@
 /* save game in xml format to *f */
 void save_xml(FILE *f, Gameboard* game);
 
-/* load game from *f */
+/* load game from *f
+ * we assume that f is a valid game-saved file
+ * NOTICE:
+ * we assume that if the file doesn't contain castling data,
+ * then Kings and Rooks in their initial positions on board
+ * are defined to be not-moved by default
+ * (so castling might be valid during the game)*/
 Gameboard *load_game(FILE* f);
 
 /* helping function for load_game
@@ -27,14 +33,14 @@ Gameboard *load_game(FILE* f);
  * we assume that if there isn't castling information in the xml,
  * then the kings and rooks who are in their beginning positions were not moved
  * so castling is valid */
-void set_has_moved_by_position(Gameboard* game);
+void set_has_moved_for_castling_by_init_position(Gameboard* game);
 
 /* helping function for load_game
  * set the row by data from the xml data*/
 void set_row(Gameboard* game, int row_number, char* str);
 
 /* helping function for set_row
- * set piece p to be position [row,col] on game*/
+ * set piece p to be in position [row,col] on game*/
 void set_position_of_piece(Gameboard *game, Piece *p, int row, int col);
 
 #endif /* FILES_H_ */

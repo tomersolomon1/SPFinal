@@ -44,7 +44,14 @@ typedef struct command_t {
 	char *file_name; /* useful for load & save commands */
 } Command;
 
-/* get promotion type */
+/* helping function for valid_commands_tail */
+bool check_tail_validity(const char *line, int offset);
+
+/* helping function for get_promotion_type_parser
+ * check if the piece type is actually the type by the first letter*/
+Piece_type get_piece(const char *line, const char *guessed_piece_name, int offset, Piece_type guessed_piece);
+
+/* parse the asking for promotion type from the user*/
 Piece_type get_promotion_type_parser(const char *line);
 
 /* destroy command */
@@ -52,9 +59,6 @@ void free_command(Command *comm);
 
 /* checks that command tail is valid */
 void valid_commands_tail(Command *comm, const char *line, int offset);
-
-/* get promotion type */
-void valid_tail(Command *comm, const char *line, int offset);
 
 /* make sure this is the right command
  * return true if and only if line starts with the comm_s */
@@ -78,7 +82,7 @@ void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s
  * advances offset by one after reading the number (offset = offset + 1)
  * checks that the following char is either a whitespace, '\0', or a "valid following char"
  * return true if and only if the number is within the proper bounds and has proper following char
- * according to Moav, we can ignore pathological cases such as -1, 00001 etc */
+ * by the instructions, we can ignore pathological cases such as -1, 00001 etc */
 bool get_number(const char *line, int *offset, int *arg, char range_offset, int lower_bound,
 		int upper_bound, char valid_following, bool end_command);
 
@@ -87,10 +91,13 @@ bool get_number(const char *line, int *offset, int *arg, char range_offset, int 
  * after calling the function, line[offset] is the first char after the coordinate (after <X,Y>) */
 bool getXY(Command *comm, const char *line, int *offset, int *row, int *col, int needed_space, bool first_coordinate);
 
-/* get arg of move */
-void get_move_arg(Command *comm, const char *line, int offset);
-
 /* the actual parsing: get a command from line */
 Command *parser(const char *line);
+
+/* parse coordinates command*/
+void coordinates_commands(Command *comm, const char *line, int offset, const char *comm_name, SP_commands type);
+
+/* initial commmand with default parameters */
+Command *init_command();
 
 #endif /* PARSER_H_ */

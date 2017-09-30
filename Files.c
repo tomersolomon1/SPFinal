@@ -11,10 +11,23 @@
 void save_xml(FILE *f, Gameboard* game){
 	fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	fprintf(f, "<game>\n");
+	//general - data for castling:
+	fprintf(f, "<general>\n");
+	fprintf(f, "<castling_data>\n");
+	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 15, game->all_pieces[white][15]->has_moved, white, 15); //15 is the place of king in all_pieces
+	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 12, game->all_pieces[white][12]->has_moved, white, 12); //12 is the place of 1st rook in all_pieces
+	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 13, game->all_pieces[white][13]->has_moved, white, 13); //13 is the place of 2nd rook in all_pieces
+	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 15, game->all_pieces[black][15]->has_moved, black, 15); //15 is the place of king in all_pieces
+	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 12, game->all_pieces[black][12]->has_moved, black, 12); //12 is the place of 1st rook in all_pieces
+	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 13, game->all_pieces[black][13]->has_moved, black, 13); //13 is the place of 2nd rook in all_pieces
+	fprintf(f, "</castling_data>\n");
+	fprintf(f, "</general>\n");
+	//game information:
 	fprintf(f, "<current_turn>%d</current_turn>\n", game->turn);
 	fprintf(f, "<game_mode>%d</game_mode>\n", game->game_mode);
 	fprintf(f, "<difficulty>%d</difficulty>\n", game->difficulty);
 	fprintf(f, "<user_color>%d</user_color>\n", game->user_color);
+	//board:
 	fprintf(f, "<board>\n");
 	for(int i = (BOARD_SIZE - 1); i >= 0; i--){
 		fprintf(f, "<row_%d>", i + 1);
@@ -24,18 +37,7 @@ void save_xml(FILE *f, Gameboard* game){
 		fprintf(f, "</row_%d>\n", i + 1);
 	}
 	fprintf(f, "</board>\n");
-	fprintf(f, "</game>\n");
-	fprintf(f, "<general>\n");
-	//data for castling:
-	fprintf(f, "<castling_data>\n");
-	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 15, game->all_pieces[white][15]->has_moved, white, 15); //15 is the place of king in all_pieces
-	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 12, game->all_pieces[white][12]->has_moved, white, 12); //12 is the place of 1st rook in all_pieces
-	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", white, 13, game->all_pieces[white][13]->has_moved, white, 13); //13 is the place of 2nd rook in all_pieces
-	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 15, game->all_pieces[black][15]->has_moved, black, 15); //15 is the place of king in all_pieces
-	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 12, game->all_pieces[black][12]->has_moved, black, 12); //12 is the place of 1st rook in all_pieces
-	fprintf(f, "<piece_%d_%d_moved>%d</piece_%d_%d_moved>\n", black, 13, game->all_pieces[black][13]->has_moved, black, 13); //13 is the place of 2nd rook in all_pieces
-	fprintf(f, "</castling_data>\n");
-	fprintf(f, "</general>");
+	fprintf(f, "</game>");
 }
 
 Gameboard *load_game(FILE* f){
@@ -74,13 +76,13 @@ Gameboard *load_game(FILE* f){
 		}
 	}
 	if(!was_castling_data){ //assume that if the king and the rooks are in their first position, then they were'nt moved
-		set_has_moved_by_position(game);
+		set_has_moved_for_castling_by_init_position(game);
 	}
 	set_all_valid_steps(game);
 	return game;
 }
 
-void set_has_moved_by_position(Gameboard* game){
+void set_has_moved_for_castling_by_init_position(Gameboard* game){
 	//kings:
 	if(game->board[7][4]->type == King && game->board[7][4]->colur == black) //7,4 is the init position of black king
 		game->board[7][4]->has_moved = false;
@@ -133,7 +135,7 @@ void set_row(Gameboard* game, int row_number, char* str){
 		if(!piece_setted){ //there was promotion so there could be more pieces of the same type
 			for(int j = 0; j < AMOUNT_PIECES_PER_COLOR; j++){
 				p = game->all_pieces[color][j];
-				if(p->type == Pawn && !p->alive){
+				if(p->type == Pawn && !p->alive){ //we take a random not-alive pawn and treat it as if it was promoted (it really doesn't matter which pawn we choose)
 					change_piece_type(p, get_piece_type_by_sign(sign));
 					set_position_of_piece(game, p, row_number, col);
 					break;

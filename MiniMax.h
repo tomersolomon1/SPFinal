@@ -48,7 +48,8 @@ int eval(Gameboard *board, int eval_perspective);
 /* return true if found a better option, and update alpha or beta if needed */
 bool update_ab(int *alpha, int *beta, int step_value, NodeType node_type, bool first_move);
 
-Move find_best_move(Gameboard *board, int search_depth); /* old version of the min-max algo*/
+/* initial step value */
+StepValue *init_step_value();
 
 /* implementation of the MiniMax algorithm, using alpha-beta pruning
  * assuming we can alter the board as we will, and that the game is not over
