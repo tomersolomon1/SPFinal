@@ -346,11 +346,11 @@ int undo_move(Gameboard *gameboard) {
 	} else {
 		Step *step = ArrayListGetFirst(gameboard->history);
 		printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n",
-				colors[1-gameboard->turn], step->drow+1, ABC[step->scol], step->srow+1, ABC[step->dcol]);
+				colors[1-gameboard->turn], step->drow+1, ABC[step->dcol], step->srow+1, ABC[step->scol]);
 		undo_step(gameboard, false);
 		step = ArrayListGetFirst(gameboard->history);
 		printf("Undo move for player %s : <%d,%c> -> <%d,%c>\n",
-				colors[1-gameboard->turn], step->drow+1, ABC[step->scol], step->srow+1, ABC[step->dcol]);
+				colors[1-gameboard->turn], step->drow+1, ABC[step->dcol], step->srow+1, ABC[step->scol]);
 		undo_step(gameboard, false);
 		ask_move(gameboard, true);
 	}
