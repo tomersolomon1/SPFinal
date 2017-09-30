@@ -175,11 +175,8 @@ int highlight_moves_feature(GameData *data, SDL_Renderer *renderer, int row_dim,
 			Piece *dest_occupier = data->board_widget->board->board[step->drow][step->dcol];
 			if(step->step_info == Castling_Move){
 				txtr = data->board_widget->castling_texture;
-				success = highlight_square(data, renderer, txtr, step->dcol, (7-step->drow), row_dim, col_dim);
-				if(success == 0){
-					int delta_y = (step->dcol > step->scol ? 7 : 0);
-					success = highlight_square(data, renderer, txtr , delta_y, (7-step->drow), row_dim, col_dim);
-				}
+				int delta_y = (step->dcol > step->scol ? 7 : 0);
+				success = highlight_square(data, renderer, txtr , delta_y, (7-step->drow), row_dim, col_dim);
 			}
 			else if (dest_occupier->type == Empty) {
 				txtr = data->board_widget->possible_move_texture;

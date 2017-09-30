@@ -226,36 +226,43 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 	Window_type next_window = Game; /* default */
 	if (event == NULL || window == NULL )
 		return ExitGame;
+	Gameboard *data_board = window->data->board_widget->board;
+	SDL_Rect *data_location = window->data->board_widget->location;
 	if (event->type == SDL_MOUSEBUTTONDOWN || event->type == SDL_MOUSEBUTTONUP) {
-		if (mouse_in_rec(event->button.x, event->button.y, window->data->board_widget->location)) { /* the event was inside the board */
-			int relative_x = event->button.x - window->data->board_widget->location->x;
-			int relative_y = event->button.y - window->data->board_widget->location->y;
-			int x_board = (8*relative_x / window->data->board_widget->location->w); /* calculating the x (column) coordinate on the board */
-			int y_board = 7 - (8*relative_y / window->data->board_widget->location->h); /* calculating the y (row) coordinate on the board */
-			Piece *piece = window->data->board_widget->board->board[y_board][x_board]; /* getting the piece on (row, col) coordinates */
+		if (mouse_in_rec(event->button.x, event->button.y, data_location)) { /* the event was inside the board */
+			int relative_x = event->button.x - data_location->x;
+			int relative_y = event->button.y - data_location->y;
+			int x_board = (8 * relative_x / data_location->w); /* calculating the x (column) coordinate on the board */
+			int y_board = 7 - (8 * relative_y / data_location->h); /* calculating the y (row) coordinate on the board */
+			Piece *piece = data_board->board[y_board][x_board]; /* getting the piece on (row, col) coordinates */
 			if (piece->type != Empty &&  event->type == SDL_MOUSEBUTTONDOWN && /* checking the conditions for selecting a piece */
-				((piece->colur == window->data->board_widget->board->user_color && window->data->board_widget->board->game_mode == 1)
-				|| (piece->colur == window->data->board_widget->board->turn && window->data->board_widget->board->game_mode == 2))) {
+				((piece->colur == data_board->user_color && data_board->game_mode == 1)
+				|| (piece->colur == data_board->turn && data_board->game_mode == 2))) {
 				window->data->selected_piece_color = piece->colur;
 				window->data->selected_piece_index = piece->indexat;
 				if (event->button.button == SDL_BUTTON_LEFT) /* selecting the piece for moving */
 					window->data->picked_piece  = true;
-				else if (event->button.button == SDL_BUTTON_RIGHT && ((*game)->game_mode == 1) && ((*game)->difficulty == 1 || (*game)->difficulty == 2))
-					window->data->highlight_moves = true; /* turning on the highlight squares feature */
+				else if (event->button.button == SDL_BUTTON_RIGHT && /* turning on the highlight squares feature */
+						((*game)->game_mode == 1) && ((*game)->difficulty == 1 || (*game)->difficulty == 2))
+					window->data->highlight_moves = true;
 			} else if (event->type == SDL_MOUSEBUTTONUP && event->button.button == SDL_BUTTON_LEFT && window->data->picked_piece) {
 				window->data->picked_piece  = false; /* the piece is no longer selected */
-				piece = window->data->board_widget->board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
-				if (is_valid_step(window->data->board_widget->board, piece->row, piece->col, y_board, x_board) == CHESS_BOARD_SUCCESS) {
-					int move_result = graphical_handle_move(window, piece->row, piece->col, y_board, x_board);
-					window->data->saved_game = false;
-					if (move_result == 1)
-						next_window = ExitGame; /* the game is over */
-					else if (move_result == 0)
-						next_window = Game; /* the game is still on */
-					else
-						next_window = SDLErrorWindow; /* some SDL related error occurred */
+				piece = data_board->all_pieces[window->data->selected_piece_color][window->data->selected_piece_index];
+				int move_result = 0;
+				bool had_step = false;
+				int dlta_cast = delta_castling_move(data_board, piece, piece->row, piece->col, y_board, x_board);
+				if (dlta_cast == 1 || dlta_cast == -1){
+					move_result = graphical_handle_move(window, piece->row, 4, piece->row, 4 + 2 * dlta_cast); //4 is the init position of king on the board
+					had_step = true;
+				} else if (dlta_cast == 0 && is_valid_step(data_board, piece->row, piece->col, y_board, x_board) == CHESS_BOARD_SUCCESS) {
+					move_result = graphical_handle_move(window, piece->row, piece->col, y_board, x_board);
+					had_step = true;
 				}
-				if (ArrayListSize(window->data->board_widget->board->history) > 1 && window->data->board_widget->board->game_mode == 1)
+				if(had_step){
+					window->data->saved_game = false;
+					next_window = next_window_after_making_move(move_result);
+				}
+				if (ArrayListSize(data_board->history) > 1 && data_board->game_mode == 1)
 					window->buttons[UndoButtonIndex]->active = true; /* updating the undo button, if necessary */
 			}
 		} else if (event->button.button == SDL_BUTTON_LEFT && event->type == SDL_MOUSEBUTTONUP) { /* the click wasn't inside the board, and it's a left click  */
@@ -263,10 +270,37 @@ Window_type handle_game_events(Window *window, SDL_Event *event,  Gameboard **ga
 			if (clicked_button != NULL) /* some button was clicked */
 				return handle_game_buttons(window, clicked_button, game);
 		}
-	} else if (event->type == SDL_MOUSEMOTION && (!window->data->picked_piece /* to be changed?*/
-			|| !mouse_in_rec(event->motion.x, event->motion.y, window->data->board_widget->location))) {
+	} else if (event->type == SDL_MOUSEMOTION && (!window->data->picked_piece
+			|| !mouse_in_rec(event->motion.x, event->motion.y, data_location))) {
 		window->data->picked_piece = false;
 	}
 	return next_window;
 }
 
+int delta_castling_move(Gameboard* data_board, Piece* p_chosen, int srow, int scol, int drow, int dcol){
+	if(p_chosen->type == King && abs(scol - dcol) == 2)
+		return 2;
+	int delta = 0;
+	if(p_chosen->type == King && data_board->board[drow][dcol]->type == Rook){
+		delta = (dcol > scol ? 1: -1);
+		if(is_valid_step(data_board, srow, 4, srow, 4 + 2 * delta) == CHESS_BOARD_SUCCESS){
+			return delta;
+		}
+	}
+	if(p_chosen->type == Rook && data_board->board[drow][dcol]->type == King){
+		delta = (dcol > scol ? -1: 1);
+		if(is_valid_step(data_board, srow, 4, srow, 4 + 2 * delta) == CHESS_BOARD_SUCCESS){
+			return delta;
+		}
+	}
+	return delta;
+}
+
+Window_type next_window_after_making_move(int move_result){
+	if (move_result == 1)
+		return ExitGame; /* the game is over */
+	else if (move_result == 0)
+		return Game; /* the game is still on */
+	else
+		return SDLErrorWindow; /* some SDL related error occurred */
+}

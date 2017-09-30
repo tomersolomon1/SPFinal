@@ -59,4 +59,17 @@ Window_type gui_begin_game(Window *window);
  * if problem occurred return Empty */
 Piece_type choose_promotion();
 
+/* helping function for handle_game_events
+ * checks if the move is a legal castling move
+ * if it's a legal castling move it returns
+ * +1 if the king should go right
+ * -1 if the king should go left
+ * 2 if the user asked to move the king itself two steps which is not legal
+ * 0 if the move is not castling at all*/
+int delta_castling_move(Gameboard* data_board, Piece* p_chosen, int srow, int scol, int drow, int dcol);
+
+/* helping function for handle_game_events
+ * returns the type of next window by move_result*/
+Window_type next_window_after_making_move(int move_result);
+
 #endif /* GRAPHICS_GUIMANAGER_GAME_H_ */
