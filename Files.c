@@ -82,20 +82,33 @@ Gameboard *load_game(FILE* f){
 
 void set_has_moved_by_position(Gameboard* game){
 	//kings:
-	if(game->board[7][4]->type == King && game->board[7][4]->colur == black)
+	if(game->board[7][4]->type == King && game->board[7][4]->colur == black) //7,4 is the init position of black king
 		game->board[7][4]->has_moved = false;
-	if(game->board[0][4]->type == King && game->board[0][4]->colur == white)
+	if(game->board[0][4]->type == King && game->board[0][4]->colur == white) //0,4 is the init position of white king
 		game->board[0][4]->has_moved = false;
 	//black rooks:
-	if(game->board[7][0]->type == Rook && game->board[7][0]->colur == black)
+	if(game->board[7][0]->type == Rook && game->board[7][0]->colur == black) //7,0 is the init position of black rook
 		game->board[7][0]->has_moved = false;
-	if(game->board[7][7]->type == Rook && game->board[7][7]->colur == black)
+	if(game->board[7][7]->type == Rook && game->board[7][7]->colur == black) //7,7 is the init position of black rook
 		game->board[7][7]->has_moved = false;
 	//white rooks:
-	if(game->board[0][0]->type == Rook && game->board[0][0]->colur == white)
+	if(game->board[0][0]->type == Rook && game->board[0][0]->colur == white) //0,0 is the init position of white rook
 		game->board[0][0]->has_moved = false;
-	if(game->board[0][7]->type == Rook && game->board[0][7]->colur == white)
+	if(game->board[0][7]->type == Rook && game->board[0][7]->colur == white) //0,7 is the init position of white rook
 		game->board[0][7]->has_moved = false;
+}
+
+void set_position_of_piece(Gameboard *game, Piece *p, int row, int col){
+	p->alive = true;
+	p->row = row;
+	p->col = col;
+	game->board[row][col] = p;
+	if(p->type == Pawn){ //set vector size of pawn by its place on board:
+		if(p->colur == white)
+			p->vectors[0]->vector_size = (row == 1? 2: 1);
+		else
+			p->vectors[0]->vector_size = (row == 6? 2: 1);
+	}
 }
 
 void set_row(Gameboard* game, int row_number, char* str){
@@ -113,16 +126,7 @@ void set_row(Gameboard* game, int row_number, char* str){
 			p = game->all_pieces[color][j];
 			if(p->sign == sign && !p->alive){
 				piece_setted = true;
-				p->alive = true;
-				p->row = row_number;
-				p->col = col;
-				game->board[row_number][col] = p;
-				if(p->type == Pawn){ //set vector size of pawn by its place on board:
-					if(color == white)
-						p->vectors[0]->vector_size = (row_number == 1? 2: 1);
-					else
-						p->vectors[0]->vector_size = (row_number == 6? 2: 1);
-				}
+				set_position_of_piece(game, p, row_number, col);
 				break;
 			}
 		}
@@ -131,15 +135,13 @@ void set_row(Gameboard* game, int row_number, char* str){
 				p = game->all_pieces[color][j];
 				if(p->type == Pawn && !p->alive){
 					change_piece_type(p, get_piece_type_by_sign(sign));
-					p->alive = true;
-					p->row = row_number;
-					p->col = col;
-					game->board[row_number][col] = p;
+					set_position_of_piece(game, p, row_number, col);
 					break;
 				}
 			}
 		}
 	}
 }
+
 
 

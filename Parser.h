@@ -50,7 +50,7 @@ Piece_type get_promotion_type_parser(const char *line);
 /* destroy command */
 void free_command(Command *comm);
 
-/* line[offset] is the first char to be checked */
+/* checks that command tail is valid */
 void valid_commands_tail(Command *comm, const char *line, int offset);
 
 /* get promotion type */
@@ -60,12 +60,16 @@ void valid_tail(Command *comm, const char *line, int offset);
  * return true if and only if line starts with the comm_s */
 bool verify_command(Command *comm, const char *line, int offset, const char *comm_s, int comm_len);
 
+/* get offset of non-whitespace */
 int get_non_whitespace_offset(const char *str);
 
+/* get non-argument command */
 void get_non_arg_command(Command *comm, const char *line, int offset, const char *comm_s, SP_commands type, Mode mode);
 
+/* get command that contains file name */
 void get_command_with_file_name(Command *comm, const char *line, int offset, const char *comm_s, SP_commands type, Mode mode);
 
+/* get integer argument */
 void get_int_arg(Command *comm, const char *line, int offset, const char *comm_s,
 		int lower_bound, int upper_bound, SP_commands type, Mode mode);
 
@@ -83,8 +87,10 @@ bool get_number(const char *line, int *offset, int *arg, char range_offset, int 
  * after calling the function, line[offset] is the first char after the coordinate (after <X,Y>) */
 bool getXY(Command *comm, const char *line, int *offset, int *row, int *col, int needed_space, bool first_coordinate);
 
+/* get arg of move */
 void get_move_arg(Command *comm, const char *line, int offset);
 
+/* the actual parsing: get a command from line */
 Command *parser(const char *line);
 
 #endif /* PARSER_H_ */

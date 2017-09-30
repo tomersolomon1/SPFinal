@@ -13,10 +13,8 @@
 #include "Parser.h"
 #include "GameBasicBuildingBlocks.h"
 
-/*
- * line[offset] is the first char to be checked
- */
 bool check_tail_validity(const char *line, int offset) {
+	 // line[offset] is the first char to be checked
 	while ((offset < SP_MAX_LINE_LENGTH) && (line[offset] != '\0') && (line[offset] != '\n')) {
 		if (!isspace(line[offset])) {
 		    /* more non-whitespace chars than should be, therefore illegal command */
@@ -69,8 +67,8 @@ void free_command(Command *comm) {
 	free(comm);
 }
 
-/* line[offset] is the first char to be checked */
 void valid_commands_tail(Command *comm, const char *line, int offset) {
+	///line[offset] is the first char to be checked
 	bool tail_validity = check_tail_validity(line, offset);
 	if (!tail_validity) {
 		comm->comm_e = Invalid_command;

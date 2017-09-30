@@ -75,8 +75,7 @@ StepValue *MiniMaxAlgo(Gameboard *board, int alpha, int beta, int search_depth,
 				int promote_to = Empty; /* default */
 				for (int step_index = 0, promotion_option = 0; (step_index < amount_steps) && (alpha < beta); step_index++){
 					Step *step = valid_steps[step_index];
-					CHESS_BOARD_MESSAGE msg = commit_move(board, step->srow, step->scol,
-							step->drow, step->dcol, true, promotion_option);
+					CHESS_BOARD_MESSAGE msg = commit_move(board, step->srow, step->scol, step->drow, step->dcol, true, promotion_option);
 					if (step->step_info == Was_promoted) { /* a pawn can be promoted to only 5 different pieces */
 						promote_to = promotion_option;
 						if (promotion_option < 4) {
